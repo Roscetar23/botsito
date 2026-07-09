@@ -7,43 +7,57 @@ import {
   Param,
   Patch,
   Post,
+  UseGuards,
 } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 import { TaskDocument } from '@asistente/tasks-data-access';
 import { CreateTaskDto, UpdateTaskDto } from '@asistente/tasks-model';
+import type { AuthenticatedUser } from '@asistente/shared-types';
 
-import { DEMO_OWNER_ID } from './tasks.constants.js';
+import { CurrentUser } from './current-user.decorator.js';
 import { TasksService } from './tasks.service.js';
 
 @Controller('tasks')
+@UseGuards(AuthGuard('jwt'))
 export class TasksController {
   constructor(private readonly tasksService: TasksService) {}
 
   @Post()
-  create(@Body() dto: CreateTaskDto): Promise<TaskDocument> {
-    return this.tasksService.create(dto, DEMO_OWNER_ID);
+  create(
+    @Body() dto: CreateTaskDto,
+    @CurrentUser() user: AuthenticatedUser,
+  ): Promise<TaskDocument> {
+    return this.tasksService.create(dto, user.userId);
   }
 
   @Get()
-  findAll(): Promise<TaskDocument[]> {
-    return this.tasksService.findAll(DEMO_OWNER_ID);
+  findAll(@CurrentUser() user: AuthenticatedUser): Promise<TaskDocument[]> {
+    return this.tasksService.findAll(user.userId);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string): Promise<TaskDocument> {
-    return this.tasksService.findOne(id, DEMO_OWNER_ID);
+  findOne(
+    @Param('id') id: string,
+    @CurrentUser() user: AuthenticatedUser,
+  ): Promise<TaskDocument> {
+    return this.tasksService.findOne(id, user.userId);
   }
 
   @Patch(':id')
   update(
     @Param('id') id: string,
     @Body() dto: UpdateTaskDto,
+    @CurrentUser() user: AuthenticatedUser,
   ): Promise<TaskDocument> {
-    return this.tasksService.update(id, DEMO_OWNER_ID, dto);
+    return this.tasksService.update(id, user.userId, dto);
   }
 
   @Delete(':id')
   @HttpCode(204)
-  remove(@Param('id') id: string): Promise<void> {
-    return this.tasksService.remove(id, DEMO_OWNER_ID);
+  remove(
+    @Param('id') id: string,
+    @CurrentUser() user: AuthenticatedUser,
+  ): Promise<void> {
+    return this.tasksService.remove(id, user.userId);
   }
 }

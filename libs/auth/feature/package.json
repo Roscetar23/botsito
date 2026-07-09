@@ -20,5 +20,16 @@
       "type:feature"
     ]
   },
-  "dependencies": {}
+  "dependencies": {
+    "@asistente/auth-data-access": "0.0.1",
+    "@asistente/auth-model": "0.0.1",
+    "@asistente/shared-types": "0.0.1",
+    "@nestjs/common": "^11.0.0",
+    "@nestjs/config": "^4.0.4",
+    "@nestjs/jwt": "^11.0.2",
+    "@nestjs/passport": "^11.0.5",
+    "bcrypt": "^6.0.0",
+    "passport": "^0.7.0",
+    "passport-jwt": "^4.0.1"
+  }
 }

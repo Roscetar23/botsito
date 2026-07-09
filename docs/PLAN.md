@@ -311,9 +311,9 @@ Estado: `[ ]` pendiente · `[~]` en curso · `[x]` hecho.
 - [x] **T-11** Wiring en `apps/api` (`ConfigModule`, `MongooseModule.forRootAsync`, `TasksModule`, `ValidationPipe`+CORS). Verificado lint/typecheck/build **y smoke test curl end-to-end** contra MongoDB Atlas (POST 201 / GET 200 / validación 400). Fase 1 ✅.
 
 ### Fase 2 — Auth
-- [ ] **T-12** `auth/model` + `auth/data-access`: `User` schema + repo.
-- [ ] **T-13** `auth/feature`: registro/login, bcrypt, JWT (access+refresh), `JwtAuthGuard`.
-- [ ] **T-14** Proteger endpoints de Tasks por usuario (`ownerId`).
+- [x] **T-12** `auth/model` (`User`, `RegisterDto`/`LoginDto`, `JwtPayload`/`AuthTokens`) + `auth/data-access` (`UserSchema` email único, `UserRepository`).
+- [x] **T-13** `auth/feature`: register/login/refresh (bcrypt salt 12), JWT access+refresh (`TokenService`), `JwtStrategy`, `JwtAuthGuard`, `@CurrentUser`. Rutas `/api/auth/*`. `AuthenticatedUser` en `shared-types`.
+- [x] **T-14** Tasks protegido con `@UseGuards(AuthGuard('jwt'))`; `ownerId` tomado del usuario autenticado (fin de `DEMO_OWNER_ID`). `AuthModule` registrado en `apps/api`. Verificado lint/typecheck/build. Smoke test curl pendiente (usuario).
 
 ### Fase 3 — Realtime + Notifications
 - [ ] **T-15** `notifications/feature`: `NotificationsGateway` (Socket.IO) con auth de handshake.

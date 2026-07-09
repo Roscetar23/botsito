@@ -1,1 +1,1 @@
-export * from './lib/shared-types.js';
+export * from './lib/authenticated-user.type.js';

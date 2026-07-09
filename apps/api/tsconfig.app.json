@@ -24,6 +24,9 @@
   "references": [
     {
       "path": "../../libs/tasks/feature/tsconfig.lib.json"
+    },
+    {
+      "path": "../../libs/auth/feature/tsconfig.lib.json"
     }
   ]
 }

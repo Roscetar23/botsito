@@ -20,5 +20,9 @@
       "type:data-access"
     ]
   },
-  "dependencies": {}
+  "dependencies": {
+    "@nestjs/common": "^11.0.0",
+    "@nestjs/mongoose": "^11.0.4",
+    "mongoose": "^9.7.4"
+  }
 }
