@@ -308,7 +308,7 @@ Estado: `[ ]` pendiente · `[~]` en curso · `[x]` hecho.
 - [x] **T-08** `tasks/model`: `Task` + enums + `CreateTaskDto`/`UpdateTaskDto` (`class-validator`, un DTO por archivo).
 - [x] **T-09** `tasks/data-access`: `TaskSchema` (Mongoose) + `TaskRepository` owner-aware + `TasksDataAccessModule`.
 - [x] **T-10** `tasks/feature`: `TasksModule` + `TasksController` (CRUD REST) + `TasksService` (`NotFoundException`). `DEMO_OWNER_ID` temporal hasta T-14.
-- [~] **T-11** Wiring en `apps/api` (`ConfigModule`, `MongooseModule.forRootAsync`, `TasksModule`, `ValidationPipe`+CORS). Verificado lint/typecheck/**build** en verde. Falta smoke test curl → requiere Mongo (docker-compose, Fase 7).
+- [x] **T-11** Wiring en `apps/api` (`ConfigModule`, `MongooseModule.forRootAsync`, `TasksModule`, `ValidationPipe`+CORS). Verificado lint/typecheck/build **y smoke test curl end-to-end** contra MongoDB Atlas (POST 201 / GET 200 / validación 400). Fase 1 ✅.
 
 ### Fase 2 — Auth
 - [ ] **T-12** `auth/model` + `auth/data-access`: `User` schema + repo.
