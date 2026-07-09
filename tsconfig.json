@@ -1,0 +1,85 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compileOnSave": false,
+  "files": [],
+  "references": [
+    {
+      "path": "./client"
+    },
+    {
+      "path": "./api-e2e"
+    },
+    {
+      "path": "./api"
+    },
+    {
+      "path": "./libs/shared/types"
+    },
+    {
+      "path": "./libs/shared/utils"
+    },
+    {
+      "path": "./libs/shared/ui"
+    },
+    {
+      "path": "./libs/auth/model"
+    },
+    {
+      "path": "./libs/auth/data-access"
+    },
+    {
+      "path": "./libs/auth/feature"
+    },
+    {
+      "path": "./libs/shared/types"
+    },
+    {
+      "path": "./libs/shared/utils"
+    },
+    {
+      "path": "./libs/auth/model"
+    },
+    {
+      "path": "./libs/auth/data-access"
+    },
+    {
+      "path": "./libs/auth/feature"
+    },
+    {
+      "path": "./libs/tasks/model"
+    },
+    {
+      "path": "./libs/tasks/data-access"
+    },
+    {
+      "path": "./libs/tasks/feature"
+    },
+    {
+      "path": "./libs/tasks/ui"
+    },
+    {
+      "path": "./libs/reminders/model"
+    },
+    {
+      "path": "./libs/reminders/data-access"
+    },
+    {
+      "path": "./libs/reminders/feature"
+    },
+    {
+      "path": "./libs/notifications/model"
+    },
+    {
+      "path": "./libs/notifications/data-access"
+    },
+    {
+      "path": "./libs/notifications/feature"
+    },
+    {
+      "path": "./libs/avatar/model"
+    },
+    {
+      "path": "./libs/avatar/ui"
+    }
+  ]
+}
