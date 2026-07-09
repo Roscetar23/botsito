@@ -305,10 +305,10 @@ Estado: `[ ]` pendiente · `[~]` en curso · `[x]` hecho.
       `reminders`, `notifications`, `avatar`, `shared`, `nx-infra` (§4).
 
 ### Fase 1 — Dominio Tasks (primer vertical funcional)
-- [ ] **T-08** `tasks/model`: entidad `Task`, DTOs + `class-validator` (un DTO por archivo).
-- [ ] **T-09** `tasks/data-access`: `TaskSchema` + `TaskRepository`.
-- [ ] **T-10** `tasks/feature`: `TasksModule` + `TasksController` + `TasksService` (CRUD).
-- [ ] **T-11** Wiring en `apps/api` + conexión Mongo. Tests + ejemplos curl/fetch.
+- [x] **T-08** `tasks/model`: `Task` + enums + `CreateTaskDto`/`UpdateTaskDto` (`class-validator`, un DTO por archivo).
+- [x] **T-09** `tasks/data-access`: `TaskSchema` (Mongoose) + `TaskRepository` owner-aware + `TasksDataAccessModule`.
+- [x] **T-10** `tasks/feature`: `TasksModule` + `TasksController` (CRUD REST) + `TasksService` (`NotFoundException`). `DEMO_OWNER_ID` temporal hasta T-14.
+- [~] **T-11** Wiring en `apps/api` (`ConfigModule`, `MongooseModule.forRootAsync`, `TasksModule`, `ValidationPipe`+CORS). Verificado lint/typecheck/**build** en verde. Falta smoke test curl → requiere Mongo (docker-compose, Fase 7).
 
 ### Fase 2 — Auth
 - [ ] **T-12** `auth/model` + `auth/data-access`: `User` schema + repo.

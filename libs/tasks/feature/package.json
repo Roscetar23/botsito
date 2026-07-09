@@ -20,5 +20,9 @@
       "type:feature"
     ]
   },
-  "dependencies": {}
+  "dependencies": {
+    "@asistente/tasks-data-access": "0.0.1",
+    "@asistente/tasks-model": "0.0.1",
+    "@nestjs/common": "^11.0.0"
+  }
 }

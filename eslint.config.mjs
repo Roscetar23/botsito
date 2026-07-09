@@ -16,6 +16,11 @@ export default [
           enforceBuildableLibDependency: true,
           allow: ['^.*/eslint(\\.base)?\\.config\\.[cm]?[jt]s$'],
           depConstraints: [
+            // --- apps (composición): pueden importar feature modules de cualquier dominio ---
+            {
+              sourceTag: 'type:app',
+              onlyDependOnLibsWithTags: ['type:feature', 'type:ui', 'type:util', 'scope:shared'],
+            },
             // --- por tipo (capas) ---
             {
               sourceTag: 'type:feature',

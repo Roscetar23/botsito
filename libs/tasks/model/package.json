@@ -20,5 +20,7 @@
       "type:model"
     ]
   },
-  "dependencies": {}
+  "dependencies": {
+    "class-validator": "^0.15.1"
+  }
 }

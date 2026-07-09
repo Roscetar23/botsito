@@ -4,15 +4,6 @@
   "files": [],
   "references": [
     {
-      "path": "./client"
-    },
-    {
-      "path": "./api-e2e"
-    },
-    {
-      "path": "./api"
-    },
-    {
       "path": "./libs/shared/types"
     },
     {
@@ -20,21 +11,6 @@
     },
     {
       "path": "./libs/shared/ui"
-    },
-    {
-      "path": "./libs/auth/model"
-    },
-    {
-      "path": "./libs/auth/data-access"
-    },
-    {
-      "path": "./libs/auth/feature"
-    },
-    {
-      "path": "./libs/shared/types"
-    },
-    {
-      "path": "./libs/shared/utils"
     },
     {
       "path": "./libs/auth/model"
@@ -80,6 +56,15 @@
     },
     {
       "path": "./libs/avatar/ui"
+    },
+    {
+      "path": "./apps/api-e2e"
+    },
+    {
+      "path": "./apps/client"
+    },
+    {
+      "path": "./apps/api"
     }
   ]
 }
