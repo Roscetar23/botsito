@@ -5,8 +5,12 @@
 
 - **Orquestador:** Oscar Javier Gomez Manrique
 - **Fecha inicial:** 2026-07-09
-- **Repo:** `/home/ogomez/bot` (branch `master`)
-- **Estado:** Fase 0 — planificación
+- **Repo:** `/home/ogomez/bot` (branch `main`, remoto `botsito`)
+- **Estado:** Fase 5 en curso (Fases 1 y 2 ✅). Backend Tasks + Auth funcionando contra Atlas.
+
+**Documentos del proyecto:**
+- [`SETUP.md`](./SETUP.md) — bootstrap del monorepo NX (paso a paso).
+- [`AVATAR.md`](./AVATAR.md) — ⭐ plan maestro del avatar (núcleo del producto), con fases propias AV-0…AV-6.
 
 ---
 
@@ -324,10 +328,18 @@ Estado: `[ ]` pendiente · `[~]` en curso · `[x]` hecho.
 - [ ] **T-18** `reminders/feature`: scheduler con **Agenda** (MVP). Job → notificación WS.
 - [ ] **T-19** Variante documentada **BullMQ + Redis** (misma interfaz `SchedulerPort`).
 
-### Fase 5 — Avatar (frontend)
-- [ ] **T-20** `avatar/model`: `AvatarState = idle | speaking | notify` + eventos.
-- [ ] **T-21** `avatar/ui`: `<Avatar>` SVG + animaciones Framer Motion (subcomponentes < 150 líneas).
-- [ ] **T-22** Integrar avatar en dashboard reaccionando a eventos realtime.
+### Fase 5 — Avatar (frontend) ⭐ **NÚCLEO DEL PRODUCTO**
+
+> El avatar es lo más importante del proyecto y tiene su **plan maestro propio** con fases
+> detalladas (AV-0…AV-6) en **[`docs/AVATAR.md`](./AVATAR.md)**. Esta fase se gobierna desde
+> ese documento; las tareas de abajo son el resumen.
+
+- [~] **T-20** Definición + arte: demo de referencia, capas de ejemplo y spec de exportación
+  (`design/avatar/`) + `docs/AVATAR.md`. → **AV-0** ✅ (falta recibir el arte del personaje, AV-0.3).
+- [ ] **T-21** `avatar/model` + `avatar/ui`: rig por capas, comportamientos idle (respirar/parpadear/
+  mirar), máquina de estados y emociones con Framer Motion. → **AV-1…AV-4** en [`AVATAR.md`](./AVATAR.md).
+- [ ] **T-22** Integrar `<Avatar>` en el dashboard de `apps/client` y reaccionar a eventos
+  realtime/acciones. → **AV-5…AV-6** en [`AVATAR.md`](./AVATAR.md).
 
 ### Fase 6 — NLU (opcional)
 - [ ] **T-23** `LlmService` con interfaz `NluPort` (provider-agnostic), keys por env.
