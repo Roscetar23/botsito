@@ -57,3 +57,6 @@ test-output
 
 # local env
 .env
+
+# assets de diseño del avatar (arte fuente, no versionado)
+design/avatar/
