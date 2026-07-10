@@ -20,24 +20,13 @@ import styles from './avatar-playground.module.css';
 export function AvatarPlayground() {
   const [mode, setMode] = useState<AvatarMode>('2d');
   const [state, setState] = useState<AvatarState>('idle');
-  const [handsMoving, setHandsMoving] = useState(false);
 
   return (
     <section className={styles.playground}>
       <div className={styles.controls}>
         <ModeToggle mode={mode} onChange={setMode} />
         {mode === '3d' && (
-          <>
-            <button
-              type="button"
-              aria-pressed={handsMoving}
-              onClick={() => setHandsMoving((prev) => !prev)}
-              className={`${styles.handsButton} ${handsMoving ? styles.handsButtonActive : ''}`.trim()}
-            >
-              Mover manos: {handsMoving ? 'ON' : 'OFF'}
-            </button>
-            <p className={styles.hint3d}>Mueve el cursor · usa el botón para mover las manos</p>
-          </>
+          <p className={styles.hint3d}>Mueve el cursor y el bot te sigue</p>
         )}
       </div>
 
@@ -53,7 +42,7 @@ export function AvatarPlayground() {
         // bloquear clics (pointer-events: none), por eso el toggle de
         // arriba sigue siendo interactivo aunque esta capa lo cubra.
         <div className={styles.stage3dFull} aria-hidden="true">
-          <Avatar3DLazy fullscreen roam animateHands={handsMoving} />
+          <Avatar3DLazy fullscreen roam />
         </div>
       )}
     </section>
