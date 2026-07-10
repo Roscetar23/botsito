@@ -52,6 +52,24 @@
   color: #ffffff;
 }
 
+.controls {
+  position: relative;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.stage3dFull {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 40;
+}
+
 .modeRow {
   display: flex;
   gap: 0.4rem;

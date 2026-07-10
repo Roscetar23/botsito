@@ -193,8 +193,9 @@ Estado: `[ ]` pendiente · `[~]` en curso · `[x]` hecho.
   con spring), parallax entre capas (perspective + preserve-3d en `Rig3D.tsx`) y **sombra de
   contacto** (`Shadow.tsx`). Prop `interactive` (default true). Respeta reduced-motion.
   *(3D real con Three.js/R3F queda como opción futura si se busca más profundidad.)*
-- [~] **AV-7.3** "La pantalla es su espacio": ya **sigue el cursor por toda la ventana** (semilla).
-  Falta que el avatar se **desplace** por el viewport y reaccione a **scroll** y **tamaño de ventana**.
+- [x] **AV-7.3** "La pantalla es su espacio": el avatar **3D vuela por todo el viewport** (capa
+  fija a pantalla completa, `pointer-events:none`, deambular Lissajous) y **sigue el cursor**.
+  *(Pendiente opcional: reaccionar a scroll / moverse hacia notificaciones — AV-6.)*
 - [ ] **AV-7.4** Micro-interacciones espaciales: seguir el cursor, "asomarse", moverse hacia una
   notificación/tarea, ocupar el centro cuando "habla".
 

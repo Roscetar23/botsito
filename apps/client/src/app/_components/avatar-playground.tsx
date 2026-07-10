@@ -24,18 +24,27 @@ export function AvatarPlayground() {
 
   return (
     <section className={styles.playground}>
-      <ModeToggle mode={mode} onChange={setMode} />
-      <div className={styles.stage}>
-        {mode === '2d' ? (
-          <Avatar state={state} size={340} />
-        ) : (
-          <Avatar3DLazy size={360} />
+      <div className={styles.controls}>
+        <ModeToggle mode={mode} onChange={setMode} />
+        {mode === '3d' && (
+          <p className={styles.hint3d}>Mueve el cursor · animaciones próximamente</p>
         )}
       </div>
+
       {mode === '2d' ? (
-        <StateButtons active={state} onSelect={setState} />
+        <>
+          <div className={styles.stage}>
+            <Avatar state={state} size={340} />
+          </div>
+          <StateButtons active={state} onSelect={setState} />
+        </>
       ) : (
-        <p className={styles.hint3d}>Mueve el cursor · animaciones próximamente</p>
+        // Capa ambiental: el robot flota sobre toda la pantalla sin
+        // bloquear clics (pointer-events: none), por eso el toggle de
+        // arriba sigue siendo interactivo aunque esta capa lo cubra.
+        <div className={styles.stage3dFull} aria-hidden="true">
+          <Avatar3DLazy fullscreen roam />
+        </div>
       )}
     </section>
   );
