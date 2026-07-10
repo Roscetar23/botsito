@@ -19,6 +19,12 @@ export interface Avatar3DProps {
   fullscreen?: boolean;
   /** Deambula (solo posición) por todo el viewport visible del canvas. */
   roam?: boolean;
+  /**
+   * Clip del GLB a reproducir (por nombre exacto). Sin especificar, se
+   * reproduce el primero disponible (`Esqueleto_acción`). Preparado para
+   * un futuro mapeo `AvatarState → clip`; hoy nadie lo pasa.
+   */
+  clip?: string;
 }
 
 /** Velocidad del lerp de la rotación hacia el cursor (más alto = más ágil). */
@@ -47,8 +53,11 @@ function CursorFollowGroup({ enabled, children }: CursorFollowGroupProps) {
 
 /**
  * Renderer 3D del robot con React Three Fiber: el mismo personaje que
- * `Avatar` (2D) pero como GLB real. Sin rig todavía (modelo estático),
- * así que la "vida" viene de levitar (`Float`) y girar hacia el cursor.
+ * `Avatar` (2D) pero como GLB real, con su propio rig animado
+ * (`Esqueleto_acción` en bucle, ver `RobotModel`/`useModelAnimation`) más
+ * `Float` (levitación) y giro hacia el cursor o hacia su desplazamiento
+ * en roam — todo convive, la animación del rig no toca la
+ * posición/rotación del grupo que la envuelve.
  * No sustituye a `Avatar`; requiere WebGL, por lo que el front debe
  * montarlo con `next/dynamic(..., { ssr: false })`.
  *
@@ -59,7 +68,9 @@ function CursorFollowGroup({ enabled, children }: CursorFollowGroupProps) {
  * Con `fullscreen`/`roam`, el canvas cubre toda la pantalla y el modelo
  * (escalado pequeño por `RoamGroup`) deambula por el viewport en vez de
  * quedar fijo en el centro — pensado como presencia ambiental, no como
- * un widget encajonado.
+ * un widget encajonado. En roam, la orientación la manda el movimiento
+ * (`RoamGroup`/`useFlightOrientation`), así que el cursor-follow se
+ * desactiva; en modo "caja" sigue igual que antes.
  */
 export function Avatar3D({
   size = 340,
@@ -67,10 +78,11 @@ export function Avatar3D({
   interactive = true,
   fullscreen = false,
   roam = false,
+  clip,
 }: Avatar3DProps) {
   const reducedMotion = Boolean(useReducedMotion());
-  const rotationEnabled = interactive && !reducedMotion;
   const roamEnabled = roam && !reducedMotion;
+  const rotationEnabled = interactive && !reducedMotion && !roamEnabled;
   const containerStyle = fullscreen ? { width: '100%', height: '100%' } : { width: size, height: size };
 
   return (
@@ -83,7 +95,7 @@ export function Avatar3D({
           <RoamGroup enabled={roamEnabled}>
             <CursorFollowGroup enabled={rotationEnabled}>
               <Float speed={reducedMotion ? 0 : 2} rotationIntensity={0.3} floatIntensity={0.6}>
-                <RobotModel url={assetUrl} />
+                <RobotModel url={assetUrl} clip={clip} playing={!reducedMotion} />
               </Float>
             </CursorFollowGroup>
           </RoamGroup>

@@ -206,12 +206,16 @@ Estado: `[ ]` pendiente · `[~]` en curso · `[x]` hecho.
 > exportación en [`design/avatar/3d/README.md`](../../design/avatar/3d/README.md).
 > Se mantiene la API `<Avatar state=... />`; el 3D es una implementación intercambiable.
 
-- [~] **AV-8.1** *(usuario)* Modelado ✅ (`botcito.glb`, cabeza + manos, levita, sin piernas).
-  Falta **riguear** (huesos manos/cabeza/boca) + **Actions nombradas** (`idle`, `wave`, `talk`…) → reexport GLB.
+- [x] **AV-8.1** *(usuario)* Modelado + **rig (8 huesos) + skin + 1 animación** (`Esqueleto_acción`)
+  en `botcito.glb`. *(Más Actions nombradas → más estados en el futuro.)*
 - [x] **AV-8.2** `Avatar3D` con **R3F** en `avatar-ui/three/` (`Canvas`, `useGLTF`, `<Center>`, `<Float>`).
-- [x] **AV-8.3** El modelo **sigue el cursor** por toda la ventana (`usePointerRotation` + lerp en `useFrame`).
-  *(Mapeo `AvatarState` → clip de animación pendiente hasta que el GLB tenga rig/animaciones.)*
+- [x] **AV-8.3** Orientación: en modo caja sigue el cursor; en **roam** se orienta hacia su vuelo
+  (`useFlightOrientation`: de lado al desplazarse, de frente en los giros, con banqueo).
 - [x] **AV-8.4** Integrado en `apps/client` con **toggle 2D/3D** y carga diferida `next/dynamic({ssr:false})`.
+- [x] **AV-8.5** **Animación reproducida** (`useModelAnimation` + `useAnimations`, bucle con fade-in) +
+  **estela `<Trail>`** y **aura aditiva** de vuelo. Prop `clip?` lista para mapear `AvatarState`→clip.
+- [ ] **AV-8.6** Mapear `AvatarState` → clip cuando el GLB tenga varias Actions (idle/wave/talk…) +
+  gestos procedurales por hueso.
 
 ---
 
