@@ -205,12 +205,12 @@ Estado: `[ ]` pendiente · `[~]` en curso · `[x]` hecho.
 > exportación en [`design/avatar/3d/README.md`](../../design/avatar/3d/README.md).
 > Se mantiene la API `<Avatar state=... />`; el 3D es una implementación intercambiable.
 
-- [ ] **AV-8.1** *(usuario)* Modelar + riguear en Blender (huesos: manos/dedos/brazos, cabeza, boca)
-  + Actions nombradas (`idle`, `talk`, `wave`, `clap`, `happy`, `think`, `sad`, `notify`) → export **GLB**.
-- [ ] **AV-8.2** Lib/render `avatar-3d` con **R3F** (`three` + `@react-three/fiber` + `@react-three/drei`):
-  `Canvas`, `useGLTF`, `useAnimations`.
-- [ ] **AV-8.3** Mapear `AvatarState` → clip de animación; **la cabeza sigue el cursor** (rotación de hueso).
-- [ ] **AV-8.4** Integrar en `apps/client` (misma API `Avatar`), con carga diferida del `Canvas` (SSR-safe).
+- [~] **AV-8.1** *(usuario)* Modelado ✅ (`botcito.glb`, cabeza + manos, levita, sin piernas).
+  Falta **riguear** (huesos manos/cabeza/boca) + **Actions nombradas** (`idle`, `wave`, `talk`…) → reexport GLB.
+- [x] **AV-8.2** `Avatar3D` con **R3F** en `avatar-ui/three/` (`Canvas`, `useGLTF`, `<Center>`, `<Float>`).
+- [x] **AV-8.3** El modelo **sigue el cursor** por toda la ventana (`usePointerRotation` + lerp en `useFrame`).
+  *(Mapeo `AvatarState` → clip de animación pendiente hasta que el GLB tenga rig/animaciones.)*
+- [x] **AV-8.4** Integrado en `apps/client` con **toggle 2D/3D** y carga diferida `next/dynamic({ssr:false})`.
 
 ---
 
