@@ -14,20 +14,30 @@ import styles from './avatar-playground.module.css';
 
 /**
  * Panel de pruebas del avatar: alterna entre el rig 2D (con botones de
- * `AvatarState`) y el renderer 3D (modelo GLB que levita y sigue el
- * cursor, aún sin animaciones propias). Sin lógica de negocio: solo
- * estado local de UI.
+ * `AvatarState`) y el renderer 3D (modelo GLB que levita, sigue el cursor
+ * y puede mover las manos). Sin lógica de negocio: solo estado local de UI.
  */
 export function AvatarPlayground() {
   const [mode, setMode] = useState<AvatarMode>('2d');
   const [state, setState] = useState<AvatarState>('idle');
+  const [handsMoving, setHandsMoving] = useState(false);
 
   return (
     <section className={styles.playground}>
       <div className={styles.controls}>
         <ModeToggle mode={mode} onChange={setMode} />
         {mode === '3d' && (
-          <p className={styles.hint3d}>Mueve el cursor · animaciones próximamente</p>
+          <>
+            <button
+              type="button"
+              aria-pressed={handsMoving}
+              onClick={() => setHandsMoving((prev) => !prev)}
+              className={`${styles.handsButton} ${handsMoving ? styles.handsButtonActive : ''}`.trim()}
+            >
+              Mover manos: {handsMoving ? 'ON' : 'OFF'}
+            </button>
+            <p className={styles.hint3d}>Mueve el cursor · usa el botón para mover las manos</p>
+          </>
         )}
       </div>
 
@@ -43,7 +53,7 @@ export function AvatarPlayground() {
         // bloquear clics (pointer-events: none), por eso el toggle de
         // arriba sigue siendo interactivo aunque esta capa lo cubra.
         <div className={styles.stage3dFull} aria-hidden="true">
-          <Avatar3DLazy fullscreen roam />
+          <Avatar3DLazy fullscreen roam animateHands={handsMoving} />
         </div>
       )}
     </section>

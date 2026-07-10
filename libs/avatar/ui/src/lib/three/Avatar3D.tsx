@@ -25,6 +25,12 @@ export interface Avatar3DProps {
    * un futuro mapeo `AvatarState → clip`; hoy nadie lo pasa.
    */
   clip?: string;
+  /**
+   * Reproduce la animación del rig (giro de manos, ya sin el movimiento
+   * del cuerpo — ver `stripRootMotion`). Por defecto `false`: el rig
+   * queda en pose de reposo (manos quietas) y la "vida" la da `Float`.
+   */
+  animateHands?: boolean;
 }
 
 /** Velocidad del lerp de la rotación hacia el cursor (más alto = más ágil). */
@@ -53,13 +59,14 @@ function CursorFollowGroup({ enabled, children }: CursorFollowGroupProps) {
 
 /**
  * Renderer 3D del robot con React Three Fiber: el mismo personaje que
- * `Avatar` (2D) pero como GLB real, con su propio rig animado
- * (`Esqueleto_acción` en bucle, ver `RobotModel`/`useModelAnimation`, que
- * ya despoja la traslación de los huesos raíz para que el loop no
- * "teletransporte" el cuerpo) más `Float` (levitación) y giro hacia el
- * cursor o hacia su desplazamiento en roam — todo convive, la animación
- * del rig solo mueve huesos, no la posición/rotación del grupo que la
- * envuelve (esa la manda el cursor-follow o el roam).
+ * `Avatar` (2D) pero como GLB real, con su propio rig (`Esqueleto_acción`,
+ * ver `RobotModel`/`useModelAnimation`, que ya despoja el movimiento del
+ * cuerpo del clip — solo queda el giro de las manos) más `Float`
+ * (levitación) y giro hacia el cursor o hacia su desplazamiento en roam.
+ * Por defecto el rig está en pose de reposo (`animateHands=false`); todo
+ * convive con la animación cuando está activa, que solo mueve huesos, no
+ * la posición/rotación del grupo que la envuelve (esa la manda el
+ * cursor-follow o el roam).
  * No sustituye a `Avatar`; requiere WebGL, por lo que el front debe
  * montarlo con `next/dynamic(..., { ssr: false })`.
  *
@@ -81,6 +88,7 @@ export function Avatar3D({
   fullscreen = false,
   roam = false,
   clip,
+  animateHands = false,
 }: Avatar3DProps) {
   const reducedMotion = Boolean(useReducedMotion());
   const roamEnabled = roam && !reducedMotion;
@@ -97,7 +105,7 @@ export function Avatar3D({
           <RoamGroup enabled={roamEnabled}>
             <CursorFollowGroup enabled={rotationEnabled}>
               <Float speed={reducedMotion ? 0 : 2} rotationIntensity={0.3} floatIntensity={0.6}>
-                <RobotModel url={assetUrl} clip={clip} playing={!reducedMotion} />
+                <RobotModel url={assetUrl} clip={clip} playing={animateHands && !reducedMotion} />
               </Float>
             </CursorFollowGroup>
           </RoamGroup>

@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef } from 'react';
 import { useAnimations } from '@react-three/drei';
 import { LoopRepeat } from 'three';
 import type { AnimationClip, Group } from 'three';
-import { stripRootTranslation } from './animationTracks.js';
+import { stripRootMotion } from './animationTracks.js';
 
 export interface UseModelAnimationOptions {
   animations: AnimationClip[];
@@ -17,11 +17,13 @@ export interface UseModelAnimationOptions {
 /**
  * Reproduce en bucle la animación del rig del GLB (`useAnimations` de
  * drei se encarga de avanzar el `AnimationMixer` cada frame). Antes de
- * ligar los clips, cada uno pasa por `stripRootTranslation` para quitar
- * la traslación de los huesos raíz del armature — si no, al reiniciar el
- * loop esa traslación salta y el cuerpo se "teletransporta"; la posición
- * del personaje ya la maneja el roam/perseguir-mouse (o el centro, en
- * modo caja), no el clip.
+ * ligar los clips, cada uno pasa por `stripRootMotion` para quitar el
+ * movimiento no deseado del cuerpo (posición/escala de los huesos raíz y
+ * la rotación del hueso del cuerpo) — si no, al reiniciar el loop esos
+ * valores saltan y el personaje se "teletransporta" o el cuerpo se
+ * encoge/rota y "desaparece"; la posición del personaje ya la maneja el
+ * roam/perseguir-mouse (o el centro, en modo caja), no el clip. Solo se
+ * conserva el giro de las manos.
  *
  * Usa el primer clip procesado **por índice** (`animations[0]`, así no
  * hace falta escribir su nombre con acentos en el código, p. ej.
@@ -35,7 +37,7 @@ export interface UseModelAnimationOptions {
  */
 export function useModelAnimation({ animations, clip, playing = true }: UseModelAnimationOptions) {
   const groupRef = useRef<Group>(null);
-  const processedAnimations = useMemo(() => animations.map(stripRootTranslation), [animations]);
+  const processedAnimations = useMemo(() => animations.map(stripRootMotion), [animations]);
   const { actions } = useAnimations(processedAnimations, groupRef);
 
   useEffect(() => {

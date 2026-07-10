@@ -97,6 +97,31 @@
   color: #ffffff;
 }
 
+.handsButton {
+  padding: 0.4rem 1.1rem;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.45);
+  background: transparent;
+  color: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background-color 150ms ease,
+    border-color 150ms ease,
+    color 150ms ease;
+}
+
+.handsButton:hover {
+  border-color: rgba(99, 102, 241, 0.75);
+}
+
+.handsButtonActive {
+  background: rgba(99, 102, 241, 0.9);
+  border-color: rgba(99, 102, 241, 0.9);
+  color: #ffffff;
+}
+
 .hint3d {
   margin: 0;
   font-size: 0.85rem;
