@@ -3,10 +3,10 @@
 import { useRef } from 'react';
 import type { ReactNode } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
-import { Trail } from '@react-three/drei';
 import type { Group } from 'three';
 import { useFlightOrientation } from './useFlightOrientation.js';
-import { Aura } from './Aura.js';
+import { usePointerViewportTarget } from './usePointerViewportTarget.js';
+import { ShadowBlob } from './ShadowBlob.js';
 
 export interface RoamGroupProps {
   enabled: boolean;
@@ -22,37 +22,32 @@ const ROAM_SCALE = ROAM_TARGET_HEIGHT / MODEL_HEIGHT;
 /** Margen respecto al borde del viewport para que no se salga de pantalla. */
 const EDGE_MARGIN = ROAM_TARGET_HEIGHT * 0.6;
 
-/** Frecuencias relativas de la trayectoria (lentas, distintas en X/Y → Lissajous). */
-const FREQ_X = 0.13;
-const FREQ_Y = 0.17;
-
-const ACCENT_COLOR = '#6C5CE7';
-
-function trailAttenuation(t: number): number {
-  return t * t;
-}
+/** Velocidad del ease hacia el cursor (bajo = va con lag, no pegado). */
+const POSITION_EASE_SPEED = 1.8;
 
 /**
  * Deambula por todo el viewport visible del `<Canvas>` (pensado para un
- * canvas a pantalla completa): escala el modelo pequeño y anima su
- * **posición** (x/y) con una curva tipo Lissajous lenta (suma de senos
- * con frecuencias distintas), clamp dentro del área visible con margen.
- * Encima, orienta el personaje según su **desplazamiento**
- * (`useFlightOrientation`, no según el cursor — eso lo desactiva el
- * llamador en modo roam) y añade una estela (`Trail`) y un halo (`Aura`)
- * de acento para reforzar la sensación de vuelo. La levitación (`Float`)
- * va *dentro* de este grupo, así que se suma a todo lo anterior.
+ * canvas a pantalla completa): escala el modelo pequeño y persigue la
+ * posición del cursor con un lerp suave (con lag, no queda pegado al
+ * puntero), clamp dentro del área visible con margen (el objetivo ya
+ * viene clamp desde el cursor normalizado, así que el ease nunca se
+ * pasa de los bordes). Encima, orienta el personaje según su
+ * **desplazamiento** (`useFlightOrientation`, no según el cursor — eso
+ * lo desactiva el llamador en modo roam) y añade una sombra de contacto
+ * (`ShadowBlob`) que lo acompaña. La levitación (`Float`) va *dentro* de
+ * este grupo, así que se suma a todo lo anterior.
  *
  * Con `enabled=false` (incluye `prefers-reduced-motion`, decidido por el
  * llamador) el grupo queda centrado, sin rotación, a escala normal y sin
- * estela ni halo — el comportamiento "en caja" de siempre.
+ * sombra — el comportamiento "en caja" de siempre.
  */
 export function RoamGroup({ enabled, children }: RoamGroupProps) {
   const groupRef = useRef<Group>(null);
   const { viewport } = useThree();
   const flight = useFlightOrientation();
+  const pointer = usePointerViewportTarget(enabled);
 
-  useFrame((state, delta) => {
+  useFrame((_state, delta) => {
     const group = groupRef.current;
     if (!group) return;
 
@@ -67,28 +62,22 @@ export function RoamGroup({ enabled, children }: RoamGroupProps) {
 
     const amplitudeX = Math.max(0, viewport.width / 2 - EDGE_MARGIN);
     const amplitudeY = Math.max(0, viewport.height / 2 - EDGE_MARGIN);
-    const elapsed = state.clock.elapsedTime;
+    const targetX = pointer.current.x * amplitudeX;
+    const targetY = -pointer.current.y * amplitudeY;
 
-    const x = Math.sin(elapsed * FREQ_X) * amplitudeX;
-    const y = Math.sin(elapsed * FREQ_Y) * amplitudeY;
-    group.position.x = x;
-    group.position.y = y;
+    const t = Math.min(1, POSITION_EASE_SPEED * delta);
+    group.position.x += (targetX - group.position.x) * t;
+    group.position.y += (targetY - group.position.y) * t;
 
-    flight.update(x, y, delta);
+    flight.update(group.position.x, group.position.y, delta);
     const { pitch, yaw, roll } = flight.orientation.current;
     group.rotation.set(pitch, yaw, roll);
   });
 
   return (
     <group ref={groupRef}>
-      {enabled ? (
-        <Trail color={ACCENT_COLOR} width={0.6} length={7} decay={1.5} attenuation={trailAttenuation}>
-          {children}
-        </Trail>
-      ) : (
-        children
-      )}
-      {enabled ? <Aura color={ACCENT_COLOR} /> : null}
+      {children}
+      {enabled ? <ShadowBlob /> : null}
     </group>
   );
 }

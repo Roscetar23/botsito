@@ -54,10 +54,12 @@ function CursorFollowGroup({ enabled, children }: CursorFollowGroupProps) {
 /**
  * Renderer 3D del robot con React Three Fiber: el mismo personaje que
  * `Avatar` (2D) pero como GLB real, con su propio rig animado
- * (`Esqueleto_acción` en bucle, ver `RobotModel`/`useModelAnimation`) más
- * `Float` (levitación) y giro hacia el cursor o hacia su desplazamiento
- * en roam — todo convive, la animación del rig no toca la
- * posición/rotación del grupo que la envuelve.
+ * (`Esqueleto_acción` en bucle, ver `RobotModel`/`useModelAnimation`, que
+ * ya despoja la traslación de los huesos raíz para que el loop no
+ * "teletransporte" el cuerpo) más `Float` (levitación) y giro hacia el
+ * cursor o hacia su desplazamiento en roam — todo convive, la animación
+ * del rig solo mueve huesos, no la posición/rotación del grupo que la
+ * envuelve (esa la manda el cursor-follow o el roam).
  * No sustituye a `Avatar`; requiere WebGL, por lo que el front debe
  * montarlo con `next/dynamic(..., { ssr: false })`.
  *

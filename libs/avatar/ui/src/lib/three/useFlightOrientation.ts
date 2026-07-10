@@ -2,8 +2,9 @@
 
 import { useRef } from 'react';
 
-const MAX_YAW_RAD = 1.1;
-const MAX_ROLL_RAD = 0.15;
+/** Clamp deliberadamente pequeño: casi siempre de frente, apenas se ladea. */
+const MAX_YAW_RAD = 0.35;
+const MAX_ROLL_RAD = 0.05;
 const MAX_PITCH_RAD = 0.12;
 
 /** rad de giro por cada unidad/seg de velocidad, antes del clamp. */
@@ -32,11 +33,11 @@ function clamp(value: number, limit: number): number {
 /**
  * Orienta el personaje según su **desplazamiento** (no según el cursor):
  * cuadro a cuadro calcula la velocidad (delta de posición / delta de
- * tiempo) y la mapea a `yaw` (gira hacia donde se mueve → se ve de lado
- * en tramos rápidos; cuando la trayectoria gira, la velocidad cae y
- * queda de frente de forma natural), más un leve `roll` de "banqueo" y
- * un `pitch` sutil por velocidad vertical. Todo suavizado con lerp para
- * que no salte entre frames.
+ * tiempo) y la mapea a `yaw` (gira levemente hacia donde se mueve, clamp
+ * pequeño → queda casi siempre de frente, solo se insinúa el giro en
+ * tramos rápidos), más un `roll` de "banqueo" apenas perceptible y un
+ * `pitch` sutil por velocidad vertical. Todo suavizado con lerp para que
+ * no salte entre frames.
  *
  * No es un hook de estado de React (no re-renderiza): guarda todo en
  * refs para poder llamarse desde un `useFrame` en cada tick.

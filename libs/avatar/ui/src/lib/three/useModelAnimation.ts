@@ -1,9 +1,10 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { useAnimations } from '@react-three/drei';
 import { LoopRepeat } from 'three';
 import type { AnimationClip, Group } from 'three';
+import { stripRootTranslation } from './animationTracks.js';
 
 export interface UseModelAnimationOptions {
   animations: AnimationClip[];
@@ -15,11 +16,18 @@ export interface UseModelAnimationOptions {
 
 /**
  * Reproduce en bucle la animación del rig del GLB (`useAnimations` de
- * drei se encarga de avanzar el `AnimationMixer` cada frame). Usa el
- * primer clip **por índice** (`animations[0]`, así no hace falta escribir
- * su nombre con acentos en el código, p. ej. `Esqueleto_acción`) salvo
- * que se pida uno por `clip` y exista. Con `playing=false` la deja
- * "congelada" en el primer frame en vez de animar.
+ * drei se encarga de avanzar el `AnimationMixer` cada frame). Antes de
+ * ligar los clips, cada uno pasa por `stripRootTranslation` para quitar
+ * la traslación de los huesos raíz del armature — si no, al reiniciar el
+ * loop esa traslación salta y el cuerpo se "teletransporta"; la posición
+ * del personaje ya la maneja el roam/perseguir-mouse (o el centro, en
+ * modo caja), no el clip.
+ *
+ * Usa el primer clip procesado **por índice** (`animations[0]`, así no
+ * hace falta escribir su nombre con acentos en el código, p. ej.
+ * `Esqueleto_acción`) salvo que se pida uno por `clip` y exista. Con
+ * `playing=false` la deja "congelada" en el primer frame en vez de
+ * animar.
  *
  * Devuelve el `ref` que hay que colgar del `<group>` que envuelve al
  * modelo — `useAnimations` liga las pistas de la animación buscando por
@@ -27,13 +35,14 @@ export interface UseModelAnimationOptions {
  */
 export function useModelAnimation({ animations, clip, playing = true }: UseModelAnimationOptions) {
   const groupRef = useRef<Group>(null);
-  const { actions } = useAnimations(animations, groupRef);
+  const processedAnimations = useMemo(() => animations.map(stripRootTranslation), [animations]);
+  const { actions } = useAnimations(processedAnimations, groupRef);
 
   useEffect(() => {
-    if (animations.length === 0) return;
+    if (processedAnimations.length === 0) return;
 
     const requested = clip ? actions[clip] : undefined;
-    const clipName = requested ? clip : animations[0]?.name;
+    const clipName = requested ? clip : processedAnimations[0]?.name;
     const action = clipName ? actions[clipName] : undefined;
     if (!action) return;
 
@@ -49,7 +58,7 @@ export function useModelAnimation({ animations, clip, playing = true }: UseModel
     return () => {
       action.fadeOut(0.3);
     };
-  }, [actions, animations, clip, playing]);
+  }, [actions, processedAnimations, clip, playing]);
 
   return groupRef;
 }
