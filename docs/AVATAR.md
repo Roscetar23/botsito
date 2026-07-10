@@ -198,6 +198,20 @@ Estado: `[ ]` pendiente · `[~]` en curso · `[x]` hecho.
 - [ ] **AV-7.4** Micro-interacciones espaciales: seguir el cursor, "asomarse", moverse hacia una
   notificación/tarea, ocupar el centro cuando "habla".
 
+### AV-8 — 3D real con React Three Fiber  *(elegido 2026-07-10)*
+
+> **Decisión:** para dar movimiento libre a las manos (no solo poses dibujadas) y profundidad
+> real, el personaje se modela en **Blender** y se entrega como **GLB** rigueado. Spec de
+> exportación en [`design/avatar/3d/README.md`](../../design/avatar/3d/README.md).
+> Se mantiene la API `<Avatar state=... />`; el 3D es una implementación intercambiable.
+
+- [ ] **AV-8.1** *(usuario)* Modelar + riguear en Blender (huesos: manos/dedos/brazos, cabeza, boca)
+  + Actions nombradas (`idle`, `talk`, `wave`, `clap`, `happy`, `think`, `sad`, `notify`) → export **GLB**.
+- [ ] **AV-8.2** Lib/render `avatar-3d` con **R3F** (`three` + `@react-three/fiber` + `@react-three/drei`):
+  `Canvas`, `useGLTF`, `useAnimations`.
+- [ ] **AV-8.3** Mapear `AvatarState` → clip de animación; **la cabeza sigue el cursor** (rotación de hueso).
+- [ ] **AV-8.4** Integrar en `apps/client` (misma API `Avatar`), con carga diferida del `Canvas` (SSR-safe).
+
 ---
 
 ## 7. Decisiones del avatar (pros/cons)
