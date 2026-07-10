@@ -17,5 +17,10 @@
       "scope:avatar",
       "type:ui"
     ]
+  },
+  "dependencies": {
+    "@asistente/avatar-model": "0.0.1",
+    "framer-motion": "^12.42.2",
+    "react": "^19.0.0"
   }
 }

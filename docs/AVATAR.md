@@ -143,33 +143,38 @@ Cada estado lleva metadatos (mouth, brows, gaze target, timing) para que el rig 
 
 Estado: `[ ]` pendiente · `[~]` en curso · `[x]` hecho.
 
-### AV-0 — Definición y arte  *(en curso)*
+> **Personaje real recibido:** robot line-art con **audífonos** y **manos** (capas: body,
+> headphones, brows, eyes-open/closed, mouth-neutral/talking/happy, hands). **Sin capa de
+> pupilas** → la mirada por pupilas no aplica; la expresividad viene de cejas, boca, parpadeo,
+> respiración/inclinación, rebote y manos. Piezas en `apps/client/public/avatar/*.png` (1024²).
+
+### AV-0 — Definición y arte
 - [x] **AV-0.1** Demo de referencia + capas de ejemplo + spec de exportación (`design/avatar/`).
 - [x] **AV-0.2** Este documento y enlace desde `PLAN.md` (Fase 5).
-- [ ] **AV-0.3** Recibir el arte del personaje por capas en `design/avatar/` (usuario).
+- [x] **AV-0.3** Arte del personaje recibido (`myDesign/Bot/`) y llevado a `apps/client/public/avatar/`.
 
 ### AV-1 — Modelo del avatar
-- [ ] **AV-1.1** `avatar-model`: `AvatarState` (union) + metadatos por emoción (mouth/brows/gaze/timing).
-- [ ] **AV-1.2** `avatar-event` (opcional): eventos que solicitan un estado.
+- [x] **AV-1.1** `avatar-model`: `AvatarState` (7 estados) + `AvatarExpression` + `AVATAR_EXPRESSIONS`.
+- [~] **AV-1.2** `avatar-event` (opcional): se hará al conectar realtime (AV-6).
 
 ### AV-2 — Rig base (capas + montaje)
-- [ ] **AV-2.1** Integrar el arte real: piezas optimizadas en `assets/` (o `public/avatar/`).
-- [ ] **AV-2.2** `parts/` (Body, Eyes, Pupils, Brows, Mouth) — una capa por archivo, alineadas.
-- [ ] **AV-2.3** `Avatar.tsx` compone las capas y acepta `state` por props (estático aún).
+- [x] **AV-2.1** Arte real en `apps/client/public/avatar/` (servido por Next en `/avatar/*.png`).
+- [x] **AV-2.2** `parts/` (Body, Headphones, Brows, Eyes, Mouth, Hands) — una capa por archivo, alineadas.
+- [x] **AV-2.3** `Avatar.tsx` compone las capas en z-order y acepta `state`, `size`, `assetsBase`.
 
 ### AV-3 — Comportamientos idle (dar vida)
-- [ ] **AV-3.1** `useBreathing` (respiración sutil).
-- [ ] **AV-3.2** `useBlink` (parpadeo con timing aleatorio).
-- [ ] **AV-3.3** `useGaze` (deriva idle + seguir cursor/objetivo).
+- [x] **AV-3.1** `useBreathing` (respiración sutil).
+- [x] **AV-3.2** `useBlink` (parpadeo con timing aleatorio).
+- [x] **AV-3.3** ~~`useGaze`~~ N/A (sin pupilas). Movimiento vivo vía inclinación + bob de manos.
 
 ### AV-4 — Máquina de estados y emociones
-- [ ] **AV-4.1** `useAvatarMachine` + `transitions` (idle/speaking/thinking/happy/sad/notify/listening).
-- [ ] **AV-4.2** `animation/variants` con Framer Motion (transiciones suaves entre estados).
-- [ ] **AV-4.3** `notify` (rebote + halo) y "hablar" (alternancia de boca).
+- [x] **AV-4.1** `useAvatarMachine` (combina `AVATAR_EXPRESSIONS` + blink + speaking).
+- [x] **AV-4.2** `animation/variants` + `timings` con Framer Motion (transiciones spring).
+- [x] **AV-4.3** `notify` (rebote + halo de acento) y "hablar" (`useSpeaking` alterna la boca).
 
 ### AV-5 — Integración en el cliente
-- [ ] **AV-5.1** Montar `<Avatar>` en el dashboard de `apps/client`.
-- [ ] **AV-5.2** Panel de pruebas para forzar estados (dev) y validar transiciones.
+- [x] **AV-5.1** `<Avatar>` montado en el dashboard de `apps/client`.
+- [x] **AV-5.2** Panel de pruebas (`avatar-playground` + `state-buttons`) para forzar estados.
 
 ### AV-6 — Reactividad e inteligencia
 - [ ] **AV-6.1** Conectar a eventos realtime (Fase 3): `notify` al recibir notificaciones.
@@ -202,3 +207,6 @@ Estado: `[ ]` pendiente · `[~]` en curso · `[x]` hecho.
 
 ## 9. Log de cambios
 - 2026-07-09 — Creación del plan del avatar (AV-0). Demo de referencia y spec de capas listos.
+- 2026-07-10 — Arte real recibido (robot con audífonos). Rig completo: `avatar-model` +
+  `avatar-ui` (parts, behaviors, machine, animation) + integración en `apps/client` con panel
+  de pruebas. AV-0…AV-5 ✅. Pendiente AV-6 (reactividad a eventos, tras Fase 3).

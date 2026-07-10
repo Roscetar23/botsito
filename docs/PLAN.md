@@ -334,12 +334,11 @@ Estado: `[ ]` pendiente · `[~]` en curso · `[x]` hecho.
 > detalladas (AV-0…AV-6) en **[`docs/AVATAR.md`](./AVATAR.md)**. Esta fase se gobierna desde
 > ese documento; las tareas de abajo son el resumen.
 
-- [~] **T-20** Definición + arte: demo de referencia, capas de ejemplo y spec de exportación
-  (`design/avatar/`) + `docs/AVATAR.md`. → **AV-0** ✅ (falta recibir el arte del personaje, AV-0.3).
-- [ ] **T-21** `avatar/model` + `avatar/ui`: rig por capas, comportamientos idle (respirar/parpadear/
-  mirar), máquina de estados y emociones con Framer Motion. → **AV-1…AV-4** en [`AVATAR.md`](./AVATAR.md).
-- [ ] **T-22** Integrar `<Avatar>` en el dashboard de `apps/client` y reaccionar a eventos
-  realtime/acciones. → **AV-5…AV-6** en [`AVATAR.md`](./AVATAR.md).
+- [x] **T-20** Definición + arte del personaje (robot con audífonos) + `docs/AVATAR.md`. → **AV-0** ✅.
+- [x] **T-21** `avatar/model` + `avatar/ui`: rig por capas del personaje real, comportamientos idle
+  (respirar/parpadear), máquina de estados y emociones con Framer Motion. → **AV-1…AV-4** ✅ (lint/typecheck/tests verde).
+- [~] **T-22** `<Avatar>` montado en el dashboard de `apps/client` con panel de pruebas (**AV-5** ✅).
+  Falta reaccionar a eventos realtime/acciones (**AV-6**, tras Fase 3). → [`AVATAR.md`](./AVATAR.md).
 
 ### Fase 6 — NLU (opcional)
 - [ ] **T-23** `LlmService` con interfaz `NluPort` (provider-agnostic), keys por env.

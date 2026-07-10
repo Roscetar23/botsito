@@ -2,9 +2,28 @@
   "name": "@asistente/client",
   "version": "0.0.1",
   "private": true,
+  "nx": {
+    "tags": [
+      "type:app"
+    ],
+    "targets": {
+      "build": {
+        "options": {
+          "command": "next build --webpack"
+        }
+      },
+      "dev": {
+        "options": {
+          "command": "next dev --webpack"
+        }
+      }
+    }
+  },
   "dependencies": {
     "next": "~16.1.6",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "@asistente/avatar-model": "0.0.1",
+    "@asistente/avatar-ui": "0.0.1"
   }
 }

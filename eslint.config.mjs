@@ -19,7 +19,13 @@ export default [
             // --- apps (composición): pueden importar feature modules de cualquier dominio ---
             {
               sourceTag: 'type:app',
-              onlyDependOnLibsWithTags: ['type:feature', 'type:ui', 'type:util', 'scope:shared'],
+              onlyDependOnLibsWithTags: [
+                'type:feature',
+                'type:ui',
+                'type:model',
+                'type:util',
+                'scope:shared',
+              ],
             },
             // --- por tipo (capas) ---
             {
