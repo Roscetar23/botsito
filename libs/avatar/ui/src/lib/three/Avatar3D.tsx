@@ -25,6 +25,12 @@ export interface Avatar3DProps {
    * un futuro mapeo `AvatarState → clip`; hoy nadie lo pasa.
    */
   clip?: string;
+  /**
+   * Gestos procedurales (huesos movidos por código, p. ej. un saludo)
+   * encima de la animación baked. Activados por defecto; se apagan solos
+   * con `prefers-reduced-motion`.
+   */
+  gestures?: boolean;
 }
 
 /** Velocidad del lerp de la rotación hacia el cursor (más alto = más ágil). */
@@ -81,6 +87,7 @@ export function Avatar3D({
   fullscreen = false,
   roam = false,
   clip,
+  gestures = true,
 }: Avatar3DProps) {
   const reducedMotion = Boolean(useReducedMotion());
   const roamEnabled = roam && !reducedMotion;
@@ -97,7 +104,12 @@ export function Avatar3D({
           <RoamGroup enabled={roamEnabled}>
             <CursorFollowGroup enabled={rotationEnabled}>
               <Float speed={reducedMotion ? 0 : 2} rotationIntensity={0.3} floatIntensity={0.6}>
-                <RobotModel url={assetUrl} clip={clip} playing={!reducedMotion} />
+                <RobotModel
+                  url={assetUrl}
+                  clip={clip}
+                  playing={!reducedMotion}
+                  gestures={gestures && !reducedMotion}
+                />
               </Float>
             </CursorFollowGroup>
           </RoamGroup>
