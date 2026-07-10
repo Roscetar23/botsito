@@ -188,14 +188,13 @@ Estado: `[ ]` pendiente · `[~]` en curso · `[x]` hecho.
 > ventana, se mueve por ella y reacciona a ella.
 
 - [ ] **AV-7.1** Mejorar el arte del personaje (líneas más limpias, volumen/sombreado).
-- [ ] **AV-7.2** Explorar la vía 3D:
-  - **Pseudo-3D (rápido):** capas con parallax por profundidad, sombras, luz, `perspective`/
-    `rotateX/Y` con Framer Motion → volumen sin motor 3D.
-  - **3D real (ambicioso):** modelar/portar el personaje a **Three.js / React Three Fiber**.
-  - *Decisión pendiente:* empezar por pseudo-3D sobre el rig actual y evaluar 3D real después.
-- [ ] **AV-7.3** "La pantalla es su espacio": el avatar se **desplaza** por el viewport, mira/
-  se inclina según su posición, reacciona al **cursor**, al **scroll** y al **tamaño de ventana**
-  (parallax de fondo, presencia ambiental).
+- [x] **AV-7.2** **Pseudo-3D** sobre el rig actual (elegido): profundidad por capa (`translateZ`
+  en `depths.ts`), inclinación 3D que sigue el cursor por toda la ventana (`useCursorTilt`, ±12°
+  con spring), parallax entre capas (perspective + preserve-3d en `Rig3D.tsx`) y **sombra de
+  contacto** (`Shadow.tsx`). Prop `interactive` (default true). Respeta reduced-motion.
+  *(3D real con Three.js/R3F queda como opción futura si se busca más profundidad.)*
+- [~] **AV-7.3** "La pantalla es su espacio": ya **sigue el cursor por toda la ventana** (semilla).
+  Falta que el avatar se **desplace** por el viewport y reaccione a **scroll** y **tamaño de ventana**.
 - [ ] **AV-7.4** Micro-interacciones espaciales: seguir el cursor, "asomarse", moverse hacia una
   notificación/tarea, ocupar el centro cuando "habla".
 
