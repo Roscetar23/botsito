@@ -181,6 +181,24 @@ Estado: `[ ]` pendiente · `[~]` en curso · `[x]` hecho.
 - [ ] **AV-6.2** Reacciones a acciones (tarea creada → `happy`, error → `sad`, LLM pensando → `thinking`).
 - [ ] **AV-6.3** Refinos: más emociones, guiño, (a futuro) lipsync por audio.
 
+### AV-7 — Profundidad 3D y presencia en pantalla  *(próxima iteración — 2026-07-10)*
+
+> **Visión:** mejorar el dibujo y llevar el avatar a una sensación **3D**, donde **la pantalla
+> es su espacio** — no un muñeco pegado en una esquina, sino un personaje que **habita** la
+> ventana, se mueve por ella y reacciona a ella.
+
+- [ ] **AV-7.1** Mejorar el arte del personaje (líneas más limpias, volumen/sombreado).
+- [ ] **AV-7.2** Explorar la vía 3D:
+  - **Pseudo-3D (rápido):** capas con parallax por profundidad, sombras, luz, `perspective`/
+    `rotateX/Y` con Framer Motion → volumen sin motor 3D.
+  - **3D real (ambicioso):** modelar/portar el personaje a **Three.js / React Three Fiber**.
+  - *Decisión pendiente:* empezar por pseudo-3D sobre el rig actual y evaluar 3D real después.
+- [ ] **AV-7.3** "La pantalla es su espacio": el avatar se **desplaza** por el viewport, mira/
+  se inclina según su posición, reacciona al **cursor**, al **scroll** y al **tamaño de ventana**
+  (parallax de fondo, presencia ambiental).
+- [ ] **AV-7.4** Micro-interacciones espaciales: seguir el cursor, "asomarse", moverse hacia una
+  notificación/tarea, ocupar el centro cuando "habla".
+
 ---
 
 ## 7. Decisiones del avatar (pros/cons)
@@ -210,3 +228,6 @@ Estado: `[ ]` pendiente · `[~]` en curso · `[x]` hecho.
 - 2026-07-10 — Arte real recibido (robot con audífonos). Rig completo: `avatar-model` +
   `avatar-ui` (parts, behaviors, machine, animation) + integración en `apps/client` con panel
   de pruebas. AV-0…AV-5 ✅. Pendiente AV-6 (reactividad a eventos, tras Fase 3).
+- 2026-07-10 — Anotada la próxima iteración **AV-7**: mejorar el dibujo, profundidad 3D
+  (pseudo-3D → posible Three.js/R3F) y "la pantalla es su espacio" (moverse por el viewport,
+  reaccionar a cursor/scroll/ventana).

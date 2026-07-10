@@ -60,3 +60,6 @@ test-output
 
 # assets de diseño del avatar (arte fuente, no versionado)
 design/avatar/
+
+# preview generado del avatar (regenerable)
+myDesign/*-animado.gif
