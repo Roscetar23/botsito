@@ -9,24 +9,37 @@ import type { AvatarState } from '@asistente/avatar-model';
 import { StateButtons } from './state-buttons';
 import { ModeToggle } from './mode-toggle';
 import type { AvatarMode } from './mode-toggle';
+import { ThreeControls } from './three-controls';
 import { Avatar3DLazy } from './avatar-3d-lazy';
 import styles from './avatar-playground.module.css';
 
 /**
  * Panel de pruebas del avatar: alterna entre el rig 2D (con botones de
  * `AvatarState`) y el renderer 3D (modelo GLB que levita, sigue el cursor
- * y puede mover las manos). Sin lógica de negocio: solo estado local de UI.
+ * y permite calibrar por separado la animación baked de Blender y los
+ * gestos procedurales por código). Sin lógica de negocio: solo estado
+ * local de UI.
  */
 export function AvatarPlayground() {
   const [mode, setMode] = useState<AvatarMode>('2d');
   const [state, setState] = useState<AvatarState>('idle');
+  const [playClip, setPlayClip] = useState(true);
+  const [gestures, setGestures] = useState(true);
 
   return (
     <section className={styles.playground}>
       <div className={styles.controls}>
         <ModeToggle mode={mode} onChange={setMode} />
         {mode === '3d' && (
-          <p className={styles.hint3d}>Mueve el cursor y el bot te sigue</p>
+          <>
+            <ThreeControls
+              playClip={playClip}
+              onTogglePlayClip={() => setPlayClip((prev) => !prev)}
+              gestures={gestures}
+              onToggleGestures={() => setGestures((prev) => !prev)}
+            />
+            <p className={styles.hint3d}>Apaga una para ver solo la otra</p>
+          </>
         )}
       </div>
 
@@ -42,7 +55,7 @@ export function AvatarPlayground() {
         // bloquear clics (pointer-events: none), por eso el toggle de
         // arriba sigue siendo interactivo aunque esta capa lo cubra.
         <div className={styles.stage3dFull} aria-hidden="true">
-          <Avatar3DLazy fullscreen roam />
+          <Avatar3DLazy fullscreen roam playClip={playClip} gestures={gestures} />
         </div>
       )}
     </section>

@@ -31,6 +31,12 @@ export interface Avatar3DProps {
    * con `prefers-reduced-motion`.
    */
   gestures?: boolean;
+  /**
+   * Reproduce el clip baked del GLB (la animación hecha en Blender).
+   * Activado por defecto. Separado de `gestures` para poder distinguir
+   * en pruebas qué mueve la animación de Blender vs los gestos por código.
+   */
+  playClip?: boolean;
 }
 
 /** Velocidad del lerp de la rotación hacia el cursor (más alto = más ágil). */
@@ -88,6 +94,7 @@ export function Avatar3D({
   roam = false,
   clip,
   gestures = true,
+  playClip = true,
 }: Avatar3DProps) {
   const reducedMotion = Boolean(useReducedMotion());
   const roamEnabled = roam && !reducedMotion;
@@ -107,7 +114,7 @@ export function Avatar3D({
                 <RobotModel
                   url={assetUrl}
                   clip={clip}
-                  playing={!reducedMotion}
+                  playing={playClip && !reducedMotion}
                   gestures={gestures && !reducedMotion}
                 />
               </Float>

@@ -97,6 +97,13 @@
   color: #ffffff;
 }
 
+.threeControlsRow {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
 .handsButton {
   padding: 0.4rem 1.1rem;
   border-radius: 999px;
