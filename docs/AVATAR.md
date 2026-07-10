@@ -205,17 +205,19 @@ Estado: `[ ]` pendiente · `[~]` en curso · `[x]` hecho.
 > real, el personaje se modela en **Blender** y se entrega como **GLB** rigueado. Spec de
 > exportación en [`design/avatar/3d/README.md`](../../design/avatar/3d/README.md).
 > Se mantiene la API `<Avatar state=... />`; el 3D es una implementación intercambiable.
+> **Detalle de animaciones (clip + gestos + calibración) en [`AVATAR-ANIMACIONES.md`](./AVATAR-ANIMACIONES.md).**
 
-- [x] **AV-8.1** *(usuario)* Modelado + **rig (8 huesos) + skin + 1 animación** (`Esqueleto_acción`)
-  en `botcito.glb`. *(Más Actions nombradas → más estados en el futuro.)*
+- [x] **AV-8.1** *(usuario)* Modelado + **rig (8 huesos) + skin + animación** (`Esqueleto_acción`,
+  manos+cara, sin teletransporte) en `botcito.glb`.
 - [x] **AV-8.2** `Avatar3D` con **R3F** en `avatar-ui/three/` (`Canvas`, `useGLTF`, `<Center>`, `<Float>`).
-- [x] **AV-8.3** Orientación: en modo caja sigue el cursor; en **roam** se orienta hacia su vuelo
-  (`useFlightOrientation`: de lado al desplazarse, de frente en los giros, con banqueo).
+- [x] **AV-8.3** Movimiento: en **roam** el bot **persigue el mouse** por el viewport, casi de frente
+  (giro leve), con **sombra de contacto** (`ShadowBlob`); en modo caja sigue el cursor con la mirada.
 - [x] **AV-8.4** Integrado en `apps/client` con **toggle 2D/3D** y carga diferida `next/dynamic({ssr:false})`.
-- [x] **AV-8.5** **Animación reproducida** (`useModelAnimation` + `useAnimations`, bucle con fade-in) +
-  **estela `<Trail>`** y **aura aditiva** de vuelo. Prop `clip?` lista para mapear `AvatarState`→clip.
-- [ ] **AV-8.6** Mapear `AvatarState` → clip cuando el GLB tenga varias Actions (idle/wave/talk…) +
-  gestos procedurales por hueso.
+- [x] **AV-8.5** **Clip baked reproducido** (`useModelAnimation`, bucle con fade-in). Prop `clip?` lista
+  para mapear `AvatarState`→clip. Toggle `playClip` para aislarlo en pruebas.
+- [~] **AV-8.6** **Gestos procedurales por hueso** (`useProceduralGestures`): primer gesto (saludo)
+  funcionando; **en calibración** (eje/amplitud). Toggle `gestures`. Ver [`AVATAR-ANIMACIONES.md`](./AVATAR-ANIMACIONES.md) §3.
+- [ ] **AV-8.7** Mapear gestos/clips → `AvatarState` (idle/speaking/happy/notify…) y conectar a eventos (AV-6).
 
 ---
 
@@ -249,3 +251,7 @@ Estado: `[ ]` pendiente · `[~]` en curso · `[x]` hecho.
 - 2026-07-10 — Anotada la próxima iteración **AV-7**: mejorar el dibujo, profundidad 3D
   (pseudo-3D → posible Three.js/R3F) y "la pantalla es su espacio" (moverse por el viewport,
   reaccionar a cursor/scroll/ventana).
+- 2026-07-10 — **AV-8 (3D real) montado:** modelo `botcito.glb` con rig+animación, `Avatar3D` (R3F)
+  que **vuela persiguiendo el mouse** con sombra, reproduce el clip baked y hace un **gesto procedural**
+  (saludo, en calibración). Toggles `playClip`/`gestures` para aislar. Detalle en
+  [`AVATAR-ANIMACIONES.md`](./AVATAR-ANIMACIONES.md). Pendiente: calibrar gestos + mapear a estados (AV-8.7).
