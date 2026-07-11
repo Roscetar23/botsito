@@ -31,6 +31,7 @@ export function AvatarPlayground() {
   const [eyebrowLeft, setEyebrowLeft] = useState(true);
   const [eyebrowRight, setEyebrowRight] = useState(true);
   const [eyebrowTilt, setEyebrowTilt] = useState(true);
+  const [eyebrowAngry, setEyebrowAngry] = useState(true);
 
   return (
     <section className={styles.playground}>
@@ -55,6 +56,8 @@ export function AvatarPlayground() {
               onToggleEyebrowRight={() => setEyebrowRight((prev) => !prev)}
               eyebrowTilt={eyebrowTilt}
               onToggleEyebrowTilt={() => setEyebrowTilt((prev) => !prev)}
+              eyebrowAngry={eyebrowAngry}
+              onToggleEyebrowAngry={() => setEyebrowAngry((prev) => !prev)}
             />
             <p className={styles.hint3d}>
               Enciende/apaga cada mano o el clip para verlos por separado
@@ -86,6 +89,7 @@ export function AvatarPlayground() {
             eyebrowLeft={eyebrowLeft}
             eyebrowRight={eyebrowRight}
             eyebrowTilt={eyebrowTilt}
+            eyebrowAngry={eyebrowAngry}
           />
         </div>
       )}

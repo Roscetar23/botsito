@@ -32,8 +32,10 @@ export interface RobotModelProps {
   eyebrowLeft?: boolean;
   /** Ceja derecha (`Hueso cuerpo.004`): se levanta, sincronizada con la izquierda. */
   eyebrowRight?: boolean;
-  /** Inclinación/fruncido de AMBAS cejas (rotación, signo opuesto por ceja) → enojo. */
+  /** Inclinación de AMBAS cejas hacia afuera (adentro→afuera). */
   eyebrowTilt?: boolean;
+  /** Inclinación contraria (afuera→adentro) → gesto de **enojo**. */
+  eyebrowAngry?: boolean;
 }
 
 /**
@@ -67,6 +69,7 @@ export function RobotModel({
   eyebrowLeft = true,
   eyebrowRight = true,
   eyebrowTilt = true,
+  eyebrowAngry = true,
 }: RobotModelProps) {
   const { scene, animations } = useGLTF(url);
   const groupRef = useModelAnimation({ animations, clip, playing });
@@ -74,19 +77,24 @@ export function RobotModel({
   useWaveGesture(groupRef, 'Hueso', gesturesLeft, WAVE_PERIOD / 2);
   useBlinkGesture(groupRef, 'Hueso cuerpo.003', blinkLeft, 0);
   useBlinkGesture(groupRef, 'Hueso cuerpo.001', blinkRight, 0);
-  // Cada ceja recibe sus propias opciones (personalizable por ceja): el
-  // LEVANTAR (sorpresa) por ceja con su toggle, y la INCLINACIÓN/fruncido
-  // (enojo) compartida con `tiltAngle` de signo OPUESTO en cada una (están
-  // dibujadas en espejo → así inclinan hacia adentro).
+  // Inclinación de cejas en DOS direcciones opuestas, cada una con su toggle:
+  // `eyebrowTilt` (adentro→afuera) y `eyebrowAngry` (afuera→adentro = enojo),
+  // que es el mismo giro con signo invertido. Se combinan en un solo ángulo
+  // (si se activan ambas, se cancelan → sin conflicto). El signo base es
+  // OPUESTO por ceja porque están dibujadas en espejo.
+  const browTilt =
+    (eyebrowTilt ? EYEBROW_FROWN_TILT : 0) + (eyebrowAngry ? -EYEBROW_FROWN_TILT : 0);
+  // Cada ceja: el LEVANTAR (sorpresa) es por ceja con su toggle; la inclinación
+  // es compartida (ceja der. con signo invertido respecto a la izq.).
   useEyebrowGesture(groupRef, 'Hueso cuerpo.005', {
     raise: eyebrowLeft,
-    tilt: eyebrowTilt,
-    tiltAngle: EYEBROW_FROWN_TILT,
+    tilt: eyebrowTilt || eyebrowAngry,
+    tiltAngle: browTilt,
   });
   useEyebrowGesture(groupRef, 'Hueso cuerpo.004', {
     raise: eyebrowRight,
-    tilt: eyebrowTilt,
-    tiltAngle: -EYEBROW_FROWN_TILT,
+    tilt: eyebrowTilt || eyebrowAngry,
+    tiltAngle: -browTilt,
   });
 
   return (

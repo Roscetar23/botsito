@@ -19,6 +19,8 @@ export interface ThreeControlsProps {
   onToggleEyebrowRight: () => void;
   eyebrowTilt: boolean;
   onToggleEyebrowTilt: () => void;
+  eyebrowAngry: boolean;
+  onToggleEyebrowAngry: () => void;
 }
 
 /**
@@ -45,6 +47,8 @@ export function ThreeControls({
   onToggleEyebrowRight,
   eyebrowTilt,
   onToggleEyebrowTilt,
+  eyebrowAngry,
+  onToggleEyebrowAngry,
 }: ThreeControlsProps) {
   return (
     <div className={styles.threeControlsRow} role="group" aria-label="Controles de animación 3D">
@@ -111,6 +115,14 @@ export function ThreeControls({
         className={`${styles.handsButton} ${eyebrowTilt ? styles.handsButtonActive : ''}`.trim()}
       >
         Inclinar cejas: {eyebrowTilt ? 'ON' : 'OFF'}
+      </button>
+      <button
+        type="button"
+        aria-pressed={eyebrowAngry}
+        onClick={onToggleEyebrowAngry}
+        className={`${styles.handsButton} ${eyebrowAngry ? styles.handsButtonActive : ''}`.trim()}
+      >
+        Fruncir (enojo): {eyebrowAngry ? 'ON' : 'OFF'}
       </button>
     </div>
   );
