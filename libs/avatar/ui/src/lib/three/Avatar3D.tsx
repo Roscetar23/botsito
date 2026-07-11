@@ -44,6 +44,12 @@ export interface Avatar3DProps {
    */
   blinkLeft?: boolean;
   /**
+   * Parpadeo procedural del ojo derecho (`Hueso cuerpo.001`), sincronizado
+   * con el izquierdo. Activado por defecto; se apaga solo con
+   * `prefers-reduced-motion`.
+   */
+  blinkRight?: boolean;
+  /**
    * Reproduce el clip baked del GLB (la animación hecha en Blender).
    * Activado por defecto. Separado de `gestures` para poder distinguir
    * en pruebas qué mueve la animación de Blender vs los gestos por código.
@@ -108,6 +114,7 @@ export function Avatar3D({
   gestures = true,
   gesturesLeft = true,
   blinkLeft = true,
+  blinkRight = true,
   playClip = true,
 }: Avatar3DProps) {
   const reducedMotion = Boolean(useReducedMotion());
@@ -132,6 +139,7 @@ export function Avatar3D({
                   gestures={gestures && !reducedMotion}
                   gesturesLeft={gesturesLeft && !reducedMotion}
                   blinkLeft={blinkLeft && !reducedMotion}
+                  blinkRight={blinkRight && !reducedMotion}
                 />
               </Float>
             </CursorFollowGroup>

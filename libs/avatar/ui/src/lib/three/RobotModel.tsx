@@ -20,6 +20,8 @@ export interface RobotModelProps {
   gesturesLeft?: boolean;
   /** Parpadeo del ojo izquierdo (`Hueso cuerpo.003`; `.005` era la ceja). */
   blinkLeft?: boolean;
+  /** Parpadeo del ojo derecho (`Hueso cuerpo.001`; par simétrico del izquierdo). */
+  blinkRight?: boolean;
 }
 
 /**
@@ -49,12 +51,14 @@ export function RobotModel({
   gestures = true,
   gesturesLeft = true,
   blinkLeft = true,
+  blinkRight = true,
 }: RobotModelProps) {
   const { scene, animations } = useGLTF(url);
   const groupRef = useModelAnimation({ animations, clip, playing });
   useWaveGesture(groupRef, 'Hueso.001', gestures, 0);
   useWaveGesture(groupRef, 'Hueso', gesturesLeft, WAVE_PERIOD / 2);
   useBlinkGesture(groupRef, 'Hueso cuerpo.003', blinkLeft, 0);
+  useBlinkGesture(groupRef, 'Hueso cuerpo.001', blinkRight, 0);
 
   return (
     <Center>

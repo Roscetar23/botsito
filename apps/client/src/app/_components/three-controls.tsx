@@ -11,13 +11,15 @@ export interface ThreeControlsProps {
   onToggleGesturesLeft: () => void;
   blinkLeft: boolean;
   onToggleBlinkLeft: () => void;
+  blinkRight: boolean;
+  onToggleBlinkRight: () => void;
 }
 
 /**
  * Toggles de calibración del 3D: permiten aislar la animación baked de
  * Blender (`playClip`), el saludo procedural por código de cada mano
- * (`gestures` = derecha, `gesturesLeft` = izquierda) y el parpadeo del
- * ojo izquierdo (`blinkLeft`) para verlos por separado.
+ * (`gestures` = derecha, `gesturesLeft` = izquierda) y el parpadeo de
+ * cada ojo (`blinkLeft`/`blinkRight`) para verlos por separado.
  */
 export function ThreeControls({
   playClip,
@@ -28,6 +30,8 @@ export function ThreeControls({
   onToggleGesturesLeft,
   blinkLeft,
   onToggleBlinkLeft,
+  blinkRight,
+  onToggleBlinkRight,
 }: ThreeControlsProps) {
   return (
     <div className={styles.threeControlsRow} role="group" aria-label="Controles de animación 3D">
@@ -62,6 +66,14 @@ export function ThreeControls({
         className={`${styles.handsButton} ${blinkLeft ? styles.handsButtonActive : ''}`.trim()}
       >
         Parpadeo ojo izq.: {blinkLeft ? 'ON' : 'OFF'}
+      </button>
+      <button
+        type="button"
+        aria-pressed={blinkRight}
+        onClick={onToggleBlinkRight}
+        className={`${styles.handsButton} ${blinkRight ? styles.handsButtonActive : ''}`.trim()}
+      >
+        Parpadeo ojo der.: {blinkRight ? 'ON' : 'OFF'}
       </button>
     </div>
   );

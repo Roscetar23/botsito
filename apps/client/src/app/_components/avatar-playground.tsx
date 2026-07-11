@@ -27,6 +27,7 @@ export function AvatarPlayground() {
   const [gestures, setGestures] = useState(true);
   const [gesturesLeft, setGesturesLeft] = useState(true);
   const [blinkLeft, setBlinkLeft] = useState(true);
+  const [blinkRight, setBlinkRight] = useState(true);
 
   return (
     <section className={styles.playground}>
@@ -43,6 +44,8 @@ export function AvatarPlayground() {
               onToggleGesturesLeft={() => setGesturesLeft((prev) => !prev)}
               blinkLeft={blinkLeft}
               onToggleBlinkLeft={() => setBlinkLeft((prev) => !prev)}
+              blinkRight={blinkRight}
+              onToggleBlinkRight={() => setBlinkRight((prev) => !prev)}
             />
             <p className={styles.hint3d}>
               Enciende/apaga cada mano o el clip para verlos por separado
@@ -70,6 +73,7 @@ export function AvatarPlayground() {
             gestures={gestures}
             gesturesLeft={gesturesLeft}
             blinkLeft={blinkLeft}
+            blinkRight={blinkRight}
           />
         </div>
       )}
