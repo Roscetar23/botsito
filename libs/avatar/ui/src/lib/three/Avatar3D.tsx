@@ -38,7 +38,7 @@ export interface Avatar3DProps {
    */
   gesturesLeft?: boolean;
   /**
-   * Parpadeo procedural del ojo izquierdo (`Hueso cuerpo.005`), encima de
+   * Parpadeo procedural del ojo izquierdo (`Hueso cuerpo.003`), encima de
    * la animación baked. Activado por defecto; se apaga solo con
    * `prefers-reduced-motion`.
    */

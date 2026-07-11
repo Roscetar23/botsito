@@ -18,7 +18,7 @@ export interface RobotModelProps {
   gestures?: boolean;
   /** Gesto de saludo en la mano izquierda (`Hueso`), escalonado media vuelta respecto a la derecha. */
   gesturesLeft?: boolean;
-  /** Parpadeo del ojo izquierdo (`Hueso cuerpo.005`). */
+  /** Parpadeo del ojo izquierdo (`Hueso cuerpo.003`; `.005` era la ceja). */
   blinkLeft?: boolean;
 }
 
@@ -54,7 +54,7 @@ export function RobotModel({
   const groupRef = useModelAnimation({ animations, clip, playing });
   useWaveGesture(groupRef, 'Hueso.001', gestures, 0);
   useWaveGesture(groupRef, 'Hueso', gesturesLeft, WAVE_PERIOD / 2);
-  useBlinkGesture(groupRef, 'Hueso cuerpo.005', blinkLeft, 0);
+  useBlinkGesture(groupRef, 'Hueso cuerpo.003', blinkLeft, 0);
 
   return (
     <Center>

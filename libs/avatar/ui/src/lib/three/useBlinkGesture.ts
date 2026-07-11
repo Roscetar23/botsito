@@ -20,7 +20,7 @@ export const BLINK_PERIOD = 4;
 /**
  * Replica el saneo de nombres de nodo de three al cargar un GLTF
  * (`PropertyBinding.sanitizeNodeName`): espacios a `_`, fuera `[ ] . : /`.
- * Así `Hueso cuerpo.005` (fuente) se busca como `Hueso_cuerpo005` en la
+ * Así `Hueso cuerpo.003` (fuente) se busca como `Hueso_cuerpo003` en la
  * escena cargada. Sin esto, `getObjectByName` devuelve `null` (ver el
  * mismo gotcha en `useWaveGesture`).
  */
