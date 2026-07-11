@@ -177,6 +177,10 @@ export function Avatar3D({
     ? gesturesForState(state)
     : { gestures, gesturesLeft, blinkLeft, blinkRight, eyebrowLeft, eyebrowRight, eyebrowTilt, eyebrowAngry, mouth };
   const g = (on: boolean) => on && !reducedMotion;
+  // El balanceo al caminar es un comportamiento de REPOSO: solo cuando el
+  // estado es `idle` (en los demás, las manos ya gesticulan y chocarían).
+  // Sin `state` (modo manual/calibración) también se permite.
+  const walkActive = walk && !reducedMotion && (state === undefined || state === 'idle');
 
   return (
     <div style={containerStyle}>
@@ -201,7 +205,7 @@ export function Avatar3D({
                   eyebrowTilt={g(flags.eyebrowTilt)}
                   eyebrowAngry={g(flags.eyebrowAngry)}
                   mouth={g(flags.mouth)}
-                  walk={walk && !reducedMotion}
+                  walk={walkActive}
                 />
               </Float>
             </CursorFollowGroup>

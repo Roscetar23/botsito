@@ -11,8 +11,8 @@ import type { Group, Object3D } from 'three';
 const WALK_AXIS: 'x' | 'y' | 'z' = 'z';
 /** Amplitud máxima del columpio (unidades locales), a velocidad tope. */
 const WALK_AMPLITUDE = 1.4;
-/** Rapidez del vaivén (rad/seg del oscilador). */
-const WALK_SPEED = 9;
+/** Rapidez del vaivén (rad/seg del oscilador). Calmado ≈ paso natural. */
+const WALK_SPEED = 5;
 /** Por debajo de esta velocidad normalizada no se escribe (deja saludar/reposo). */
 const WALK_MIN_SPEED = 0.06;
 /** Velocidad normalizada a la que el columpio llega a su amplitud plena. */
