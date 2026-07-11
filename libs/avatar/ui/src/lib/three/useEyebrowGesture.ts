@@ -12,7 +12,11 @@ import type { Group, Object3D } from 'three';
 const EYEBROW_LIFT_AXIS: 'x' | 'y' | 'z' = 'y';
 /** Cuánto sube la ceja en el pico del gesto (unidades de mundo). */
 const EYEBROW_LIFT_AMOUNT = 0.4;
-/** Eje LOCAL del hueso sobre el que se INCLINA la ceja (fruncir/dudar). */
+/** Eje EN ESPACIO DEL PADRE (≈ mundo; Z = hacia la cámara) sobre el que se
+ *  INCLINA la ceja (fruncir/dudar). Se aplica con `premultiply` (frame del
+ *  padre), NO en el eje local del hueso: así ambas cejas giran igual dentro
+ *  del plano de la cara. Si fuera local, la ceja izquierda (cuyo hueso está
+ *  más inclinado fuera del plano) se escorzaría/"contraería" al girar. */
 const EYEBROW_TILT_AXIS: 'x' | 'y' | 'z' = 'z';
 /** Ángulo de inclinación por defecto (rad) en el pico del fruncido. */
 const EYEBROW_TILT_ANGLE = 0.6;
@@ -128,7 +132,9 @@ export function useEyebrowGesture(
       eulerScratch.set(0, 0, 0);
       eulerScratch[EYEBROW_TILT_AXIS] = envelope * tiltAngle;
       offsetScratch.setFromEuler(eulerScratch);
-      bone.quaternion.multiply(offsetScratch);
+      // premultiply = giro en el frame del padre (≈ mundo), no en el local:
+      // ambas cejas rotan dentro del plano de la cara sin escorzarse.
+      bone.quaternion.premultiply(offsetScratch);
     }
   });
 }
