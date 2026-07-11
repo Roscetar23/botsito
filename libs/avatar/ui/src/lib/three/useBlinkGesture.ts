@@ -77,7 +77,14 @@ export function useBlinkGesture(
     if (!bone || !baseScale) return;
 
     const phase = (state.clock.elapsedTime + phaseOffset) % BLINK_PERIOD;
-    if (phase >= BLINK_DURATION) return;
+    // Fuera de la ventana: ojo ABIERTO. Restauramos la escala base en vez de
+    // solo `return`, porque el parpadeo es corto y el último frame dentro de
+    // la ventana deja el ojo a medio cerrar; sin restaurar se quedaría
+    // encogido. La escala del ojo NO la anima el clip, así que es seguro.
+    if (phase >= BLINK_DURATION) {
+      bone.scale.copy(baseScale);
+      return;
+    }
 
     // Envolvente 0→1→0: el ojo se cierra (aplasta) y se vuelve a abrir.
     const envelope = Math.sin((phase / BLINK_DURATION) * Math.PI);

@@ -14,6 +14,8 @@ const EYEBROW_LIFT_AXIS: 'x' | 'y' | 'z' = 'y';
 const EYEBROW_LIFT_AMOUNT = 0.4;
 /** Eje LOCAL del hueso sobre el que se INCLINA la ceja (fruncir/dudar). */
 const EYEBROW_TILT_AXIS: 'x' | 'y' | 'z' = 'z';
+/** Ángulo de inclinación por defecto (rad) en el pico del fruncido. */
+const EYEBROW_TILT_ANGLE = 0.6;
 /** Cada cuántos segundos se repite el gesto por defecto. */
 const EYEBROW_PERIOD = 5;
 /** Duración del gesto (s, `< period`); más largo que un parpadeo. */
@@ -22,14 +24,18 @@ const EYEBROW_DURATION = 1.2;
 
 /**
  * Opciones por instancia: cada ceja puede personalizarse por separado.
- * Todo es opcional; lo que se omite usa el default de módulo. `tiltAngle`
- * es 0 por defecto (solo levanta); para fruncir se pasa un ángulo con
- * **signo opuesto en cada ceja** (están dibujadas en espejo).
+ * Los dos efectos se activan de forma **independiente** (`raise`/`tilt`)
+ * para poder aislarlos con toggles distintos; lo demás usa defaults de
+ * módulo si se omite.
  */
 export interface EyebrowOptions {
+  /** Activa el LEVANTAR (posición). Default false. */
+  raise?: boolean;
+  /** Activa la INCLINACIÓN/fruncido (rotación). Default false. */
+  tilt?: boolean;
   /** Cuánto sube (unidades de mundo). Default `EYEBROW_LIFT_AMOUNT`. */
   liftAmount?: number;
-  /** Inclinación en `EYEBROW_TILT_AXIS` (rad) en el pico. Default 0. */
+  /** Inclinación en `EYEBROW_TILT_AXIS` (rad) en el pico. Signo OPUESTO por ceja. Default `EYEBROW_TILT_ANGLE`. */
   tiltAngle?: number;
   /** Cada cuántos segundos se repite. Default `EYEBROW_PERIOD`. */
   period?: number;
@@ -53,30 +59,33 @@ function findBone(root: Group | null, boneName: string): Object3D | null {
 }
 
 /**
- * Gesto de ceja reutilizable y **personalizable por instancia**: levanta
- * (posición en `EYEBROW_LIFT_AXIS`, que al ser el padre identidad equivale
- * a subir en el mundo) y, opcionalmente, **inclina** (rotación en
- * `EYEBROW_TILT_AXIS`) el hueso `boneName`, todo escalado por una
- * envolvente 0→1→0. Captura la pose base (quaternion + position) una vez;
- * fuera de la ventana activa no toca el hueso (el clip manda el resto del
- * tiempo) — misma filosofía que `useWaveGesture`/`useBlinkGesture`.
+ * Gesto de ceja reutilizable y **personalizable por instancia**, con dos
+ * efectos independientes que se activan por separado:
+ * - `raise`: **levanta** la ceja (posición en `EYEBROW_LIFT_AXIS`; como el
+ *   padre `Hueso cuerpo` es identidad, equivale a subir en el mundo) → sorpresa.
+ * - `tilt`: **inclina** la ceja (rotación en `EYEBROW_TILT_AXIS`, con signo
+ *   opuesto por ceja porque están dibujadas en espejo) → fruncir/enojo.
+ *
+ * Ambos comparten la misma envolvente 0→1→0 y se combinan en una sola
+ * escritura del hueso (sin conflicto). Captura la pose base una vez; fuera
+ * de la ventana activa restaura la pose base (así, con el gesto encendido
+ * pero en reposo, la ceja no queda desplazada). Con ambos apagados no toca
+ * el hueso → el clip manda.
  *
  * Se instancia una vez por ceja con sus propias `options`, de modo que
- * cada una es independiente: p. ej. subir ambas (sorpresa) o inclinarlas
- * con signo opuesto (enojo), ya que las cejas están dibujadas en espejo.
- *
- * Orden: llamar **después** de `useModelAnimation` en `RobotModel` (para
- * correr tras el `AnimationMixer`). Con `enabled=false` no toca el hueso.
+ * cada una es independiente. Orden: llamar **después** de
+ * `useModelAnimation` en `RobotModel` (para correr tras el `AnimationMixer`).
  */
 export function useEyebrowGesture(
   groupRef: RefObject<Group | null>,
   boneName: string,
-  enabled: boolean,
   options: EyebrowOptions = {},
 ): void {
   const {
+    raise = false,
+    tilt = false,
     liftAmount = EYEBROW_LIFT_AMOUNT,
-    tiltAngle = 0,
+    tiltAngle = EYEBROW_TILT_ANGLE,
     period = EYEBROW_PERIOD,
     duration = EYEBROW_DURATION,
     phaseOffset = 0,
@@ -87,7 +96,7 @@ export function useEyebrowGesture(
   const basePosRef = useRef<Vector3 | null>(null);
 
   useFrame((state) => {
-    if (!enabled) return;
+    if (!raise && !tilt) return;
 
     if (!boneRef.current) {
       const bone = findBone(groupRef.current, boneName);
@@ -102,20 +111,24 @@ export function useEyebrowGesture(
     const basePos = basePosRef.current;
     if (!bone || !baseQuat || !basePos) return;
 
+    // Parte de la pose base siempre (restaura fuera de la ventana / entre efectos).
+    bone.position.copy(basePos);
+    bone.quaternion.copy(baseQuat);
+
     const phase = (state.clock.elapsedTime + phaseOffset) % period;
     if (phase >= duration) return;
 
-    // Envolvente 0→1→0: la ceja sube (e inclina) y vuelve a su sitio.
+    // Envolvente 0→1→0: la ceja sube y/o inclina y vuelve a su sitio.
     const envelope = Math.sin((phase / duration) * Math.PI);
 
-    bone.position.copy(basePos);
-    bone.position[EYEBROW_LIFT_AXIS] += envelope * liftAmount;
-
-    if (tiltAngle !== 0) {
+    if (raise) {
+      bone.position[EYEBROW_LIFT_AXIS] += envelope * liftAmount;
+    }
+    if (tilt) {
       eulerScratch.set(0, 0, 0);
       eulerScratch[EYEBROW_TILT_AXIS] = envelope * tiltAngle;
       offsetScratch.setFromEuler(eulerScratch);
-      bone.quaternion.copy(baseQuat).multiply(offsetScratch);
+      bone.quaternion.multiply(offsetScratch);
     }
   });
 }

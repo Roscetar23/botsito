@@ -60,6 +60,12 @@ export interface Avatar3DProps {
    */
   eyebrowRight?: boolean;
   /**
+   * Inclinación/fruncido de ambas cejas (rotación con signo opuesto por
+   * ceja) → gesto de enojo. Activado por defecto; se apaga solo con
+   * `prefers-reduced-motion`.
+   */
+  eyebrowTilt?: boolean;
+  /**
    * Reproduce el clip baked del GLB (la animación hecha en Blender).
    * Activado por defecto. Separado de `gestures` para poder distinguir
    * en pruebas qué mueve la animación de Blender vs los gestos por código.
@@ -127,6 +133,7 @@ export function Avatar3D({
   blinkRight = true,
   eyebrowLeft = true,
   eyebrowRight = true,
+  eyebrowTilt = true,
   playClip = true,
 }: Avatar3DProps) {
   const reducedMotion = Boolean(useReducedMotion());
@@ -154,6 +161,7 @@ export function Avatar3D({
                   blinkRight={blinkRight && !reducedMotion}
                   eyebrowLeft={eyebrowLeft && !reducedMotion}
                   eyebrowRight={eyebrowRight && !reducedMotion}
+                  eyebrowTilt={eyebrowTilt && !reducedMotion}
                 />
               </Float>
             </CursorFollowGroup>
