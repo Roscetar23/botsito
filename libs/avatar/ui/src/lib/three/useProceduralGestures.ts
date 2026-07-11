@@ -3,7 +3,7 @@
 import { useRef } from 'react';
 import type { RefObject } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { Euler, Quaternion } from 'three';
+import { Euler, Quaternion, Vector3 } from 'three';
 import type { Group, Object3D } from 'three';
 
 // --- Constantes calibrables del saludo (primera prueba) -------------------
@@ -21,9 +21,14 @@ const WAVE_AMPLITUDE = 0.5;
 /** Velocidad de oscilación dentro del gesto (osc/seg aprox). */
 const WAVE_SPEED = 8;
 /** Cada cuántos segundos se repite el gesto. */
-const WAVE_PERIOD = 5;
+const WAVE_PERIOD = 7;
 /** Cuánto dura el gesto, en segundos (debe ser < WAVE_PERIOD). */
-const WAVE_DURATION = 2;
+const WAVE_DURATION = 3.4;
+/** Eje local por el que se LEVANTA la mano completa durante el saludo. */
+const WAVE_RAISE_AXIS: 'x' | 'y' | 'z' = 'y';
+/** Cuánto se levanta la mano (unidades locales). Calibrable: si se mueve
+ *  hacia el lado equivocado, invierte el signo o cambia `WAVE_RAISE_AXIS`. */
+const WAVE_RAISE_AMOUNT = 1;
 // ---------------------------------------------------------------------------
 
 const eulerScratch = new Euler();
@@ -65,6 +70,7 @@ function findBone(root: Group | null): Object3D | null {
 export function useProceduralGestures(groupRef: RefObject<Group | null>, enabled: boolean): void {
   const boneRef = useRef<Object3D | null>(null);
   const baseQuatRef = useRef<Quaternion | null>(null);
+  const basePosRef = useRef<Vector3 | null>(null);
 
   useFrame((state) => {
     if (!enabled) return;
@@ -74,11 +80,13 @@ export function useProceduralGestures(groupRef: RefObject<Group | null>, enabled
       if (bone) {
         boneRef.current = bone;
         baseQuatRef.current = bone.quaternion.clone();
+        basePosRef.current = bone.position.clone();
       }
     }
     const bone = boneRef.current;
     const baseQuat = baseQuatRef.current;
-    if (!bone || !baseQuat) return;
+    const basePos = basePosRef.current;
+    if (!bone || !baseQuat || !basePos) return;
 
     const elapsed = state.clock.elapsedTime;
     const phase = elapsed % WAVE_PERIOD;
@@ -93,5 +101,9 @@ export function useProceduralGestures(groupRef: RefObject<Group | null>, enabled
     eulerScratch[WAVE_AXIS] = angle;
     offsetScratch.setFromEuler(eulerScratch);
     bone.quaternion.copy(baseQuat).multiply(offsetScratch);
+
+    // Levanta la mano completa mientras saluda (sube con la envolvente y baja).
+    bone.position.copy(basePos);
+    bone.position[WAVE_RAISE_AXIS] += envelope * WAVE_RAISE_AMOUNT;
   });
 }
