@@ -21,6 +21,8 @@ export interface ThreeControlsProps {
   onToggleEyebrowTilt: () => void;
   eyebrowAngry: boolean;
   onToggleEyebrowAngry: () => void;
+  mouth: boolean;
+  onToggleMouth: () => void;
 }
 
 /**
@@ -49,6 +51,8 @@ export function ThreeControls({
   onToggleEyebrowTilt,
   eyebrowAngry,
   onToggleEyebrowAngry,
+  mouth,
+  onToggleMouth,
 }: ThreeControlsProps) {
   return (
     <div className={styles.threeControlsRow} role="group" aria-label="Controles de animación 3D">
@@ -123,6 +127,14 @@ export function ThreeControls({
         className={`${styles.handsButton} ${eyebrowAngry ? styles.handsButtonActive : ''}`.trim()}
       >
         Fruncir (enojo): {eyebrowAngry ? 'ON' : 'OFF'}
+      </button>
+      <button
+        type="button"
+        aria-pressed={mouth}
+        onClick={onToggleMouth}
+        className={`${styles.handsButton} ${mouth ? styles.handsButtonActive : ''}`.trim()}
+      >
+        Boca (hablar): {mouth ? 'ON' : 'OFF'}
       </button>
     </div>
   );

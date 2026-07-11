@@ -5,6 +5,7 @@ import { useModelAnimation } from './useModelAnimation.js';
 import { useWaveGesture, WAVE_PERIOD } from './useWaveGesture.js';
 import { useBlinkGesture } from './useBlinkGesture.js';
 import { useEyebrowGesture } from './useEyebrowGesture.js';
+import { useMouthGesture } from './useMouthGesture.js';
 
 /** Ruta por defecto del GLB, precargada a nivel de módulo. */
 const DEFAULT_ASSET_URL = '/avatar/botcito.glb';
@@ -36,6 +37,8 @@ export interface RobotModelProps {
   eyebrowTilt?: boolean;
   /** Inclinación contraria (afuera→adentro) → gesto de **enojo**. */
   eyebrowAngry?: boolean;
+  /** Boca hablando (`Hueso cuerpo.002`): abre/cierra en ráfagas. */
+  mouth?: boolean;
 }
 
 /**
@@ -70,6 +73,7 @@ export function RobotModel({
   eyebrowRight = true,
   eyebrowTilt = true,
   eyebrowAngry = true,
+  mouth = true,
 }: RobotModelProps) {
   const { scene, animations } = useGLTF(url);
   const groupRef = useModelAnimation({ animations, clip, playing });
@@ -96,6 +100,7 @@ export function RobotModel({
     tilt: eyebrowTilt || eyebrowAngry,
     tiltAngle: -browTilt,
   });
+  useMouthGesture(groupRef, 'Hueso cuerpo.002', mouth, 0);
 
   return (
     <Center>

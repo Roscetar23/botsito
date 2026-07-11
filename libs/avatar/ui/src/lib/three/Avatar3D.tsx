@@ -70,6 +70,11 @@ export interface Avatar3DProps {
    */
   eyebrowAngry?: boolean;
   /**
+   * Boca hablando (`Hueso cuerpo.002`): abre/cierra en ráfagas. Activado
+   * por defecto; se apaga solo con `prefers-reduced-motion`.
+   */
+  mouth?: boolean;
+  /**
    * Reproduce el clip baked del GLB (la animación hecha en Blender).
    * Activado por defecto. Separado de `gestures` para poder distinguir
    * en pruebas qué mueve la animación de Blender vs los gestos por código.
@@ -139,6 +144,7 @@ export function Avatar3D({
   eyebrowRight = true,
   eyebrowTilt = true,
   eyebrowAngry = true,
+  mouth = true,
   playClip = true,
 }: Avatar3DProps) {
   const reducedMotion = Boolean(useReducedMotion());
@@ -168,6 +174,7 @@ export function Avatar3D({
                   eyebrowRight={eyebrowRight && !reducedMotion}
                   eyebrowTilt={eyebrowTilt && !reducedMotion}
                   eyebrowAngry={eyebrowAngry && !reducedMotion}
+                  mouth={mouth && !reducedMotion}
                 />
               </Float>
             </CursorFollowGroup>
