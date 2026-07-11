@@ -85,6 +85,13 @@ export interface Avatar3DProps {
    */
   mouth?: boolean;
   /**
+   * Balanceo de las manos al desplazarse (columpio adelante/atrás según la
+   * velocidad de roam). Independiente de la emoción; solo actúa en modo
+   * `roam` (necesita la velocidad de `RoamGroup`). Activado por defecto; se
+   * apaga con `prefers-reduced-motion`.
+   */
+  walk?: boolean;
+  /**
    * Reproduce el clip baked del GLB (la animación hecha en Blender).
    * Activado por defecto. Separado de `gestures` para poder distinguir
    * en pruebas qué mueve la animación de Blender vs los gestos por código.
@@ -156,6 +163,7 @@ export function Avatar3D({
   eyebrowTilt = true,
   eyebrowAngry = true,
   mouth = true,
+  walk = true,
   playClip = true,
 }: Avatar3DProps) {
   const reducedMotion = Boolean(useReducedMotion());
@@ -193,6 +201,7 @@ export function Avatar3D({
                   eyebrowTilt={g(flags.eyebrowTilt)}
                   eyebrowAngry={g(flags.eyebrowAngry)}
                   mouth={g(flags.mouth)}
+                  walk={walk && !reducedMotion}
                 />
               </Float>
             </CursorFollowGroup>

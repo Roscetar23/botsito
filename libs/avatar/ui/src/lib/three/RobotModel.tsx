@@ -6,6 +6,8 @@ import { useWaveGesture, WAVE_PERIOD } from './useWaveGesture.js';
 import { useBlinkGesture } from './useBlinkGesture.js';
 import { useEyebrowGesture } from './useEyebrowGesture.js';
 import { useMouthGesture } from './useMouthGesture.js';
+import { useWalkSwing } from './useWalkSwing.js';
+import { useRoamSpeed } from './roamSpeedContext.js';
 
 /** Ruta por defecto del GLB, precargada a nivel de módulo. */
 const DEFAULT_ASSET_URL = '/avatar/botcito.glb';
@@ -39,6 +41,8 @@ export interface RobotModelProps {
   eyebrowAngry?: boolean;
   /** Boca hablando (`Hueso cuerpo.002`): abre/cierra en ráfagas. */
   mouth?: boolean;
+  /** Balanceo de manos al desplazarse (columpio adelante/atrás, según velocidad). */
+  walk?: boolean;
 }
 
 /**
@@ -74,9 +78,11 @@ export function RobotModel({
   eyebrowTilt = true,
   eyebrowAngry = true,
   mouth = true,
+  walk = true,
 }: RobotModelProps) {
   const { scene, animations } = useGLTF(url);
   const groupRef = useModelAnimation({ animations, clip, playing });
+  const roamSpeed = useRoamSpeed();
   useWaveGesture(groupRef, 'Hueso.001', gestures, 0);
   useWaveGesture(groupRef, 'Hueso', gesturesLeft, WAVE_PERIOD / 2);
   useBlinkGesture(groupRef, 'Hueso cuerpo.003', blinkLeft, 0);
@@ -101,6 +107,10 @@ export function RobotModel({
     tiltAngle: -browTilt,
   });
   useMouthGesture(groupRef, 'Hueso cuerpo.002', mouth, 0);
+  // Balanceo al caminar: después del saludo para tener prioridad en las manos
+  // mientras se mueve; alternado (fase π) como los brazos al andar.
+  useWalkSwing(groupRef, 'Hueso.001', roamSpeed, walk, 0);
+  useWalkSwing(groupRef, 'Hueso', roamSpeed, walk, Math.PI);
 
   return (
     <Center>
