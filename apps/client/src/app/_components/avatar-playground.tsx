@@ -23,6 +23,10 @@ import styles from './avatar-playground.module.css';
 export function AvatarPlayground() {
   const [mode, setMode] = useState<AvatarMode>('2d');
   const [state, setState] = useState<AvatarState>('idle');
+  // Modo de control del 3D: por emoción (el muñeco se expresa solo) o
+  // manual (toggles de calibración por gesto).
+  const [drive, setDrive] = useState<'emotion' | 'manual'>('emotion');
+  const [emotion, setEmotion] = useState<AvatarState>('happy');
   const [playClip, setPlayClip] = useState(true);
   const [gestures, setGestures] = useState(true);
   const [gesturesLeft, setGesturesLeft] = useState(true);
@@ -40,30 +44,54 @@ export function AvatarPlayground() {
         <ModeToggle mode={mode} onChange={setMode} />
         {mode === '3d' && (
           <>
-            <ThreeControls
-              playClip={playClip}
-              onTogglePlayClip={() => setPlayClip((prev) => !prev)}
-              gestures={gestures}
-              onToggleGestures={() => setGestures((prev) => !prev)}
-              gesturesLeft={gesturesLeft}
-              onToggleGesturesLeft={() => setGesturesLeft((prev) => !prev)}
-              blinkLeft={blinkLeft}
-              onToggleBlinkLeft={() => setBlinkLeft((prev) => !prev)}
-              blinkRight={blinkRight}
-              onToggleBlinkRight={() => setBlinkRight((prev) => !prev)}
-              eyebrowLeft={eyebrowLeft}
-              onToggleEyebrowLeft={() => setEyebrowLeft((prev) => !prev)}
-              eyebrowRight={eyebrowRight}
-              onToggleEyebrowRight={() => setEyebrowRight((prev) => !prev)}
-              eyebrowTilt={eyebrowTilt}
-              onToggleEyebrowTilt={() => setEyebrowTilt((prev) => !prev)}
-              eyebrowAngry={eyebrowAngry}
-              onToggleEyebrowAngry={() => setEyebrowAngry((prev) => !prev)}
-              mouth={mouth}
-              onToggleMouth={() => setMouth((prev) => !prev)}
-            />
+            <div className={styles.threeControlsRow} role="group" aria-label="Modo de control 3D">
+              <button
+                type="button"
+                aria-pressed={drive === 'emotion'}
+                onClick={() => setDrive('emotion')}
+                className={`${styles.handsButton} ${drive === 'emotion' ? styles.handsButtonActive : ''}`.trim()}
+              >
+                Emociones
+              </button>
+              <button
+                type="button"
+                aria-pressed={drive === 'manual'}
+                onClick={() => setDrive('manual')}
+                className={`${styles.handsButton} ${drive === 'manual' ? styles.handsButtonActive : ''}`.trim()}
+              >
+                Manual (calibrar)
+              </button>
+            </div>
+            {drive === 'emotion' ? (
+              <StateButtons active={emotion} onSelect={setEmotion} />
+            ) : (
+              <ThreeControls
+                playClip={playClip}
+                onTogglePlayClip={() => setPlayClip((prev) => !prev)}
+                gestures={gestures}
+                onToggleGestures={() => setGestures((prev) => !prev)}
+                gesturesLeft={gesturesLeft}
+                onToggleGesturesLeft={() => setGesturesLeft((prev) => !prev)}
+                blinkLeft={blinkLeft}
+                onToggleBlinkLeft={() => setBlinkLeft((prev) => !prev)}
+                blinkRight={blinkRight}
+                onToggleBlinkRight={() => setBlinkRight((prev) => !prev)}
+                eyebrowLeft={eyebrowLeft}
+                onToggleEyebrowLeft={() => setEyebrowLeft((prev) => !prev)}
+                eyebrowRight={eyebrowRight}
+                onToggleEyebrowRight={() => setEyebrowRight((prev) => !prev)}
+                eyebrowTilt={eyebrowTilt}
+                onToggleEyebrowTilt={() => setEyebrowTilt((prev) => !prev)}
+                eyebrowAngry={eyebrowAngry}
+                onToggleEyebrowAngry={() => setEyebrowAngry((prev) => !prev)}
+                mouth={mouth}
+                onToggleMouth={() => setMouth((prev) => !prev)}
+              />
+            )}
             <p className={styles.hint3d}>
-              Enciende/apaga cada mano o el clip para verlos por separado
+              {drive === 'emotion'
+                ? 'Elige una emoción y el muñeco se expresa solo'
+                : 'Enciende/apaga cada gesto para calibrarlo por separado'}
             </p>
           </>
         )}
@@ -85,15 +113,19 @@ export function AvatarPlayground() {
             fullscreen
             roam
             playClip={playClip}
-            gestures={gestures}
-            gesturesLeft={gesturesLeft}
-            blinkLeft={blinkLeft}
-            blinkRight={blinkRight}
-            eyebrowLeft={eyebrowLeft}
-            eyebrowRight={eyebrowRight}
-            eyebrowTilt={eyebrowTilt}
-            eyebrowAngry={eyebrowAngry}
-            mouth={mouth}
+            {...(drive === 'emotion'
+              ? { state: emotion }
+              : {
+                  gestures,
+                  gesturesLeft,
+                  blinkLeft,
+                  blinkRight,
+                  eyebrowLeft,
+                  eyebrowRight,
+                  eyebrowTilt,
+                  eyebrowAngry,
+                  mouth,
+                })}
           />
         </div>
       )}

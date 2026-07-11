@@ -6,13 +6,23 @@ import { Canvas, useFrame } from '@react-three/fiber';
 import { Float } from '@react-three/drei';
 import { useReducedMotion } from 'framer-motion';
 import type { Group } from 'three';
+import type { AvatarState } from '@asistente/avatar-model';
 import { RobotModel } from './RobotModel.js';
 import { usePointerRotation } from './usePointerRotation.js';
 import { RoamGroup } from './RoamGroup.js';
+import { gesturesForState } from './stateGestures.js';
+import type { RobotGestureFlags } from './stateGestures.js';
 
 export interface Avatar3DProps {
   size?: number;
   assetUrl?: string;
+  /**
+   * Emoción/estado a expresar. Si se pasa, los gestos se derivan de él
+   * (`gesturesForState`) y **anulan** las banderas individuales de gestos —
+   * el muñeco se expresa solo. Sin `state`, mandan las banderas manuales
+   * (útil para calibrar). No afecta a `playClip` (clip baked).
+   */
+  state?: AvatarState;
   /** Rotación 3D que sigue al cursor por toda la ventana. Activada por defecto. */
   interactive?: boolean;
   /** El `<div>` raíz ocupa 100% del contenedor en vez del cuadro `size`. */
@@ -132,6 +142,7 @@ function CursorFollowGroup({ enabled, children }: CursorFollowGroupProps) {
 export function Avatar3D({
   size = 340,
   assetUrl = '/avatar/botcito.glb',
+  state,
   interactive = true,
   fullscreen = false,
   roam = false,
@@ -152,6 +163,13 @@ export function Avatar3D({
   const rotationEnabled = interactive && !reducedMotion && !roamEnabled;
   const containerStyle = fullscreen ? { width: '100%', height: '100%' } : { width: size, height: size };
 
+  // Con `state` los gestos los manda la emoción; sin él, las banderas
+  // manuales (calibración). `prefers-reduced-motion` apaga todo gesto.
+  const flags: RobotGestureFlags = state
+    ? gesturesForState(state)
+    : { gestures, gesturesLeft, blinkLeft, blinkRight, eyebrowLeft, eyebrowRight, eyebrowTilt, eyebrowAngry, mouth };
+  const g = (on: boolean) => on && !reducedMotion;
+
   return (
     <div style={containerStyle}>
       <Canvas camera={{ position: [0, 0, 9], fov: 42 }}>
@@ -166,15 +184,15 @@ export function Avatar3D({
                   url={assetUrl}
                   clip={clip}
                   playing={playClip && !reducedMotion}
-                  gestures={gestures && !reducedMotion}
-                  gesturesLeft={gesturesLeft && !reducedMotion}
-                  blinkLeft={blinkLeft && !reducedMotion}
-                  blinkRight={blinkRight && !reducedMotion}
-                  eyebrowLeft={eyebrowLeft && !reducedMotion}
-                  eyebrowRight={eyebrowRight && !reducedMotion}
-                  eyebrowTilt={eyebrowTilt && !reducedMotion}
-                  eyebrowAngry={eyebrowAngry && !reducedMotion}
-                  mouth={mouth && !reducedMotion}
+                  gestures={g(flags.gestures)}
+                  gesturesLeft={g(flags.gesturesLeft)}
+                  blinkLeft={g(flags.blinkLeft)}
+                  blinkRight={g(flags.blinkRight)}
+                  eyebrowLeft={g(flags.eyebrowLeft)}
+                  eyebrowRight={g(flags.eyebrowRight)}
+                  eyebrowTilt={g(flags.eyebrowTilt)}
+                  eyebrowAngry={g(flags.eyebrowAngry)}
+                  mouth={g(flags.mouth)}
                 />
               </Float>
             </CursorFollowGroup>
