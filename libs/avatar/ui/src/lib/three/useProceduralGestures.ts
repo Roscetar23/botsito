@@ -10,9 +10,13 @@ import type { Group, Object3D } from 'three';
 /** Hueso que hace el gesto (`Hueso.001` ≈ la mano en x≈+3.27; nombre fuente,
  *  legible — el saneo al nombre real de three se hace en `sanitize`). */
 const WAVE_BONE = 'Hueso.001';
-/** Eje local sobre el que oscila el saludo. */
+/** Eje local sobre el que gira/oscila el saludo. */
 const WAVE_AXIS: 'x' | 'y' | 'z' = 'z';
-/** Amplitud del vaivén, en radianes. */
+/** Giro base para LEVANTAR la mano (dedos arriba) antes de saludar, en
+ *  radianes, sobre `WAVE_AXIS`. ~π ≈ 180° voltea de "dedos abajo" a "arriba".
+ *  Calibrable: si queda muy volteada, baja; si sigue abajo, sube o invierte el signo. */
+const WAVE_LIFT_ANGLE = Math.PI;
+/** Amplitud del vaivén (saludo) alrededor de la posición levantada, en radianes. */
 const WAVE_AMPLITUDE = 0.5;
 /** Velocidad de oscilación dentro del gesto (osc/seg aprox). */
 const WAVE_SPEED = 8;
@@ -80,9 +84,10 @@ export function useProceduralGestures(groupRef: RefObject<Group | null>, enabled
     const phase = elapsed % WAVE_PERIOD;
     if (phase >= WAVE_DURATION) return;
 
-    // Envolvente 0→1→0 (fade in/out) a lo largo del gesto.
+    // Envolvente 0→1→0 (fade in/out): la mano sube (lift) mientras saluda y baja.
     const envelope = Math.sin((phase / WAVE_DURATION) * Math.PI);
-    const angle = Math.sin(phase * WAVE_SPEED) * WAVE_AMPLITUDE * envelope;
+    const wave = Math.sin(phase * WAVE_SPEED) * WAVE_AMPLITUDE;
+    const angle = envelope * (WAVE_LIFT_ANGLE + wave);
 
     eulerScratch.set(0, 0, 0);
     eulerScratch[WAVE_AXIS] = angle;
