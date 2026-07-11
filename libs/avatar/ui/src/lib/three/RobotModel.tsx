@@ -9,6 +9,11 @@ import { useEyebrowGesture } from './useEyebrowGesture.js';
 /** Ruta por defecto del GLB, precargada a nivel de módulo. */
 const DEFAULT_ASSET_URL = '/avatar/botcito.glb';
 
+/** Inclinación del fruncido (rad) en el pico del gesto de cejas. Se aplica
+ *  con signo OPUESTO en cada ceja (espejo) para que inclinen hacia adentro.
+ *  Calibrable: subir = frunce más; invertir el signo si frunce hacia afuera. */
+const EYEBROW_FROWN_TILT = 0.35;
+
 export interface RobotModelProps {
   url: string;
   /** Clip a reproducir; por defecto el primero disponible (`Esqueleto_acción`). */
@@ -66,11 +71,11 @@ export function RobotModel({
   useWaveGesture(groupRef, 'Hueso', gesturesLeft, WAVE_PERIOD / 2);
   useBlinkGesture(groupRef, 'Hueso cuerpo.003', blinkLeft, 0);
   useBlinkGesture(groupRef, 'Hueso cuerpo.001', blinkRight, 0);
-  // Cada ceja recibe sus propias opciones (personalizable por ceja): hoy
-  // ambas solo se levantan (sorpresa). Para fruncir/dudar se añadiría
-  // `tiltAngle` con signo opuesto en cada una (están dibujadas en espejo).
-  useEyebrowGesture(groupRef, 'Hueso cuerpo.005', eyebrowLeft, {});
-  useEyebrowGesture(groupRef, 'Hueso cuerpo.004', eyebrowRight, {});
+  // Cada ceja recibe sus propias opciones (personalizable por ceja): se
+  // levantan (sorpresa) y fruncen (`tiltAngle` con signo OPUESTO en cada
+  // una, porque están dibujadas en espejo → así inclinan hacia adentro).
+  useEyebrowGesture(groupRef, 'Hueso cuerpo.005', eyebrowLeft, { tiltAngle: EYEBROW_FROWN_TILT });
+  useEyebrowGesture(groupRef, 'Hueso cuerpo.004', eyebrowRight, { tiltAngle: -EYEBROW_FROWN_TILT });
 
   return (
     <Center>
