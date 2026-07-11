@@ -26,11 +26,17 @@ export interface Avatar3DProps {
    */
   clip?: string;
   /**
-   * Gestos procedurales (huesos movidos por código, p. ej. un saludo)
-   * encima de la animación baked. Activados por defecto; se apagan solos
-   * con `prefers-reduced-motion`.
+   * Gesto de saludo procedural en la mano derecha (`Hueso.001`), encima
+   * de la animación baked. Activado por defecto; se apaga solo con
+   * `prefers-reduced-motion`.
    */
   gestures?: boolean;
+  /**
+   * Gesto de saludo procedural en la mano izquierda (`Hueso`), escalonado
+   * media vuelta respecto al de la derecha para que alternen. Activado
+   * por defecto; se apaga solo con `prefers-reduced-motion`.
+   */
+  gesturesLeft?: boolean;
   /**
    * Reproduce el clip baked del GLB (la animación hecha en Blender).
    * Activado por defecto. Separado de `gestures` para poder distinguir
@@ -94,6 +100,7 @@ export function Avatar3D({
   roam = false,
   clip,
   gestures = true,
+  gesturesLeft = true,
   playClip = true,
 }: Avatar3DProps) {
   const reducedMotion = Boolean(useReducedMotion());
@@ -116,6 +123,7 @@ export function Avatar3D({
                   clip={clip}
                   playing={playClip && !reducedMotion}
                   gestures={gestures && !reducedMotion}
+                  gesturesLeft={gesturesLeft && !reducedMotion}
                 />
               </Float>
             </CursorFollowGroup>

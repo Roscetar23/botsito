@@ -25,6 +25,7 @@ export function AvatarPlayground() {
   const [state, setState] = useState<AvatarState>('idle');
   const [playClip, setPlayClip] = useState(true);
   const [gestures, setGestures] = useState(true);
+  const [gesturesLeft, setGesturesLeft] = useState(true);
 
   return (
     <section className={styles.playground}>
@@ -37,8 +38,12 @@ export function AvatarPlayground() {
               onTogglePlayClip={() => setPlayClip((prev) => !prev)}
               gestures={gestures}
               onToggleGestures={() => setGestures((prev) => !prev)}
+              gesturesLeft={gesturesLeft}
+              onToggleGesturesLeft={() => setGesturesLeft((prev) => !prev)}
             />
-            <p className={styles.hint3d}>Apaga una para ver solo la otra</p>
+            <p className={styles.hint3d}>
+              Enciende/apaga cada mano o el clip para verlos por separado
+            </p>
           </>
         )}
       </div>
@@ -55,7 +60,13 @@ export function AvatarPlayground() {
         // bloquear clics (pointer-events: none), por eso el toggle de
         // arriba sigue siendo interactivo aunque esta capa lo cubra.
         <div className={styles.stage3dFull} aria-hidden="true">
-          <Avatar3DLazy fullscreen roam playClip={playClip} gestures={gestures} />
+          <Avatar3DLazy
+            fullscreen
+            roam
+            playClip={playClip}
+            gestures={gestures}
+            gesturesLeft={gesturesLeft}
+          />
         </div>
       )}
     </section>

@@ -2,7 +2,7 @@
 
 import { Center, useGLTF } from '@react-three/drei';
 import { useModelAnimation } from './useModelAnimation.js';
-import { useProceduralGestures } from './useProceduralGestures.js';
+import { useWaveGesture, WAVE_PERIOD } from './useWaveGesture.js';
 
 /** Ruta por defecto del GLB, precargada a nivel de módulo. */
 const DEFAULT_ASSET_URL = '/avatar/botcito.glb';
@@ -13,14 +13,16 @@ export interface RobotModelProps {
   clip?: string;
   /** `false` (reduced-motion) deja la animación fija en el primer frame. */
   playing?: boolean;
-  /** Gestos procedurales (p. ej. saludo) encima de la animación baked. */
+  /** Gesto de saludo en la mano derecha (`Hueso.001`) encima de la animación baked. */
   gestures?: boolean;
+  /** Gesto de saludo en la mano izquierda (`Hueso`), escalonado media vuelta respecto a la derecha. */
+  gesturesLeft?: boolean;
 }
 
 /**
  * Carga el GLB del robot: 19 mallas con materiales/colores propios, con
  * rig + animación en bucle (`useModelAnimation`, drei `useAnimations`) y
- * gestos procedurales opcionales (`useProceduralGestures`) que mueven
+ * gestos de saludo opcionales por mano (`useWaveGesture`) que mueven
  * huesos por código encima de esa animación. La "vida" del personaje
  * viene de la animación propia, los gestos, y de `Float`/la rotación por
  * cursor o de vuelo en `Avatar3D`/`RoamGroup` (conviven: nada de esto
@@ -31,14 +33,23 @@ export interface RobotModelProps {
  * envuelve en `<Center>` de drei para que rote/levite sobre su propio eje
  * en vez de describir una órbita.
  *
- * Orden de hooks importante: `useProceduralGestures` debe llamarse
- * después de `useModelAnimation` para que su ajuste se aplique después
- * del `AnimationMixer` en cada frame (ver comentario en ese hook).
+ * Orden de hooks importante: ambas llamadas a `useWaveGesture` van
+ * después de `useModelAnimation`, para que su ajuste se aplique después
+ * del `AnimationMixer` en cada frame (ver comentario en ese hook). La
+ * mano izquierda usa `phaseOffset = WAVE_PERIOD / 2` para alternar con
+ * la derecha en vez de saludar exactamente al mismo tiempo.
  */
-export function RobotModel({ url, clip, playing = true, gestures = true }: RobotModelProps) {
+export function RobotModel({
+  url,
+  clip,
+  playing = true,
+  gestures = true,
+  gesturesLeft = true,
+}: RobotModelProps) {
   const { scene, animations } = useGLTF(url);
   const groupRef = useModelAnimation({ animations, clip, playing });
-  useProceduralGestures(groupRef, gestures);
+  useWaveGesture(groupRef, 'Hueso.001', gestures, 0);
+  useWaveGesture(groupRef, 'Hueso', gesturesLeft, WAVE_PERIOD / 2);
 
   return (
     <Center>

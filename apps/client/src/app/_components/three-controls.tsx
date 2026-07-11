@@ -7,18 +7,23 @@ export interface ThreeControlsProps {
   onTogglePlayClip: () => void;
   gestures: boolean;
   onToggleGestures: () => void;
+  gesturesLeft: boolean;
+  onToggleGesturesLeft: () => void;
 }
 
 /**
  * Toggles de calibración del 3D: permiten aislar la animación baked de
- * Blender (`playClip`) de los gestos procedurales por código (`gestures`)
- * para verlas por separado.
+ * Blender (`playClip`) del saludo procedural por código de cada mano
+ * (`gestures` = derecha, `gesturesLeft` = izquierda) para verlos por
+ * separado.
  */
 export function ThreeControls({
   playClip,
   onTogglePlayClip,
   gestures,
   onToggleGestures,
+  gesturesLeft,
+  onToggleGesturesLeft,
 }: ThreeControlsProps) {
   return (
     <div className={styles.threeControlsRow} role="group" aria-label="Controles de animación 3D">
@@ -36,7 +41,15 @@ export function ThreeControls({
         onClick={onToggleGestures}
         className={`${styles.handsButton} ${gestures ? styles.handsButtonActive : ''}`.trim()}
       >
-        Gesto código (mío): {gestures ? 'ON' : 'OFF'}
+        Saludo mano der.: {gestures ? 'ON' : 'OFF'}
+      </button>
+      <button
+        type="button"
+        aria-pressed={gesturesLeft}
+        onClick={onToggleGesturesLeft}
+        className={`${styles.handsButton} ${gesturesLeft ? styles.handsButtonActive : ''}`.trim()}
+      >
+        Saludo mano izq.: {gesturesLeft ? 'ON' : 'OFF'}
       </button>
     </div>
   );
