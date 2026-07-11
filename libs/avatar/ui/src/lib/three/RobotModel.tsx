@@ -3,6 +3,7 @@
 import { Center, useGLTF } from '@react-three/drei';
 import { useModelAnimation } from './useModelAnimation.js';
 import { useWaveGesture, WAVE_PERIOD } from './useWaveGesture.js';
+import { useBlinkGesture } from './useBlinkGesture.js';
 
 /** Ruta por defecto del GLB, precargada a nivel de módulo. */
 const DEFAULT_ASSET_URL = '/avatar/botcito.glb';
@@ -17,6 +18,8 @@ export interface RobotModelProps {
   gestures?: boolean;
   /** Gesto de saludo en la mano izquierda (`Hueso`), escalonado media vuelta respecto a la derecha. */
   gesturesLeft?: boolean;
+  /** Parpadeo del ojo izquierdo (`Hueso cuerpo.005`). */
+  blinkLeft?: boolean;
 }
 
 /**
@@ -45,11 +48,13 @@ export function RobotModel({
   playing = true,
   gestures = true,
   gesturesLeft = true,
+  blinkLeft = true,
 }: RobotModelProps) {
   const { scene, animations } = useGLTF(url);
   const groupRef = useModelAnimation({ animations, clip, playing });
   useWaveGesture(groupRef, 'Hueso.001', gestures, 0);
   useWaveGesture(groupRef, 'Hueso', gesturesLeft, WAVE_PERIOD / 2);
+  useBlinkGesture(groupRef, 'Hueso cuerpo.005', blinkLeft, 0);
 
   return (
     <Center>
