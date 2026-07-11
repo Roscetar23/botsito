@@ -4,6 +4,7 @@ import { Center, useGLTF } from '@react-three/drei';
 import { useModelAnimation } from './useModelAnimation.js';
 import { useWaveGesture, WAVE_PERIOD } from './useWaveGesture.js';
 import { useBlinkGesture } from './useBlinkGesture.js';
+import { useEyebrowGesture } from './useEyebrowGesture.js';
 
 /** Ruta por defecto del GLB, precargada a nivel de módulo. */
 const DEFAULT_ASSET_URL = '/avatar/botcito.glb';
@@ -22,6 +23,10 @@ export interface RobotModelProps {
   blinkLeft?: boolean;
   /** Parpadeo del ojo derecho (`Hueso cuerpo.001`; par simétrico del izquierdo). */
   blinkRight?: boolean;
+  /** Ceja izquierda (`Hueso cuerpo.005`): se levanta (sorpresa). */
+  eyebrowLeft?: boolean;
+  /** Ceja derecha (`Hueso cuerpo.004`): se levanta, sincronizada con la izquierda. */
+  eyebrowRight?: boolean;
 }
 
 /**
@@ -52,6 +57,8 @@ export function RobotModel({
   gesturesLeft = true,
   blinkLeft = true,
   blinkRight = true,
+  eyebrowLeft = true,
+  eyebrowRight = true,
 }: RobotModelProps) {
   const { scene, animations } = useGLTF(url);
   const groupRef = useModelAnimation({ animations, clip, playing });
@@ -59,6 +66,11 @@ export function RobotModel({
   useWaveGesture(groupRef, 'Hueso', gesturesLeft, WAVE_PERIOD / 2);
   useBlinkGesture(groupRef, 'Hueso cuerpo.003', blinkLeft, 0);
   useBlinkGesture(groupRef, 'Hueso cuerpo.001', blinkRight, 0);
+  // Cada ceja recibe sus propias opciones (personalizable por ceja): hoy
+  // ambas solo se levantan (sorpresa). Para fruncir/dudar se añadiría
+  // `tiltAngle` con signo opuesto en cada una (están dibujadas en espejo).
+  useEyebrowGesture(groupRef, 'Hueso cuerpo.005', eyebrowLeft, {});
+  useEyebrowGesture(groupRef, 'Hueso cuerpo.004', eyebrowRight, {});
 
   return (
     <Center>

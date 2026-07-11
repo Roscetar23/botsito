@@ -50,6 +50,16 @@ export interface Avatar3DProps {
    */
   blinkRight?: boolean;
   /**
+   * Ceja izquierda (`Hueso cuerpo.005`): se levanta (sorpresa). Activado
+   * por defecto; se apaga solo con `prefers-reduced-motion`.
+   */
+  eyebrowLeft?: boolean;
+  /**
+   * Ceja derecha (`Hueso cuerpo.004`): se levanta, sincronizada con la
+   * izquierda. Activado por defecto; se apaga solo con `prefers-reduced-motion`.
+   */
+  eyebrowRight?: boolean;
+  /**
    * Reproduce el clip baked del GLB (la animación hecha en Blender).
    * Activado por defecto. Separado de `gestures` para poder distinguir
    * en pruebas qué mueve la animación de Blender vs los gestos por código.
@@ -115,6 +125,8 @@ export function Avatar3D({
   gesturesLeft = true,
   blinkLeft = true,
   blinkRight = true,
+  eyebrowLeft = true,
+  eyebrowRight = true,
   playClip = true,
 }: Avatar3DProps) {
   const reducedMotion = Boolean(useReducedMotion());
@@ -140,6 +152,8 @@ export function Avatar3D({
                   gesturesLeft={gesturesLeft && !reducedMotion}
                   blinkLeft={blinkLeft && !reducedMotion}
                   blinkRight={blinkRight && !reducedMotion}
+                  eyebrowLeft={eyebrowLeft && !reducedMotion}
+                  eyebrowRight={eyebrowRight && !reducedMotion}
                 />
               </Float>
             </CursorFollowGroup>
