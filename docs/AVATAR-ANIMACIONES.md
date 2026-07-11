@@ -2,7 +2,7 @@
 
 > Referencia del avatar 3D (`botcito.glb`) y sus dos sistemas de animación:
 > el **clip de Blender** (baked) y los **gestos procedurales por código**.
-> Complementa a [`AVATAR.md`](./AVATAR.md) (fases AV-8). Estado: **en calibración**.
+> Complementa a [`AVATAR.md`](./AVATAR.md) (fases AV-8). Estado: **saludo en ambas manos calibrado y confirmado ✅**.
 
 ---
 
@@ -37,12 +37,13 @@ en `getObjectByName` (o sanear en código). Esto causó el bug "no se mueve nada
 
 ## 2. Dos sistemas de animación (independientes)
 
-Se controlan por separado desde el panel de pruebas (modo 3D) con dos toggles:
+Se controlan por separado desde el panel de pruebas (modo 3D) con tres toggles:
 
 | Toggle en la UI | Prop de `Avatar3D` | Qué anima |
 |---|---|---|
 | **"Animación Blender (tuya)"** | `playClip` (default true) | El clip baked `Esqueleto_acción` (manos + cara). |
-| **"Gesto código (mío)"** | `gestures` (default true) | Gestos procedurales por hueso (hoy: un saludo). |
+| **"Saludo mano der."** | `gestures` (default true) | Saludo procedural en la mano derecha (`Hueso.001`). |
+| **"Saludo mano izq."** | `gesturesLeft` (default true) | Saludo procedural en la mano izquierda (`Hueso`), alternado. |
 
 ### 2.1 Clip de Blender (`Esqueleto_acción`)
 - Se reproduce en bucle (`useModelAnimation.ts` + drei `useAnimations`).
@@ -113,7 +114,8 @@ la misma; esto es lo que aprendimos:
 ## 4. Próximos pasos
 
 - [x] **Saludo calibrado** (levanta la mano + vaivén) en la mano derecha.
-- [x] **Segunda mano** (`Hueso`) con su botón (saludos alternados).
+- [x] **Segunda mano** (`Hueso`) con su botón (saludos alternados) — **confirmado por el usuario** (las mismas
+      perillas sirven para ambas manos; la izquierda NO necesitó espejo).
 - [ ] **Más gestos** con la misma receta: asentir, celebrar con las dos manos, señalar, "pensar".
 - [ ] **Mapear gestos/estado → `AvatarState`** (idle/speaking/happy/notify…): reutilizar la prop
       `clip?` de `Avatar3D` y/o disparar gestos según el estado. Conecta con **AV-6** (reactividad a eventos).
@@ -142,3 +144,5 @@ la misma; esto es lo que aprendimos:
 - 2026-07-10 — **Saludo calibrado** (levanta la mano/dedos arriba + vaivén más largo). Gesto
   refactorizado a `useWaveGesture` reutilizable e instanciado en **ambas manos** (alternadas) con
   sus toggles. Documentada la **receta** para crear cualquier gesto.
+- 2026-07-11 — **Saludo en ambas manos confirmado por el usuario** ("quedó perfecto"). La mano
+  izquierda funciona con las mismas perillas (sin espejo). Sistema de gestos procedurales **estable**.
