@@ -10,10 +10,12 @@ import type { Group, Object3D } from 'three';
 /** Eje LOCAL del hueso que, al escalar, agranda el ALTO de la boca en el mundo
  *  (medido: escalar X del hueso ⇒ alto ×2.9 sin tocar el ancho) → "abrir". */
 const MOUTH_OPEN_AXIS: 'x' | 'y' | 'z' = 'x';
-/** Cuánto se abre en el pico (factor extra sobre la escala base; 2 ⇒ hasta ×3). */
-const MOUTH_OPEN_AMOUNT = 2;
+/** Cuánto se abre en el pico (factor extra sobre la escala base; 0.7 ⇒ hasta
+ *  ×1.7). Bajo a propósito: el pivote del hueso está descentrado, así que
+ *  abrir mucho también empuja la boca hacia arriba (llegaba a "desaparecer"). */
+const MOUTH_OPEN_AMOUNT = 0.7;
 /** Rapidez del abrir/cerrar al hablar (flaps ≈ por segundo). */
-const MOUTH_SPEED = 12;
+const MOUTH_SPEED = 7;
 /** Cada cuántos segundos se repite la ráfaga de habla. */
 const MOUTH_PERIOD = 5;
 /** Cuánto dura la ráfaga de habla, en segundos (`< period`). */
