@@ -23,8 +23,6 @@ export interface ThreeControlsProps {
   onToggleEyebrowAngry: () => void;
   mouth: boolean;
   onToggleMouth: () => void;
-  smile: boolean;
-  onToggleSmile: () => void;
 }
 
 /**
@@ -55,8 +53,6 @@ export function ThreeControls({
   onToggleEyebrowAngry,
   mouth,
   onToggleMouth,
-  smile,
-  onToggleSmile,
 }: ThreeControlsProps) {
   return (
     <div className={styles.threeControlsRow} role="group" aria-label="Controles de animación 3D">
@@ -139,14 +135,6 @@ export function ThreeControls({
         className={`${styles.handsButton} ${mouth ? styles.handsButtonActive : ''}`.trim()}
       >
         Boca (hablar): {mouth ? 'ON' : 'OFF'}
-      </button>
-      <button
-        type="button"
-        aria-pressed={smile}
-        onClick={onToggleSmile}
-        className={`${styles.handsButton} ${smile ? styles.handsButtonActive : ''}`.trim()}
-      >
-        Sonreír: {smile ? 'ON' : 'OFF'}
       </button>
     </div>
   );
