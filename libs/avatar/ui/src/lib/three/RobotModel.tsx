@@ -39,6 +39,8 @@ export interface RobotModelProps {
   eyebrowAngry?: boolean;
   /** Boca hablando (`Hueso cuerpo.002`): abre/cierra en ráfagas. */
   mouth?: boolean;
+  /** Boca sonriendo (`Hueso cuerpo.002`): ensancha y aplana (pose contenta). */
+  smile?: boolean;
 }
 
 /**
@@ -74,6 +76,7 @@ export function RobotModel({
   eyebrowTilt = true,
   eyebrowAngry = true,
   mouth = true,
+  smile = true,
 }: RobotModelProps) {
   const { scene, animations } = useGLTF(url);
   const groupRef = useModelAnimation({ animations, clip, playing });
@@ -100,7 +103,7 @@ export function RobotModel({
     tilt: eyebrowTilt || eyebrowAngry,
     tiltAngle: -browTilt,
   });
-  useMouthGesture(groupRef, 'Hueso cuerpo.002', mouth, 0);
+  useMouthGesture(groupRef, 'Hueso cuerpo.002', { talk: mouth, smile });
 
   return (
     <Center>

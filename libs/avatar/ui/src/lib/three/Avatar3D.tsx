@@ -75,6 +75,11 @@ export interface Avatar3DProps {
    */
   mouth?: boolean;
   /**
+   * Boca sonriendo (`Hueso cuerpo.002`): ensancha y aplana (pose contenta).
+   * Activado por defecto; se apaga solo con `prefers-reduced-motion`.
+   */
+  smile?: boolean;
+  /**
    * Reproduce el clip baked del GLB (la animación hecha en Blender).
    * Activado por defecto. Separado de `gestures` para poder distinguir
    * en pruebas qué mueve la animación de Blender vs los gestos por código.
@@ -145,6 +150,7 @@ export function Avatar3D({
   eyebrowTilt = true,
   eyebrowAngry = true,
   mouth = true,
+  smile = true,
   playClip = true,
 }: Avatar3DProps) {
   const reducedMotion = Boolean(useReducedMotion());
@@ -175,6 +181,7 @@ export function Avatar3D({
                   eyebrowTilt={eyebrowTilt && !reducedMotion}
                   eyebrowAngry={eyebrowAngry && !reducedMotion}
                   mouth={mouth && !reducedMotion}
+                  smile={smile && !reducedMotion}
                 />
               </Float>
             </CursorFollowGroup>
