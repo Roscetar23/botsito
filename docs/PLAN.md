@@ -6,8 +6,9 @@
 - **Orquestador:** Oscar Javier Gomez Manrique
 - **Fecha inicial:** 2026-07-09
 - **Repo:** `/home/ogomez/bot` (branch `main`, remoto `botsito`)
-- **Estado:** Fases 1, 2 y 5 ✅ (Backend Tasks + Auth contra Atlas; **avatar 2D+3D TERMINADO**).
-  Pendiente para reactivar el avatar solo: eventos realtime (Fase 3) → `AvatarState`.
+- **Estado:** Fases 1, 2 y 5 ✅ (Backend Tasks + Auth contra Atlas; **avatar 2D+3D TERMINADO**;
+  **auth en el cliente** listo, T-14b). Próximo: **Fase 3 realtime** (gateway Socket.IO con auth de
+  handshake usando el token del login) → eventos → `AvatarState`.
 
 **Documentos del proyecto:**
 - [`SETUP.md`](./SETUP.md) — bootstrap del monorepo NX (paso a paso).
@@ -319,6 +320,11 @@ Estado: `[ ]` pendiente · `[~]` en curso · `[x]` hecho.
 - [x] **T-12** `auth/model` (`User`, `RegisterDto`/`LoginDto`, `JwtPayload`/`AuthTokens`) + `auth/data-access` (`UserSchema` email único, `UserRepository`).
 - [x] **T-13** `auth/feature`: register/login/refresh (bcrypt salt 12), JWT access+refresh (`TokenService`), `JwtStrategy`, `JwtAuthGuard`, `@CurrentUser`. Rutas `/api/auth/*`. `AuthenticatedUser` en `shared-types`.
 - [x] **T-14** Tasks protegido con `@UseGuards(AuthGuard('jwt'))`; `ownerId` tomado del usuario autenticado (fin de `DEMO_OWNER_ID`). `AuthModule` registrado en `apps/api`. Verificado lint/typecheck/build. Smoke test curl pendiente (usuario).
+- [x] **T-14b** *(fase intermedia)* **Auth en el cliente** (`libs/auth/ui` = `@asistente/auth-ui`):
+  cliente API (register/login/refresh/me), tokens en `localStorage`, contexto `AuthProvider`/`useAuth`
+  (rehidrata con refresh) y `AuthPanel` (login/registro). `apps/client` se puertea tras login
+  (`AppShell`) y expone el `accessToken` — necesario para el handshake del realtime (Fase 3).
+  Verificado lint/typecheck/test/build. Falta: probar login real contra el backend (usuario).
 
 ### Fase 3 — Realtime + Notifications
 - [ ] **T-15** `notifications/feature`: `NotificationsGateway` (Socket.IO) con auth de handshake.
