@@ -14,7 +14,7 @@
       },
       "dev": {
         "options": {
-          "command": "next dev --webpack"
+          "command": "next dev --webpack --port 3000"
         }
       }
     }
