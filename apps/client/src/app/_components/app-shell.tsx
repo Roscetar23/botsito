@@ -42,7 +42,7 @@ function AuthGate({ children }: { children: ReactNode }) {
         <main className={styles.authMain}>
           <AuthPanel />
           <div className={styles.authBot} aria-hidden="true">
-            <Avatar3DLazy state="idle" interactive={false} size={360} />
+            <Avatar3DLazy state="idle" interactive={false} size={320} />
           </div>
         </main>
         <footer className={styles.footer}>

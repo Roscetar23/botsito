@@ -25,16 +25,20 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: clamp(1rem, 5vw, 3.5rem);
   padding: 1.5rem;
 }
 
-/* Bot 3D estático en reposo, a un lado de la card (no sigue el cursor). */
+/* Bot 3D estático en reposo: la card queda centrada y el bot se posiciona a
+ * su derecha pero dentro de pantalla (antes se iba al borde). Ajusta el
+ * offset de `left` para moverlo más hacia el centro o hacia afuera. */
 .authBot {
-  flex-shrink: 0;
+  position: absolute;
+  top: 50%;
+  left: calc(50% + 230px);
+  transform: translateY(-50%);
 }
 
-@media (max-width: 900px) {
+@media (max-width: 1150px) {
   .authBot {
     display: none;
   }
