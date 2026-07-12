@@ -7,8 +7,8 @@ import type {
   RegisterInput,
 } from './auth-types.js';
 
-/** Base de la API (Next inyecta `NEXT_PUBLIC_*`); fallback a dev local. */
-const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3000/api';
+/** Base de la API (Next inyecta `NEXT_PUBLIC_*`); fallback al backend en :3001. */
+const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001/api';
 
 /** Extrae un mensaje legible del cuerpo de error estándar de Nest. */
 function messageFrom(body: unknown, fallback: string): string {
