@@ -54,23 +54,51 @@ App delgada + UI en libs (D-06). Todo componente con estado/efectos lleva `'use 
 
 ---
 
-## 4. Sistema de diseño (a construir)
+## 4. Identidad de marca 🎨
 
-Hoy no existe; se creará al pulir login/registro y se centraliza para reutilizar. Propuesta inicial
-(partiendo del morado actual), como **variables CSS** globales:
+Fuente: `myDesign/IdentidadDeMarca/Colores.png` y `myDesign/Logotipo/`. **Tema oscuro = principal.**
 
-| Token | Uso | Valor tentativo |
-|---|---|---|
-| `--bg` | Fondo de la app | `#0e0e14` (oscuro) |
-| `--surface` | Tarjetas/paneles | `rgba(255,255,255,.04)` |
-| `--text` / `--text-muted` | Texto | `#f3f3f7` / `rgba(243,243,247,.7)` |
-| `--accent` / `--accent-soft` | Acento (botones/links) | `#7c5cff` / `#b3a2ff` |
-| `--danger` | Errores | `#ff6b6b` |
-| `--radius` / `--radius-lg` | Radios | `10px` / `16px` |
-| `--space-*` | Espaciado | escala 4/8/12/16/24… |
+### 4.1 Colores (hex exactos de la guía de marca)
 
-> Dónde vivirán: variables globales en `global.css` (o un `theme.css`) y, si crecen los átomos
-> reutilizables (botón, input, card), en `libs/shared/ui`. Decidir tema **claro/oscuro** (hoy oscuro).
+| Rol | Nombre en la guía | Hex | Uso |
+|---|---|---|---|
+| **Primario** | Morado | `#44237B` | Base de la app y del robot; **todo gira en torno a él**. Marca, botones, iconos. |
+| **Terciario** | Azul | `#3944E7` | Acento secundario, en menor medida pero **siempre presente** (brillos, detalles, foco). |
+| **Secundario oscuro** | Negro | `#1E1E1E` | Fondo del **tema oscuro (principal)**. |
+| **Secundario claro** | Blanco | `#FFFFFF` | Fondo del tema claro / texto sobre oscuro. |
+
+> El morado es intenso y oscuro; para elementos interactivos (botón, hover) se usa una **variante
+> más brillante** derivada (p. ej. `#6E3FD0`) manteniendo `#44237B` como base de marca.
+
+### 4.2 Tipografía
+
+- **Exo 2** para **toda la aplicación** (Google Fonts). Se carga con `next/font/google` en
+  `layout.tsx` y se expone como variable (`--font-exo2`) aplicada al `body`. Pesos: 400/600/700.
+
+### 4.3 Logotipo (dos variantes por tema)
+
+Robot con audífonos morados + dos "ojos" (uno blanco, uno azul terciario) + wordmark **"BotCito"**.
+
+| Archivo fuente | Tema | Texto | Copia en el cliente |
+|---|---|---|---|
+| `myDesign/Logotipo/Logotipo Final.png` | **Oscuro** (principal) | blanco | `apps/client/public/brand/logo-dark.png` |
+| `myDesign/Logotipo/Group 3.png` | **Claro** | oscuro (`#1E1E1E`) | `apps/client/public/brand/logo-light.png` |
+
+### 4.4 Tokens (variables CSS — tema oscuro por defecto)
+
+Viven en `global.css` (o `theme.css`); si crecen los átomos (botón/input/card), pasan a `libs/shared/ui`.
+
+| Token | Valor (oscuro) |
+|---|---|
+| `--bg` | `#141018` → `#1E1E1E` (fondo, con leve tinte morado) |
+| `--surface` | `rgba(255,255,255,.04)` (tarjetas) |
+| `--border` | `rgba(255,255,255,.10)` |
+| `--text` / `--text-muted` | `#FFFFFF` / `rgba(255,255,255,.65)` |
+| `--primary` / `--primary-bright` | `#44237B` / `#6E3FD0` |
+| `--accent` (terciario) | `#3944E7` |
+| `--danger` | `#ff6b6b` |
+| `--radius` / `--radius-lg` | `10px` / `16px` |
+| `--font-exo2` | (lo inyecta `next/font`) |
 
 ---
 
@@ -92,7 +120,9 @@ Estado: `[ ]` pendiente · `[~]` en curso · `[x]` hecho.
 - **FD-01 CSS Modules (no framework CSS)** · *Pro:* cero deps, co-localizado, coherente con lo hecho.
   *Con:* sin utilidades; se compensa con tokens/átomos compartidos.
 - **FD-02 Tokens por variables CSS** · *Pro:* tema consistente, cambia en un sitio, funciona sin build.
-- **FD-03 Tema oscuro por defecto** (revisable) · alineado con el look actual del avatar/panel.
+- **FD-03 Tema oscuro por defecto (principal)** · decisión de marca; el claro es secundario.
+- **FD-04 Marca BotCito** · primario `#44237B` + terciario `#3944E7`; fuente **Exo 2**; logo con dos
+  variantes (oscuro/claro). Ver §4.
 
 ---
 
@@ -100,3 +130,6 @@ Estado: `[ ]` pendiente · `[~]` en curso · `[x]` hecho.
 
 - 2026-07-12 — Documento creado. Estado: auth (login/registro) funcional con diseño básico; avatar
   terminado; sin sistema de diseño aún. Próximo: **FE-1** (diseño de login/registro).
+- 2026-07-12 — **Identidad de marca añadida** (§4): colores exactos (primario `#44237B`, terciario
+  `#3944E7`, secundarios `#1E1E1E`/`#FFFFFF`), fuente **Exo 2**, logo en dos variantes (oscuro=principal
+  / claro). Guía de layout del login por captura del usuario. Arranca la implementación de **FE-1**.
