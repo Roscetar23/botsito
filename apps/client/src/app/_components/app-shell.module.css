@@ -34,7 +34,7 @@
 .authBot {
   position: absolute;
   top: 50%;
-  left: calc(50% + 230px);
+  left: calc(50% + 270px);
   transform: translateY(-50%);
 }
 

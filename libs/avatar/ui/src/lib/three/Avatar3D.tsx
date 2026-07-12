@@ -17,6 +17,12 @@ export interface Avatar3DProps {
   size?: number;
   assetUrl?: string;
   /**
+   * Distancia de la cámara (eje Z). Mayor = más lejos = el modelo se ve más
+   * pequeño con **más margen** (útil en modo caja para que no se corten las
+   * manos). Default 9.
+   */
+  cameraZ?: number;
+  /**
    * Emoción/estado a expresar. Si se pasa, los gestos se derivan de él
    * (`gesturesForState`) y **anulan** las banderas individuales de gestos —
    * el muñeco se expresa solo. Sin `state`, mandan las banderas manuales
@@ -149,6 +155,7 @@ function CursorFollowGroup({ enabled, children }: CursorFollowGroupProps) {
 export function Avatar3D({
   size = 340,
   assetUrl = '/avatar/botcito.glb',
+  cameraZ = 9,
   state,
   interactive = true,
   fullscreen = false,
@@ -185,7 +192,7 @@ export function Avatar3D({
 
   return (
     <div style={containerStyle}>
-      <Canvas camera={{ position: [0, 0, 9], fov: 42 }}>
+      <Canvas camera={{ position: [0, 0, cameraZ], fov: 42 }}>
         <ambientLight intensity={0.7} />
         <directionalLight position={[4, 6, 5]} intensity={1.1} />
         <directionalLight position={[-4, -2, -3]} intensity={0.4} />
