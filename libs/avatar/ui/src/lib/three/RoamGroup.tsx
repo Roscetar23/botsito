@@ -8,6 +8,9 @@ import { useFlightOrientation } from './useFlightOrientation.js';
 import { usePointerViewportTarget } from './usePointerViewportTarget.js';
 import { ShadowBlob } from './ShadowBlob.js';
 import { RoamSpeedContext } from './roamSpeedContext.js';
+import { HandBonesContext } from './handBonesContext.js';
+import type { HandBones } from './handBonesContext.js';
+import { HandShadows } from './HandShadows.js';
 
 export interface RoamGroupProps {
   enabled: boolean;
@@ -54,6 +57,8 @@ export function RoamGroup({ enabled, children }: RoamGroupProps) {
   const pointer = usePointerViewportTarget(enabled);
   /** Velocidad normalizada 0..1, compartida por contexto a los gestos hijos. */
   const speedRef = useRef(0);
+  /** Huesos de mano (los puebla `RobotModel`), para las sombras de mano. */
+  const handBonesRef = useRef<HandBones>({ left: null, right: null });
 
   useFrame((_state, delta) => {
     const group = groupRef.current;
@@ -95,10 +100,13 @@ export function RoamGroup({ enabled, children }: RoamGroupProps) {
 
   return (
     <RoamSpeedContext.Provider value={speedRef}>
-      <group ref={groupRef}>
-        {children}
-        {enabled ? <ShadowBlob /> : null}
-      </group>
+      <HandBonesContext.Provider value={handBonesRef}>
+        <group ref={groupRef}>
+          {children}
+          {enabled ? <ShadowBlob /> : null}
+          {enabled ? <HandShadows bonesRef={handBonesRef} /> : null}
+        </group>
+      </HandBonesContext.Provider>
     </RoamSpeedContext.Provider>
   );
 }

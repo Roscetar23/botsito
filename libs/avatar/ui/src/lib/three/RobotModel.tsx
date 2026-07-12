@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import { Center, useGLTF } from '@react-three/drei';
 import { useModelAnimation } from './useModelAnimation.js';
 import { useWaveGesture, WAVE_PERIOD } from './useWaveGesture.js';
@@ -8,6 +9,7 @@ import { useEyebrowGesture } from './useEyebrowGesture.js';
 import { useMouthGesture } from './useMouthGesture.js';
 import { useWalkSwing } from './useWalkSwing.js';
 import { useRoamSpeed } from './roamSpeedContext.js';
+import { useHandBones } from './handBonesContext.js';
 
 /** Ruta por defecto del GLB, precargada a nivel de módulo. */
 const DEFAULT_ASSET_URL = '/avatar/botcito.glb';
@@ -83,6 +85,18 @@ export function RobotModel({
   const { scene, animations } = useGLTF(url);
   const groupRef = useModelAnimation({ animations, clip, playing });
   const roamSpeed = useRoamSpeed();
+  const handBones = useHandBones();
+
+  // Publica los huesos de mano (nombres saneados por three) para que
+  // `HandShadows` (en `RoamGroup`) les proyecte sombra. Solo hay ref en roam.
+  useEffect(() => {
+    const root = groupRef.current;
+    if (!root || !handBones) return;
+    handBones.current = {
+      left: root.getObjectByName('Hueso') ?? null,
+      right: root.getObjectByName('Hueso001') ?? null,
+    };
+  }, [scene, groupRef, handBones]);
   useWaveGesture(groupRef, 'Hueso.001', gestures, 0);
   useWaveGesture(groupRef, 'Hueso', gesturesLeft, WAVE_PERIOD / 2);
   useBlinkGesture(groupRef, 'Hueso cuerpo.003', blinkLeft, 0);
