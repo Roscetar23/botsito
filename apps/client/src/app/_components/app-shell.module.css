@@ -1,39 +1,97 @@
-.header {
+/* ===== Pantalla de acceso (sin sesión) ===== */
+.authScreen {
+  position: relative;
+  min-height: 100vh;
   width: 100%;
-  max-width: 900px;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  overflow: hidden;
+}
+
+/* Resplandor de marca (morado + azul) al fondo */
+.glow {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(60% 50% at 80% 90%, rgba(57, 68, 231, 0.16), transparent 70%),
+    radial-gradient(55% 45% at 15% 8%, rgba(110, 63, 208, 0.14), transparent 70%);
+}
+
+.authMain {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+}
+
+/* ===== App con sesión ===== */
+.app {
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ===== Barra superior (ambos estados) ===== */
+.topbar {
+  position: relative;
+  z-index: 1;
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+}
+
+.session {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
   font-size: 0.9rem;
 }
 
-.user {
-  opacity: 0.85;
-}
-
 .logout {
-  padding: 0.4rem 0.8rem;
-  border: 1px solid rgba(255, 255, 255, 0.25);
+  padding: 0.4rem 0.9rem;
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.25));
   border-radius: 8px;
   background: transparent;
   color: inherit;
   cursor: pointer;
+  font: inherit;
   font-size: 0.85rem;
 }
 
 .logout:hover {
-  background: rgba(255, 255, 255, 0.08);
+  background: var(--surface-2, rgba(255, 255, 255, 0.08));
+}
+
+/* ===== Footer de la pantalla de acceso ===== */
+.footer {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  font-size: 0.78rem;
+  border-top: 1px solid var(--border, rgba(255, 255, 255, 0.08));
 }
 
 .centered {
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 40vh;
+  min-height: 100vh;
   width: 100%;
 }
 
 .muted {
-  opacity: 0.7;
+  color: var(--text-muted, rgba(255, 255, 255, 0.6));
 }

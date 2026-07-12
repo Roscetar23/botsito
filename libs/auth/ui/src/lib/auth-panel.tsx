@@ -4,28 +4,45 @@ import { useState } from 'react';
 import type { FormEvent } from 'react';
 import { useAuth } from './auth-context.js';
 import { AuthApiError } from './auth-types.js';
+import { Field } from './field.js';
 import styles from './auth-ui.module.css';
 
 type Mode = 'login' | 'register';
 
 /**
- * Panel de acceso: alterna login/registro, envía credenciales al backend
- * vía `useAuth` y muestra errores legibles. Al autenticar, `AuthProvider`
- * cambia el estado y el `apps/client` muestra la app.
+ * Panel de acceso con la identidad de marca BotCito: icono, título/subtítulo,
+ * campos (registro añade nombre, confirmar contraseña y términos), botón
+ * morado y toggle login↔registro. Envía al backend vía `useAuth`; al
+ * autenticar, `AuthProvider` cambia el estado y se muestra la app.
  */
 export function AuthPanel() {
   const { login, register } = useAuth();
   const [mode, setMode] = useState<Mode>('login');
+  const [displayName, setDisplayName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [displayName, setDisplayName] = useState('');
+  const [confirm, setConfirm] = useState('');
+  const [terms, setTerms] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
   const isRegister = mode === 'register';
 
+  function switchMode() {
+    setMode(isRegister ? 'login' : 'register');
+    setError(null);
+  }
+
   async function onSubmit(event: FormEvent) {
     event.preventDefault();
+    if (isRegister && password !== confirm) {
+      setError('Las contraseñas no coinciden');
+      return;
+    }
+    if (isRegister && !terms) {
+      setError('Debes aceptar los Términos de Servicio');
+      return;
+    }
     setError(null);
     setSubmitting(true);
     try {
@@ -35,9 +52,7 @@ export function AuthPanel() {
         await login({ email, password });
       }
     } catch (err) {
-      const msg =
-        err instanceof AuthApiError ? err.message : 'Ocurrió un error inesperado';
-      setError(msg);
+      setError(err instanceof AuthApiError ? err.message : 'Ocurrió un error inesperado');
     } finally {
       setSubmitting(false);
     }
@@ -45,65 +60,87 @@ export function AuthPanel() {
 
   return (
     <form className={styles.card} onSubmit={onSubmit}>
-      <h2 className={styles.title}>{isRegister ? 'Crear cuenta' : 'Iniciar sesión'}</h2>
+      <span className={styles.badge} aria-hidden="true">⚡</span>
+      <div className={styles.head}>
+        <h2 className={styles.title}>{isRegister ? 'Crear cuenta' : 'Iniciar sesión'}</h2>
+        <p className={styles.subtitle}>
+          {isRegister
+            ? 'Únete al futuro de tu asistente virtual.'
+            : 'Bienvenido de vuelta a BotCito.'}
+        </p>
+      </div>
 
       {error && <p className={styles.error} role="alert">{error}</p>}
 
-      <div className={styles.form}>
+      <div className={styles.fields}>
         {isRegister && (
-          <label className={styles.field}>
-            Nombre (opcional)
-            <input
-              className={styles.input}
-              type="text"
-              value={displayName}
-              onChange={(e) => setDisplayName(e.target.value)}
-              autoComplete="name"
-              maxLength={120}
-            />
-          </label>
-        )}
-        <label className={styles.field}>
-          Email
-          <input
-            className={styles.input}
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            autoComplete="email"
-            required
+          <Field
+            label="Nombre completo"
+            type="text"
+            value={displayName}
+            onChange={setDisplayName}
+            placeholder="Juan Pérez"
+            autoComplete="name"
+            icon="👤"
           />
-        </label>
-        <label className={styles.field}>
-          Contraseña
-          <input
-            className={styles.input}
+        )}
+        <Field
+          label="Correo"
+          type="email"
+          value={email}
+          onChange={setEmail}
+          placeholder="nombre@empresa.com"
+          autoComplete="email"
+          required
+        />
+        <div className={isRegister ? styles.row : undefined}>
+          <Field
+            label="Contraseña"
             type="password"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={setPassword}
+            placeholder="••••••••"
             autoComplete={isRegister ? 'new-password' : 'current-password'}
             minLength={isRegister ? 8 : undefined}
+            icon="🔒"
             required
           />
-        </label>
+          {isRegister && (
+            <Field
+              label="Confirmar"
+              type="password"
+              value={confirm}
+              onChange={setConfirm}
+              placeholder="••••••••"
+              autoComplete="new-password"
+              required
+            />
+          )}
+        </div>
+
+        {isRegister && (
+          <label className={styles.terms}>
+            <input type="checkbox" checked={terms} onChange={(e) => setTerms(e.target.checked)} />
+            Acepto los <span className={styles.termsLink}>Términos de Servicio</span>
+          </label>
+        )}
+
         <button className={styles.button} type="submit" disabled={submitting}>
-          {submitting ? 'Enviando…' : isRegister ? 'Registrarme' : 'Entrar'}
+          {submitting ? 'Enviando…' : isRegister ? 'Registrarme →' : 'Entrar →'}
         </button>
       </div>
 
       <p className={styles.toggle}>
         {isRegister ? '¿Ya tienes cuenta? ' : '¿No tienes cuenta? '}
-        <button
-          type="button"
-          className={styles.link}
-          onClick={() => {
-            setMode(isRegister ? 'login' : 'register');
-            setError(null);
-          }}
-        >
+        <button type="button" className={styles.link} onClick={switchMode}>
           {isRegister ? 'Inicia sesión' : 'Regístrate'}
         </button>
       </p>
+
+      <div className={styles.footerBadges} aria-hidden="true">
+        <span>🔒 CIFRADO AES-256</span>
+        <span>🤖 AVATAR IA</span>
+      </div>
     </form>
   );
 }
