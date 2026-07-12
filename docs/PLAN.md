@@ -13,6 +13,7 @@
 **Documentos del proyecto:**
 - [`SETUP.md`](./SETUP.md) — bootstrap del monorepo NX (paso a paso).
 - [`AVATAR.md`](./AVATAR.md) — ⭐ plan maestro del avatar (núcleo del producto), con fases propias AV-0…AV-6.
+- [`FRONTEND.md`](./FRONTEND.md) — 🎨 diseño y progreso **visual** del cliente (estructura, estilos, tokens, roadmap FE-1…).
 
 ---
 
@@ -140,6 +141,16 @@ Se aplican reglas con `@nx/enforce-module-boundaries`:
 `type:feature` → puede usar `data-access`, `ui`, `model`, `scope:shared`.
 `type:data-access` → sólo `model` y `scope:shared`. `model`/`shared` → sin dependencias de
 dominio. Un `scope:X` no importa `type:feature` de otro `scope:Y`.
+
+### 3.6 Visual / diseño del frontend 🎨
+
+Todo lo que se **ve en pantalla** (estructura del cliente, estilos, sistema de diseño y roadmap
+visual) vive en su documento propio: **[`FRONTEND.md`](./FRONTEND.md)**. Resumen:
+
+- **App delgada** (`apps/client`) + UI en `libs/*/ui`; **CSS Modules** por componente (sin framework CSS).
+- **Sistema de diseño** (tokens por variables CSS: color/tipografía/espaciado/radios) — a construir.
+- **Roadmap visual (FE-1…):** login/registro con diseño → vista Home → tokens/tema → marca → a11y.
+- Estado hoy: auth (login/registro) funcional con diseño **básico**; avatar **terminado**. **En curso: FE-1.**
 
 ---
 
