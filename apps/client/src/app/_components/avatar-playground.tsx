@@ -26,17 +26,18 @@ export function AvatarPlayground() {
   // Modo de control del 3D: por emoción (el muñeco se expresa solo) o
   // manual (toggles de calibración por gesto).
   const [drive, setDrive] = useState<'emotion' | 'manual'>('emotion');
-  const [emotion, setEmotion] = useState<AvatarState>('happy');
-  const [playClip, setPlayClip] = useState(true);
-  const [gestures, setGestures] = useState(true);
-  const [gesturesLeft, setGesturesLeft] = useState(true);
-  const [blinkLeft, setBlinkLeft] = useState(true);
-  const [blinkRight, setBlinkRight] = useState(true);
-  const [eyebrowLeft, setEyebrowLeft] = useState(true);
-  const [eyebrowRight, setEyebrowRight] = useState(true);
-  const [eyebrowTilt, setEyebrowTilt] = useState(true);
-  const [eyebrowAngry, setEyebrowAngry] = useState(true);
-  const [mouth, setMouth] = useState(true);
+  const [emotion, setEmotion] = useState<AvatarState>('idle');
+  // Modo manual: todos los gestos arrancan en OFF (se encienden a mano al calibrar).
+  const [playClip, setPlayClip] = useState(false);
+  const [gestures, setGestures] = useState(false);
+  const [gesturesLeft, setGesturesLeft] = useState(false);
+  const [blinkLeft, setBlinkLeft] = useState(false);
+  const [blinkRight, setBlinkRight] = useState(false);
+  const [eyebrowLeft, setEyebrowLeft] = useState(false);
+  const [eyebrowRight, setEyebrowRight] = useState(false);
+  const [eyebrowTilt, setEyebrowTilt] = useState(false);
+  const [eyebrowAngry, setEyebrowAngry] = useState(false);
+  const [mouth, setMouth] = useState(false);
 
   return (
     <section className={styles.playground}>
