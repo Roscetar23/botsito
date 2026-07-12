@@ -12,21 +12,18 @@
   gap: 1.25rem;
 }
 
-/* Icono de marca (cuadro morado) */
+/* Cuadro con el icono del robot (logo sin texto), vía background-image. */
 .badge {
   align-self: center;
-  width: 48px;
-  height: 48px;
-  display: grid;
-  place-items: center;
-  border-radius: 12px;
-  font-size: 1.4rem;
-  background: linear-gradient(
-    145deg,
-    var(--brand-primary-bright, #6e3fd0),
-    var(--brand-primary, #44237b)
-  );
-  box-shadow: 0 8px 24px -8px var(--brand-primary, #44237b);
+  width: 66px;
+  height: 66px;
+  border-radius: 16px;
+  background-color: rgba(110, 63, 208, 0.14);
+  background-image: url('/brand/icon-dark.png');
+  background-size: 42px;
+  background-position: center;
+  background-repeat: no-repeat;
+  border: 1px solid rgba(110, 63, 208, 0.35);
 }
 
 .head {
@@ -75,20 +72,6 @@
   color: var(--text-muted, rgba(255, 255, 255, 0.62));
 }
 
-.inputWrap {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-
-.inputIcon {
-  position: absolute;
-  left: 0.7rem;
-  font-size: 0.85rem;
-  opacity: 0.6;
-  pointer-events: none;
-}
-
 .input {
   width: 100%;
   padding: 0.65rem 0.8rem;
@@ -98,10 +81,6 @@
   color: var(--text, #fff);
   font: inherit;
   font-size: 0.95rem;
-}
-
-.inputWrap:has(.inputIcon) .input {
-  padding-left: 2rem;
 }
 
 .input::placeholder {

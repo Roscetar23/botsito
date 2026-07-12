@@ -3,6 +3,7 @@
 import type { ReactNode } from 'react';
 import { AuthProvider, AuthPanel, useAuth } from '@asistente/auth-ui';
 import { BrandLogo } from './brand-logo';
+import { Avatar3DLazy } from './avatar-3d-lazy';
 import styles from './app-shell.module.css';
 
 /**
@@ -40,6 +41,9 @@ function AuthGate({ children }: { children: ReactNode }) {
         </header>
         <main className={styles.authMain}>
           <AuthPanel />
+          <div className={styles.authBot} aria-hidden="true">
+            <Avatar3DLazy state="idle" interactive={false} size={360} />
+          </div>
         </main>
         <footer className={styles.footer}>
           <span>© 2026 BotCito</span>

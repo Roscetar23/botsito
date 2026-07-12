@@ -60,7 +60,7 @@ export function AuthPanel() {
 
   return (
     <form className={styles.card} onSubmit={onSubmit}>
-      <span className={styles.badge} aria-hidden="true">⚡</span>
+      <span className={styles.badge} aria-hidden="true" />
       <div className={styles.head}>
         <h2 className={styles.title}>{isRegister ? 'Crear cuenta' : 'Iniciar sesión'}</h2>
         <p className={styles.subtitle}>
@@ -81,7 +81,6 @@ export function AuthPanel() {
             onChange={setDisplayName}
             placeholder="Juan Pérez"
             autoComplete="name"
-            icon="👤"
           />
         )}
         <Field
@@ -102,7 +101,6 @@ export function AuthPanel() {
             placeholder="••••••••"
             autoComplete={isRegister ? 'new-password' : 'current-password'}
             minLength={isRegister ? 8 : undefined}
-            icon="🔒"
             required
           />
           {isRegister && (
@@ -138,8 +136,8 @@ export function AuthPanel() {
       </p>
 
       <div className={styles.footerBadges} aria-hidden="true">
-        <span>🔒 CIFRADO AES-256</span>
-        <span>🤖 AVATAR IA</span>
+        <span>CIFRADO AES-256</span>
+        <span>AVATAR IA</span>
       </div>
     </form>
   );
