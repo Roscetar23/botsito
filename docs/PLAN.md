@@ -6,7 +6,8 @@
 - **Orquestador:** Oscar Javier Gomez Manrique
 - **Fecha inicial:** 2026-07-09
 - **Repo:** `/home/ogomez/bot` (branch `main`, remoto `botsito`)
-- **Estado:** Fase 5 en curso (Fases 1 y 2 ✅). Backend Tasks + Auth funcionando contra Atlas.
+- **Estado:** Fases 1, 2 y 5 ✅ (Backend Tasks + Auth contra Atlas; **avatar 2D+3D TERMINADO**).
+  Pendiente para reactivar el avatar solo: eventos realtime (Fase 3) → `AvatarState`.
 
 **Documentos del proyecto:**
 - [`SETUP.md`](./SETUP.md) — bootstrap del monorepo NX (paso a paso).
@@ -337,8 +338,11 @@ Estado: `[ ]` pendiente · `[~]` en curso · `[x]` hecho.
 - [x] **T-20** Definición + arte del personaje (robot con audífonos) + `docs/AVATAR.md`. → **AV-0** ✅.
 - [x] **T-21** `avatar/model` + `avatar/ui`: rig por capas del personaje real, comportamientos idle
   (respirar/parpadear), máquina de estados y emociones con Framer Motion. → **AV-1…AV-4** ✅ (lint/typecheck/tests verde).
-- [~] **T-22** `<Avatar>` montado en el dashboard de `apps/client` con panel de pruebas (**AV-5** ✅).
-  Falta reaccionar a eventos realtime/acciones (**AV-6**, tras Fase 3). → [`AVATAR.md`](./AVATAR.md).
+- [x] **T-22** Avatar **3D real** (React Three Fiber): gestos por hueso (saludo/parpadeo/cejas/boca),
+  **emociones** que los combinan (`AvatarState`), caminado y sombras. Panel de pruebas Emociones/Manual.
+  → **AV-5…AV-8 ✅ (personaje TERMINADO, 2026-07-12)**. Ver [`AVATAR.md`](./AVATAR.md) / [`AVATAR-ANIMACIONES.md`](./AVATAR-ANIMACIONES.md).
+- [ ] **T-22b** *(futuro)* Reaccionar a **eventos realtime/acciones** (**AV-6**, tras Fase 3): mapear
+  eventos → `AvatarState` para que el muñeco cambie de emoción solo.
 
 ### Fase 6 — NLU (opcional)
 - [ ] **T-23** `LlmService` con interfaz `NluPort` (provider-agnostic), keys por env.

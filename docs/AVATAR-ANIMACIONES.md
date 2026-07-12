@@ -2,8 +2,13 @@
 
 > Referencia del avatar 3D (`botcito.glb`) y sus dos sistemas de animación:
 > el **clip de Blender** (baked) y los **gestos procedurales por código**.
-> Complementa a [`AVATAR.md`](./AVATAR.md) (fases AV-8). Estado: **saludo (ambas manos) + parpadeo
-> (ambos ojos) calibrados y confirmados ✅**.
+> Complementa a [`AVATAR.md`](./AVATAR.md) (fases AV-8).
+>
+> **Estado: personaje TERMINADO ✅** (con posibles mejoras a futuro — ver §7). Vocabulario completo
+> de gestos (manos, ojos, cejas, boca), **emociones** que los combinan solas (`AvatarState`),
+> **caminado** con balanceo de manos según la velocidad y **sombras** de cuerpo y manos. Todo
+> calibrado y confirmado por el usuario, modular (hooks reutilizables, archivos <150 líneas) y en
+> verde (lint/typecheck/test/build).
 
 ---
 
@@ -47,17 +52,27 @@ en `getObjectByName` (o sanear en código). Esto causó el bug "no se mueve nada
 
 ---
 
-## 2. Dos sistemas de animación (independientes)
+## 2. Cómo se controla (panel de pruebas, modo 3D)
 
-Se controlan por separado desde el panel de pruebas (modo 3D) con **cinco toggles**:
+El panel tiene dos **modos de control** (switch en la UI):
+
+- **Emociones** (por defecto; el 3D **abre en `idle`/Reposo**): eliges un `AvatarState` y el muñeco
+  **se expresa solo** combinando los gestos — ver §4. Es la forma "de verdad".
+- **Manual (calibrar)**: toggles por gesto, **todos arrancan en OFF**, para aislar y calibrar cada
+  uno. Cada toggle mapea a una prop de `Avatar3D`:
 
 | Toggle en la UI | Prop de `Avatar3D` | Qué anima |
 |---|---|---|
-| **"Animación Blender (tuya)"** | `playClip` (default true) | El clip baked `Esqueleto_acción` (manos + cara). |
-| **"Saludo mano der."** | `gestures` (default true) | Saludo procedural en la mano derecha (`Hueso.001`). |
-| **"Saludo mano izq."** | `gesturesLeft` (default true) | Saludo procedural en la mano izquierda (`Hueso`), alternado. |
-| **"Parpadeo ojo izq."** | `blinkLeft` (default true) | Parpadeo procedural del ojo izquierdo (`Hueso cuerpo.003`). |
-| **"Parpadeo ojo der."** | `blinkRight` (default true) | Parpadeo procedural del ojo derecho (`Hueso cuerpo.001`), sincronizado. |
+| **"Animación Blender (tuya)"** | `playClip` | El clip baked `Esqueleto_acción` (manos + cara). |
+| **"Saludo mano der." / "izq."** | `gestures` / `gesturesLeft` | Saludo en la mano der. (`Hueso.001`) / izq. (`Hueso`), alternado. |
+| **"Parpadeo ojo izq." / "der."** | `blinkLeft` / `blinkRight` | Parpadeo del ojo izq. (`Hueso cuerpo.003`) / der. (`Hueso cuerpo.001`), a la vez. |
+| **"Ceja izq." / "der."** | `eyebrowLeft` / `eyebrowRight` | Levantar la ceja izq. (`Hueso cuerpo.005`) / der. (`Hueso cuerpo.004`) → sorpresa. |
+| **"Inclinar cejas"** | `eyebrowTilt` | Inclina ambas cejas adentro→afuera. |
+| **"Fruncir (enojo)"** | `eyebrowAngry` | Inclina ambas cejas afuera→adentro → enojo. |
+| **"Boca (hablar)"** | `mouth` | Abre/cierra la boca en ráfagas (`Hueso cuerpo.002`). |
+
+Además, dos comportamientos **no son toggles** sino automáticos: el **caminado** (`walk`, balanceo
+de manos según la velocidad de roam — §5) y las **sombras** de cuerpo y manos (§6).
 
 ### 2.1 Clip de Blender (`Esqueleto_acción`)
 - Se reproduce en bucle (`useModelAnimation.ts` + drei `useAnimations`).
@@ -125,6 +140,28 @@ emparentado a un hueso; aplastar el hueso en vertical cierra el párpado).
 
 > Para **desincronizar** los ojos (un guiño/tic), basta con un `phaseOffset` distinto en un ojo.
 
+### 2.4 Cejas (`useEyebrowGesture.ts`) — levantar + inclinar/fruncir
+Hook con **dos efectos independientes** por instancia (`{ raise, tilt, tiltAngle, ... }`), uno por
+ceja (`Hueso cuerpo.005` izq., `.004` der.):
+- **Levantar** (`raise`): sube la ceja por **posición**. Como el hueso padre (`Hueso cuerpo`) es
+  identidad, `bone.position.y` equivale a subir en el mundo. → sorpresa.
+- **Inclinar/fruncir** (`tilt`): gira la ceja por **rotación**, con `tiltAngle` de **signo opuesto por
+  ceja** (están dibujadas en espejo). Se ofrecen las dos direcciones: adentro→afuera (`eyebrowTilt`)
+  y afuera→adentro = enojo (`eyebrowAngry`); es el mismo giro con signo invertido, y en `RobotModel`
+  se combinan en un solo ángulo (si se activan ambas, se cancelan).
+- ⚠️ **La inclinación se aplica con `premultiply`** (giro en el frame del **padre/mundo**), NO en el
+  eje local: la ceja izquierda tiene su hueso más inclinado fuera del plano y, en local, se
+  **escorzaba/"contraía"** al girar. En el frame del mundo ambas rotan igual dentro del plano.
+
+### 2.5 Boca hablando (`useMouthGesture.ts`)
+Por **escala** (la boca es un rectángulo plano de 4 vértices; una sonrisa *curvada* real no es
+posible con un plano + un hueso — haría falta una shape key en Blender).
+- **Hablar:** abre/cierra en ráfagas escalando el hueso en `MOUTH_OPEN_AXIS='x'` (medido: escalar
+  X ⇒ alto en mundo ×2.9 sin tocar el ancho). Envolvente de ráfaga × oscilación de flaps; restaura
+  la escala base fuera de la ventana.
+- Calibrado suave: `MOUTH_OPEN_AMOUNT=0.7` (el pivote está descentrado; abrir mucho subía la boca) y
+  `MOUTH_SPEED=7`.
+
 ---
 
 ## 3. Receta: cómo crear un gesto nuevo (con cualquier hueso/mano)
@@ -155,41 +192,89 @@ la misma; esto es lo que aprendimos:
 
 ---
 
-## 4. Próximos pasos
+## 4. Emociones → gestos (`stateGestures.ts`)
 
-- [x] **Saludo calibrado** (levanta la mano + vaivén) en la mano derecha.
-- [x] **Segunda mano** (`Hueso`) con su botón (saludos alternados) — **confirmado por el usuario** (las mismas
-      perillas sirven para ambas manos; la izquierda NO necesitó espejo).
-- [x] **Parpadeo de ambos ojos** (`useBlinkGesture`, escala en Y) con sus toggles — **confirmado por el
-      usuario**. Primero se apuntó por error a la ceja (`.005`); corregido al ojo real (`.003`/`.001`).
-- [ ] **Más gestos** con la misma receta: cejas (sorpresa/enojo), boca (hablar/sonreír), asentir,
-      celebrar con las dos manos, señalar, "pensar".
-- [ ] **Mapear gestos/estado → `AvatarState`** (idle/speaking/happy/notify…): reutilizar la prop
-      `clip?` de `Avatar3D` y/o disparar gestos según el estado. Conecta con **AV-6** (reactividad a eventos).
-- [ ] (Opcional) Más Actions en Blender si se prefieren clips baked a procedural.
+El muñeco **se expresa solo** al recibir un `AvatarState`. `gesturesForState(state)` es la fuente
+de verdad: devuelve qué banderas de gesto enciende cada emoción. `Avatar3D` acepta `state?`; si se
+pasa, deriva los gestos y **anula** los toggles manuales.
+
+| Estado | Gestos que combina |
+|---|---|
+| `idle` (Reposo) | Parpadeo (+ caminado si se mueve) |
+| `listening` (Escuchando) | Parpadeo + cejas arriba |
+| `speaking` (Hablando) | Parpadeo + boca |
+| `thinking` (Pensando) | Parpadeo + cejas inclinadas |
+| `happy` (Feliz) | Parpadeo + cejas arriba + **saludo con ambas manos** |
+| `sad` (Triste) | Parpadeo + cejas fruncidas/caídas |
+| `notify` (Notificación) | Parpadeo + cejas arriba + saludo + boca |
+
+> El vocabulario de gestos es limitado, así que algunas emociones se **aproximan** (p. ej. `sad`
+> reutiliza el fruncido; `thinking` usa la inclinación). Pendiente: conectar `state` a **eventos
+> reales** (asistente hablando → `speaking`, notificación → `notify`).
+
+## 5. Caminado — balanceo de manos (`useWalkSwing.ts` + `roamSpeedContext.ts`)
+
+Cuando el muñeco deambula (roam) y se mueve, las manos **columpian adelante/atrás** (eje `z`),
+**alternadas** (fase π, como los brazos al andar) y con **amplitud proporcional a la velocidad**:
+
+- `RoamGroup` mide su velocidad de desplazamiento, la normaliza 0..1 y la comparte por **contexto**
+  (un ref, sin re-render). `useWalkSwing` la lee y columpia cada mano.
+- **Quieto → manos quietas** (deja el saludo/reposo). Usa `smoothstep` para volver a la base sin
+  residuo al frenar. Corre **después** del saludo para tener prioridad en las manos en movimiento.
+- Va en **todos los estados MENOS `happy` y `notify`** (esos ya saludan con las manos). Se apaga en
+  modo "caja" (sin roam no hay velocidad) y con `prefers-reduced-motion`. Calmado: `WALK_SPEED=5`.
+
+## 6. Sombras (`ShadowBlob.tsx` + `HandShadows.tsx`)
+
+Solo en modo roam (dan sensación de peso, no de brillo):
+- **`ShadowBlob`**: elipse de contacto bajo el cuerpo (dos capas concéntricas), pegada al suelo.
+- **`HandShadows`**: una elipse tenue bajo **cada mano** que la **sigue** (útil al caminar): proyecta
+  la posición mundial de cada hueso de mano al suelo cada frame. Los huesos llegan desde `RobotModel`
+  hasta `RoamGroup` (donde vive la sombra, fuera del `Float`) por contexto (`handBonesContext`).
 
 ---
 
-## 5. Archivos clave
+## 7. Posibles mejoras a futuro
 
-- `libs/avatar/ui/src/lib/three/Avatar3D.tsx` — componente 3D (props: `size`, `fullscreen`, `roam`,
-  `interactive`, `clip?`, `gestures` (mano der.), `gesturesLeft` (mano izq.), `blinkLeft`/`blinkRight`
-  (ojos), `playClip`).
-- `libs/avatar/ui/src/lib/three/RobotModel.tsx` — carga GLB + `useModelAnimation` + `useWaveGesture`
-  (×2 manos) + `useBlinkGesture` (×2 ojos).
-- `libs/avatar/ui/src/lib/three/useModelAnimation.ts` — reproduce el clip baked.
-- `libs/avatar/ui/src/lib/three/useWaveGesture.ts` — **saludo reutilizable** por hueso (rotación;
-  perillas calibradas aquí; se instancia por mano).
-- `libs/avatar/ui/src/lib/three/useBlinkGesture.ts` — **parpadeo reutilizable** por hueso (escala en
-  Y; perillas calibradas aquí; se instancia por ojo).
-- `libs/avatar/ui/src/lib/three/RoamGroup.tsx` — perseguir el mouse + orientación de vuelo + sombra.
-- `libs/avatar/ui/src/lib/three/ShadowBlob.tsx` — sombra de contacto.
-- `apps/client/src/app/_components/three-controls.tsx` — los toggles (clip / saludo der.·izq. / parpadeo izq.·der.).
+El personaje está **terminado y funcional**. Ideas si algún día se retoma:
+
+- [ ] **Conectar `state` a eventos reales** (asistente hablando → `speaking`, notificación → `notify`,
+      escuchando micro → `listening`). Es el gran paso pendiente (AV-6 en [`AVATAR.md`](./AVATAR.md)).
+- [ ] **Emociones más ricas**: `sad`/`thinking` hoy se aproximan con el vocabulario existente;
+      podrían tener gestos propios (p. ej. mirar hacia un lado, "cabeza" ladeada).
+- [ ] **Sonrisa real**: hoy no se hace (rectángulo plano). Requiere una **shape key** de sonrisa (o
+      malla de boca curva) en Blender; luego se anima igual que el resto.
+- [ ] **Más gestos** con la misma receta: asentir/negar (cara), señalar, celebrar, "pensar".
+- [ ] **Transiciones** suaves entre emociones (hoy el cambio de banderas es inmediato).
+- [ ] (Opcional) Micro-bob del cuerpo al caminar; modular boca/cejas por la velocidad.
+
+---
+
+## 8. Archivos clave
+
+Gestos por hueso (reutilizables; perillas calibradas al inicio de cada archivo):
+- `useWaveGesture.ts` — **saludo** (rotación; ×2 manos).
+- `useBlinkGesture.ts` — **parpadeo** (escala; ×2 ojos).
+- `useEyebrowGesture.ts` — **cejas** levantar/inclinar/fruncir (posición + rotación; ×2 cejas).
+- `useMouthGesture.ts` — **boca hablando** (escala).
+- `useWalkSwing.ts` — **balanceo al caminar** (posición, según velocidad).
+
+Orquestación y escena:
+- `Avatar3D.tsx` — componente público (props: `state?`, `size`, `fullscreen`, `roam`, `interactive`,
+  `clip?`, banderas de gesto manuales, `walk`, `playClip`).
+- `RobotModel.tsx` — carga GLB + `useModelAnimation` + instancia todos los gestos; publica los huesos
+  de mano por contexto para las sombras.
+- `stateGestures.ts` — mapeo **emoción → gestos** (`gesturesForState`).
+- `RoamGroup.tsx` — deambular/perseguir el mouse + orientación de vuelo + velocidad (contexto) + sombras.
+- `roamSpeedContext.ts` / `handBonesContext.ts` — refs compartidos (velocidad / huesos de mano).
+- `ShadowBlob.tsx` / `HandShadows.tsx` — sombras de cuerpo / de manos.
+- `useModelAnimation.ts` — reproduce el clip baked.
+- `apps/client/src/app/_components/three-controls.tsx` + `avatar-playground.tsx` — panel (Emociones/Manual).
 - Agente para tocar esto: **`avatar`** (`.claude/agents/avatar.md`).
 
 ---
 
-## 6. Log
+## 9. Log
 - 2026-07-10 — Sistema documentado. Clip baked corregido (sin teletransporte) + primer gesto
   procedural (saludo) funcionando; pendiente calibrar. Toggles de aislamiento en la UI.
 - 2026-07-10 — **Saludo calibrado** (levanta la mano/dedos arriba + vaivén más largo). Gesto
@@ -201,3 +286,11 @@ la misma; esto es lo que aprendimos:
   la cara midiendo el bounding box en mundo: `.004/.005` son **cejas**, los ojos son `.003` (izq.) y
   `.001` (der.). Hook reutilizable instanciado por ojo (parpadean a la vez), con sus toggles.
   Confirmado por el usuario ("quedó perfecto").
+- 2026-07-12 — **Cejas** (`useEyebrowGesture`): levantar + inclinar/fruncir (dos direcciones), con fix
+  de escorzado de la ceja izq. (giro en frame del mundo, `premultiply`). **Boca hablando**
+  (`useMouthGesture`, escala en X). Confirmados por el usuario.
+- 2026-07-12 — **Emociones** (`stateGestures.ts` + `Avatar3D` prop `state`): cada `AvatarState` combina
+  gestos; el 3D abre en `idle`, modo manual todo en OFF. **Caminado** (`useWalkSwing` +
+  `roamSpeedContext`): balanceo de manos según velocidad, en todos los estados menos `happy`/`notify`.
+  **Sombras de mano** (`HandShadows` + `handBonesContext`) que siguen a cada mano.
+- 2026-07-12 — **Personaje TERMINADO** ✅. Cierre de la tarea; mejoras a futuro en §7.

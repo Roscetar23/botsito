@@ -7,7 +7,8 @@
 
 - **Dominio:** `libs/avatar` (`avatar-model`, `avatar-ui`)
 - **Stack:** React + SVG + **Framer Motion** (ver decisión D-06 del PLAN)
-- **Estado:** AV-0 (definición) — a la espera del arte del personaje
+- **Estado:** **TERMINADO ✅** (2026-07-12) — rig 2D + 3D real (R3F) con gestos, emociones,
+  caminado y sombras. Mejoras a futuro en [`AVATAR-ANIMACIONES.md`](./AVATAR-ANIMACIONES.md) §7.
 - **Regla del repo:** ≤150 líneas por archivo, Screaming Architecture, TS estricto
 
 ---
@@ -215,9 +216,16 @@ Estado: `[ ]` pendiente · `[~]` en curso · `[x]` hecho.
 - [x] **AV-8.4** Integrado en `apps/client` con **toggle 2D/3D** y carga diferida `next/dynamic({ssr:false})`.
 - [x] **AV-8.5** **Clip baked reproducido** (`useModelAnimation`, bucle con fade-in). Prop `clip?` lista
   para mapear `AvatarState`→clip. Toggle `playClip` para aislarlo en pruebas.
-- [~] **AV-8.6** **Gestos procedurales por hueso** (`useProceduralGestures`): primer gesto (saludo)
-  funcionando; **en calibración** (eje/amplitud). Toggle `gestures`. Ver [`AVATAR-ANIMACIONES.md`](./AVATAR-ANIMACIONES.md) §3.
-- [ ] **AV-8.7** Mapear gestos/clips → `AvatarState` (idle/speaking/happy/notify…) y conectar a eventos (AV-6).
+- [x] **AV-8.6** **Gestos procedurales por hueso** (hooks reutilizables): **saludo** (2 manos),
+  **parpadeo** (2 ojos), **cejas** (levantar/inclinar/fruncir), **boca** (hablar) — todos calibrados
+  y confirmados. Además **caminado** (balanceo de manos según velocidad) y **sombras** de mano.
+  Detalle en [`AVATAR-ANIMACIONES.md`](./AVATAR-ANIMACIONES.md).
+- [x] **AV-8.7** **Emociones → gestos** (`stateGestures.ts`): `Avatar3D` acepta `state?` y combina los
+  gestos por `AvatarState`. **Falta** solo conectar `state` a **eventos reales** (AV-6).
+
+> **AV-8 / personaje 3D: TERMINADO ✅** (2026-07-12). Mejoras a futuro en
+> [`AVATAR-ANIMACIONES.md`](./AVATAR-ANIMACIONES.md) §7; lo principal pendiente es cablear las
+> emociones a eventos reales del asistente (AV-6).
 
 ---
 
