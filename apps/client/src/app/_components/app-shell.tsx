@@ -42,7 +42,9 @@ function AuthGate({ children }: { children: ReactNode }) {
         <main className={styles.authMain}>
           <AuthPanel />
           <div className={styles.authBot} aria-hidden="true">
-            <Avatar3DLazy state="idle" interactive={false} size={340} cameraZ={12.5} />
+            {/* Escuchando: solo parpadeo + cejas. La mirada sigue el cursor
+                (interactive) pero NO deambula (roam off) → se queda en su sitio. */}
+            <Avatar3DLazy state="listening" playClip={false} interactive size={340} cameraZ={12.5} />
           </div>
         </main>
         <footer className={styles.footer}>
