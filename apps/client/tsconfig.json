@@ -50,6 +50,9 @@
   ],
   "references": [
     {
+      "path": "../../libs/auth/ui"
+    },
+    {
       "path": "../../libs/avatar/ui"
     },
     {
