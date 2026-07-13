@@ -6,6 +6,31 @@
   flex-direction: column;
 }
 
+/* Bloques que cambian al alternar login/registro: entran con un fundido
+ * suave (se remontan por `key={mode}`) para que el cambio no sea brusco. */
+.pane {
+  display: flex;
+  flex-direction: column;
+  animation: authFade 0.32s ease;
+}
+
+@keyframes authFade {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pane {
+    animation: none;
+  }
+}
+
 .kicker {
   margin: 0 0 0.6rem;
   font-size: 0.7rem;

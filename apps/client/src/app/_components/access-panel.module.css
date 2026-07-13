@@ -10,41 +10,10 @@
   background: linear-gradient(155deg, #3d2270 0%, #241733 55%, #1b1226 100%);
 }
 
-/* Marca (icono + letras) */
+/* Marca (Logotipo Final) */
 .brand {
   display: flex;
   align-items: center;
-  gap: 0.85rem;
-}
-
-.brandIcon {
-  width: 46px;
-  height: 46px;
-  border-radius: 12px;
-  background-color: rgba(255, 255, 255, 0.08);
-  background-image: url('/brand/icon-dark.png');
-  background-size: 30px;
-  background-position: center;
-  background-repeat: no-repeat;
-  border: 1px solid rgba(255, 255, 255, 0.18);
-}
-
-.brandText {
-  display: flex;
-  flex-direction: column;
-  line-height: 1.2;
-}
-
-.brandText strong {
-  font-size: 1.05rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-}
-
-.brandText small {
-  font-size: 0.68rem;
-  letter-spacing: 0.22em;
-  color: rgba(255, 255, 255, 0.55);
 }
 
 /* Tarjeta del entorno de acceso */

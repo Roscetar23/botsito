@@ -60,8 +60,10 @@ export function AuthPanel() {
   return (
     <form className={styles.form} onSubmit={onSubmit}>
       <p className={styles.kicker}>Portal de control</p>
-      <h1 className={styles.title}>{copy.title}</h1>
-      <p className={styles.subtitle}>{copy.subtitle}</p>
+      <div className={styles.pane} key={`${mode}-head`}>
+        <h1 className={styles.title}>{copy.title}</h1>
+        <p className={styles.subtitle}>{copy.subtitle}</p>
+      </div>
 
       <div className={styles.tabs} role="tablist">
         <button type="button" role="tab" aria-selected={!isRegister}
@@ -74,6 +76,7 @@ export function AuthPanel() {
         </button>
       </div>
 
+      <div className={styles.pane} key={`${mode}-body`}>
       {error && <p className={styles.error} role="alert">{error}</p>}
 
       {isRegister && (
@@ -100,6 +103,7 @@ export function AuthPanel() {
       <button className={styles.button} type="submit" disabled={submitting}>
         {submitting ? 'Enviando…' : `${copy.cta} →`}
       </button>
+      </div>
 
       <p className={styles.switch}>
         {isRegister ? '¿Ya formas parte de Botcito? ' : '¿Aún no tienes acceso? '}

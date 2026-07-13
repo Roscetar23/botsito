@@ -1,6 +1,7 @@
 'use client';
 
 import { Avatar3DLazy } from './avatar-3d-lazy';
+import { BrandLogo } from './brand-logo';
 import styles from './access-panel.module.css';
 
 /**
@@ -12,18 +13,14 @@ export function AccessPanel() {
   return (
     <aside className={styles.panel}>
       <div className={styles.brand}>
-        <span className={styles.brandIcon} aria-hidden="true" />
-        <span className={styles.brandText}>
-          <strong>BOTCITO</strong>
-          <small>ROBOT SYSTEMS</small>
-        </span>
+        <BrandLogo height={62} />
       </div>
 
       <div className={styles.card}>
         <div className={styles.cardHead}>
           <div>
             <p className={styles.cardKicker}>Entorno de acceso</p>
-            <h2 className={styles.cardTitle}>Tu copiloto está listo.</h2>
+            <h2 className={styles.cardTitle}>Tu asistente casi inteligente.</h2>
           </div>
           <span className={styles.cardBadge} aria-hidden="true">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
@@ -34,7 +31,7 @@ export function AccessPanel() {
         </div>
 
         <div className={styles.modelFrame}>
-          <Avatar3DLazy state="happy" interactive size={280} cameraZ={12.5} />
+          <Avatar3DLazy state="happy" playClip={false} interactive size={320} cameraZ={12.5} />
           <span className={styles.modelTag}>MODELO 3D</span>
         </div>
 
