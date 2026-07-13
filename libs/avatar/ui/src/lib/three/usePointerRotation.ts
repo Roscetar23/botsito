@@ -21,9 +21,9 @@ function clamp(value: number, limit: number): number {
  * queda en `{ x: 0, y: 0 }`.
  *
  * Nota de signos: `y` (yaw) sigue la posición horizontal del cursor y `x`
- * (pitch) la vertical, invertida (cursor arriba → levanta la "mirada").
- * Si el GLB resulta estar orientado de espaldas, la corrección es girar
- * el modelo 180° en `RobotModel`/`Avatar3D`, no tocar estos signos.
+ * (pitch) la vertical, en el mismo sentido (cursor arriba → mira arriba).
+ * Este signo de `x` está calibrado para la orientación real del GLB
+ * (`botcito.glb`): con `-normalizedY` miraba al revés en vertical.
  */
 export function usePointerRotation(enabled: boolean): PointerRotationTarget {
   const target = useRef({ x: 0, y: 0 });
@@ -38,7 +38,7 @@ export function usePointerRotation(enabled: boolean): PointerRotationTarget {
       const normalizedX = (event.clientX / window.innerWidth) * 2 - 1;
       const normalizedY = (event.clientY / window.innerHeight) * 2 - 1;
       target.current = {
-        x: clamp(-normalizedY * MAX_ROTATION_RAD, MAX_ROTATION_RAD),
+        x: clamp(normalizedY * MAX_ROTATION_RAD, MAX_ROTATION_RAD),
         y: clamp(normalizedX * MAX_ROTATION_RAD, MAX_ROTATION_RAD),
       };
     }
