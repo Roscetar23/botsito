@@ -3,15 +3,15 @@
 import type { ReactNode } from 'react';
 import { AuthProvider, AuthPanel, useAuth } from '@asistente/auth-ui';
 import { BrandLogo } from './brand-logo';
-import { Avatar3DLazy } from './avatar-3d-lazy';
+import { AccessPanel } from './access-panel';
 import styles from './app-shell.module.css';
 
 /**
  * Envuelve la app con la sesión y **puertea el acceso**: mientras carga
- * muestra un aviso; sin sesión, la pantalla de acceso de marca (logo +
- * `AuthPanel` + footer); con sesión, una barra con el usuario + "salir" y
- * el contenido (el avatar). El `accessToken` de `useAuth` alimentará el
- * socket realtime (Fase 3).
+ * muestra un aviso; sin sesión, la pantalla de acceso split (panel de marca
+ * + modelo 3D a la izquierda, formulario a la derecha); con sesión, una
+ * barra con el usuario + "salir" y el contenido (el avatar). El
+ * `accessToken` de `useAuth` alimentará el socket realtime (Fase 3).
  */
 export function AppShell({ children }: { children: ReactNode }) {
   return (
@@ -34,23 +34,11 @@ function AuthGate({ children }: { children: ReactNode }) {
 
   if (status !== 'authenticated' || !user) {
     return (
-      <div className={styles.authScreen}>
-        <div className={styles.glow} aria-hidden="true" />
-        <header className={styles.topbar}>
-          <BrandLogo />
-        </header>
-        <main className={styles.authMain}>
+      <div className={styles.split}>
+        <AccessPanel />
+        <div className={styles.formSide}>
           <AuthPanel />
-          <div className={styles.authBot} aria-hidden="true">
-            {/* Feliz: parpadeo + cejas + saludo. La mirada sigue el cursor
-                (interactive) pero NO deambula (roam off) → se queda en su sitio. */}
-            <Avatar3DLazy state="happy" playClip={false} interactive size={340} cameraZ={12.5} />
-          </div>
-        </main>
-        <footer className={styles.footer}>
-          <span>© 2026 BotCito</span>
-          <span className={styles.muted}>Tu asistente casi inteligente</span>
-        </footer>
+        </div>
       </div>
     );
   }

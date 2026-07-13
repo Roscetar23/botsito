@@ -1,45 +1,24 @@
-/* ===== Pantalla de acceso (sin sesión) ===== */
-.authScreen {
-  position: relative;
+/* ===== Pantalla de acceso (split): marca+modelo | formulario ===== */
+.split {
   min-height: 100vh;
-  width: 100%;
   display: grid;
-  grid-template-rows: auto 1fr auto;
-  overflow: hidden;
+  grid-template-columns: 1fr 1fr;
 }
 
-/* Resplandor de marca (morado + azul) al fondo */
-.glow {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  background:
-    radial-gradient(60% 50% at 80% 90%, rgba(57, 68, 231, 0.16), transparent 70%),
-    radial-gradient(55% 45% at 15% 8%, rgba(110, 63, 208, 0.14), transparent 70%);
-}
-
-.authMain {
-  position: relative;
-  z-index: 1;
+.formSide {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 1.5rem;
+  padding: 2.5rem 2rem;
+  background: var(--bg);
 }
 
-/* Bot 3D estático en reposo: la card queda centrada y el bot se posiciona a
- * su derecha pero dentro de pantalla (antes se iba al borde). Ajusta el
- * offset de `left` para moverlo más hacia el centro o hacia afuera. */
-.authBot {
-  position: absolute;
-  top: 50%;
-  left: calc(50% + 270px);
-  transform: translateY(-50%);
-}
-
-@media (max-width: 1150px) {
-  .authBot {
+@media (max-width: 900px) {
+  .split {
+    grid-template-columns: 1fr;
+  }
+  /* En móvil se oculta el panel de marca/modelo; queda solo el formulario. */
+  .split > :first-child {
     display: none;
   }
 }
@@ -52,10 +31,7 @@
   flex-direction: column;
 }
 
-/* ===== Barra superior (ambos estados) ===== */
 .topbar {
-  position: relative;
-  z-index: 1;
   width: 100%;
   display: flex;
   align-items: center;
@@ -85,19 +61,6 @@
 
 .logout:hover {
   background: var(--surface-2, rgba(255, 255, 255, 0.08));
-}
-
-/* ===== Footer de la pantalla de acceso ===== */
-.footer {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  padding: 1rem 1.5rem;
-  font-size: 0.78rem;
-  border-top: 1px solid var(--border, rgba(255, 255, 255, 0.08));
 }
 
 .centered {
