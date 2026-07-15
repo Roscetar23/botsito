@@ -87,7 +87,7 @@ En la pantalla de acceso aparece **solo en el panel izquierdo**; con sesión, en
 | Archivo fuente | Tema | Texto | Copia en el cliente |
 |---|---|---|---|
 | `myDesign/Logotipo/Logotipo Final.png` | **Oscuro** (principal) | blanco | `apps/client/public/brand/logo-dark.png` |
-| `myDesign/Logotipo/LogoClaro.png` | **Claro** | oscuro (`#1E1E1E`) | `apps/client/public/brand/logo-light.png` |
+| `myDesign/Logotipo/LogotipoClaroFinal.png` | **Claro** | oscuro (`#1E1E1E`) | `apps/client/public/brand/logo-light.png` |
 
 > Variantes de **icono sin texto** disponibles (`Frame.png`/`logoBotcito 1.png` → `icon-dark/-light.png`),
 > hoy sin uso activo tras el rediseño split.
