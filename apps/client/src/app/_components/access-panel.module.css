@@ -1,4 +1,12 @@
+/* Panel de marca (izquierda). Variables locales por tema, siguiendo la
+ * identidad: morado primario de fondo en oscuro; lavanda claro en modo claro. */
 .panel {
+  --p-text: #fff;
+  --p-muted: rgba(255, 255, 255, 0.6);
+  --p-card: rgba(10, 8, 14, 0.55);
+  --p-border: rgba(255, 255, 255, 0.1);
+  --p-bg: linear-gradient(155deg, #3d2270 0%, #241733 55%, #1b1226 100%);
+
   height: 100%;
   min-height: 100vh;
   display: flex;
@@ -6,11 +14,19 @@
   justify-content: space-between;
   gap: 2rem;
   padding: 2.5rem;
-  color: #fff;
-  background: linear-gradient(155deg, #3d2270 0%, #241733 55%, #1b1226 100%);
+  color: var(--p-text);
+  background: var(--p-bg);
 }
 
-/* Marca (Logotipo Final) */
+:root[data-theme='light'] .panel {
+  --p-text: #1e1e1e;
+  --p-muted: rgba(30, 30, 30, 0.62);
+  --p-card: rgba(255, 255, 255, 0.66);
+  --p-border: rgba(30, 30, 30, 0.12);
+  --p-bg: linear-gradient(155deg, #efeafa 0%, #e4ddf3 55%, #d9d0ec 100%);
+}
+
+/* Marca (Logotipo Final / Group 3 según tema) */
 .brand {
   display: flex;
   align-items: center;
@@ -23,8 +39,8 @@
   margin: 0 auto;
   padding: 1.5rem;
   border-radius: var(--radius-lg, 16px);
-  background: rgba(10, 8, 14, 0.55);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--p-card);
+  border: 1px solid var(--p-border);
   display: flex;
   flex-direction: column;
   gap: 1.1rem;
@@ -43,7 +59,7 @@
   font-weight: 600;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.5);
+  color: var(--p-muted);
 }
 
 .cardTitle {
@@ -70,10 +86,7 @@
   display: grid;
   place-items: center;
   border-radius: var(--radius, 10px);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background:
-    linear-gradient(rgba(255, 255, 255, 0.04), transparent),
-    repeating-linear-gradient(0deg, transparent 0 22px, rgba(255, 255, 255, 0.03) 22px 23px);
+  border: 1px solid var(--p-border);
   overflow: hidden;
 }
 
@@ -83,12 +96,12 @@
   bottom: 0.55rem;
   font-size: 0.62rem;
   letter-spacing: 0.16em;
-  color: rgba(255, 255, 255, 0.45);
+  color: var(--p-muted);
 }
 
 .divider {
   height: 1px;
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--p-border);
 }
 
 .cardFoot {
@@ -101,7 +114,7 @@
 .cardCaption {
   margin: 0;
   font-size: 0.78rem;
-  color: rgba(255, 255, 255, 0.6);
+  color: var(--p-muted);
 }
 
 .liveBadge {
@@ -121,5 +134,5 @@
   align-items: center;
   gap: 0.5rem;
   font-size: 0.78rem;
-  color: rgba(255, 255, 255, 0.6);
+  color: var(--p-muted);
 }

@@ -7,10 +7,23 @@
 
 .formSide {
   display: flex;
+  flex-direction: column;
+  padding: 1.75rem 2rem 2.5rem;
+  background: var(--bg);
+}
+
+.formHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.formCenter {
+  flex: 1;
+  display: flex;
   align-items: center;
   justify-content: center;
-  padding: 2.5rem 2rem;
-  background: var(--bg);
 }
 
 @media (max-width: 900px) {

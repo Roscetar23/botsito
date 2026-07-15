@@ -1,11 +1,15 @@
+'use client';
+
+import { useTheme } from './theme';
+
 /**
- * Logotipo de marca (imagen). Usa la variante de **modo oscuro** (texto
- * blanco), que es el tema principal; la variante clara vive en
- * `public/brand/logo-light.png` para cuando se active el tema claro.
+ * Logotipo de marca (imagen), sensible al tema: usa la variante de **modo
+ * oscuro** (texto blanco, `Logotipo Final`) o la de **modo claro** (texto
+ * oscuro, `Group 3`) según `data-theme`. El `<img>` con alto fijo y ancho
+ * automático respeta la relación de aspecto (los dos archivos difieren).
  */
 export function BrandLogo({ height = 46 }: { height?: number }) {
-  return (
-    // eslint-disable-next-line @next/next/no-img-element
-    <img src="/brand/logo-dark.png" alt="BotCito" height={height} style={{ height, width: 'auto' }} />
-  );
+  const { theme } = useTheme();
+  const src = theme === 'light' ? '/brand/logo-light.png' : '/brand/logo-dark.png';
+  return <img src={src} alt="BotCito" height={height} style={{ height, width: 'auto' }} />;
 }

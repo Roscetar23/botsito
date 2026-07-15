@@ -14,6 +14,9 @@ export const metadata = {
   description: 'Tu asistente virtual con un avatar casi inteligente.',
 };
 
+/** Fija el tema guardado antes de pintar para evitar el "flash" oscuro→claro. */
+const THEME_SCRIPT = `(function(){try{var t=localStorage.getItem('asistente.theme');if(t==='light'||t==='dark'){document.documentElement.setAttribute('data-theme',t);}}catch(e){}})();`;
+
 export default function RootLayout({
   children,
 }: {
@@ -21,7 +24,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="es" className={exo2.variable} data-theme="dark">
-      <body>{children}</body>
+      <body>
+        <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
+        {children}
+      </body>
     </html>
   );
 }
