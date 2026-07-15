@@ -29,7 +29,7 @@
 .button {
   padding: 0.55rem 1.1rem;
   border-radius: 999px;
-  border: 1px solid rgba(148, 163, 184, 0.45);
+  border: 1px solid var(--border, rgba(148, 163, 184, 0.45));
   background: transparent;
   color: inherit;
   font-size: 0.9rem;
@@ -42,13 +42,13 @@
 }
 
 .button:hover {
-  border-color: rgba(99, 102, 241, 0.75);
+  border-color: var(--brand-primary-bright, #6e3fd0);
   transform: translateY(-1px);
 }
 
 .buttonActive {
-  background: rgba(99, 102, 241, 0.9);
-  border-color: rgba(99, 102, 241, 0.9);
+  background: linear-gradient(135deg, var(--brand-primary, #44237b) 0%, var(--brand-primary-bright, #6e3fd0) 100%);
+  border-color: var(--brand-primary-bright, #6e3fd0);
   color: #ffffff;
 }
 
@@ -75,7 +75,7 @@
   gap: 0.4rem;
   padding: 0.25rem;
   border-radius: 999px;
-  background: rgba(148, 163, 184, 0.15);
+  background: var(--surface-2, rgba(148, 163, 184, 0.15));
 }
 
 .modeButton {
@@ -93,7 +93,7 @@
 }
 
 .modeButtonActive {
-  background: rgba(99, 102, 241, 0.9);
+  background: linear-gradient(135deg, var(--brand-primary, #44237b) 0%, var(--brand-primary-bright, #6e3fd0) 100%);
   color: #ffffff;
 }
 

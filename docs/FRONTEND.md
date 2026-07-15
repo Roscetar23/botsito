@@ -20,7 +20,7 @@ Flujo de la pantalla principal (`apps/client/src/app/page.tsx`):
  │    ├─ izq: AccessPanel (logo + tarjeta con MODELO 3D feliz + "acceso seguro")
  │    └─ der: header (toggle de tema) + AuthPanel (portal, tabs login/registro, campos)
  └─ CON sesión → HomeView: barra lateral colapsable (logo + Inicio/Calendario + usuario/salir)
-                 + topbar (toggle de tema) + contenido aislado (placeholder → vista 2D/3D)
+                 + topbar (toggle de tema) + Visualizer (avatar 2D/3D con emociones, aislado)
 ```
 
 - **Acceso (login/registro):** rediseño **split-screen** de marca (BotCito). Panel izquierdo con el
@@ -149,9 +149,10 @@ Iteraciones previstas (se refinan sobre la marcha, no son fijas):
 
 - [x] **H-0 — Estructura aislada.** La Home como vista propia y autocontenida (módulo `home/` +
       **error boundary** `ViewBoundary`), montada tras el login en lugar del playground. **Hecho** (Commit A).
-- [~] **H-1 — Layout de marca.** Distribución (barra lateral colapsable + topbar + área principal)
-      según el mockup del usuario. **Shell hecho** (sidebar Inicio/Calendario + usuario/cerrar sesión;
-      topbar solo con toggle de tema). Falta el **avatar** como presencia protagonista en el `main`.
+- [x] **H-1 — Layout de marca.** Distribución (barra lateral colapsable + topbar + área principal)
+      según el mockup del usuario. **Hecho**: shell (sidebar Inicio/Calendario + usuario/cerrar sesión;
+      topbar solo con toggle de tema) + `Visualizer` en el `main` = avatar **2D/3D con emociones**
+      (misma `emotion` para ambos modos; 3D contenido con la mirada al cursor, como el login).
 - [ ] **H-2 — Secciones (placeholders).** Zonas/tarjetas para **tareas**, **recordatorios** y
       **notificaciones** con estados vacíos, listas para cablear al backend.
 - [ ] **H-3 — Avatar integrado.** El avatar presente (idle) y preparado para reaccionar a eventos/estado.
@@ -197,3 +198,8 @@ Iteraciones previstas (se refinan sobre la marcha, no son fijas):
   el login + chevron; riel de iconos al cerrar) con **Inicio** (activo) y **Calendario**; abajo, usuario
   (iniciales+nombre reales) + **Cerrar sesión**. **Topbar mínima** (solo toggle de tema; fuera "Nuevo
   proyecto"). `main` = placeholder del visualizador. Falta llevar la **vista 2D/3D** al `main` (Commit B).
+- 2026-07-15 — **FE-2 H-1 (Commit B) — visualizador en el `main`**: el `main` pasa de placeholder a
+  `Visualizer` = tarjeta con **toggle 2D/3D** + el **avatar** (2D por capas / 3D contenido, mirada al
+  cursor) + **botones de emoción** (la misma `emotion` alimenta ambos modos). Sin calibración manual.
+  Los estilos compartidos de `ModeToggle`/`StateButtons` pasan a tokens de marca (theme-aware). Se borra
+  el placeholder; `avatar-playground.tsx` queda de referencia, sin usarse.

@@ -1,10 +1,10 @@
 import { AppShell } from './_components/app-shell';
-import { VisualizerPlaceholder } from './_components/home/visualizer-placeholder';
+import { Visualizer } from './_components/home/visualizer';
 
 export default function Index() {
   return (
     <AppShell>
-      <VisualizerPlaceholder />
+      <Visualizer />
     </AppShell>
   );
 }
