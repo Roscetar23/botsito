@@ -9,6 +9,11 @@
   display: flex;
   flex-direction: column;
   padding: 1.75rem 2rem 2.5rem;
+  /* Modo oscuro: lado morado (marca) a la derecha; el izquierdo va oscuro. */
+  background: linear-gradient(155deg, #3d2270 0%, #241733 55%, #1b1226 100%);
+}
+
+:root[data-theme='light'] .formSide {
   background: var(--bg);
 }
 
