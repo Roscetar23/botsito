@@ -7,8 +7,8 @@
 - **Fecha inicial:** 2026-07-09
 - **Repo:** `/home/ogomez/bot` (branch `main`, remoto `botsito`)
 - **Estado:** Fases 1, 2 y 5 ✅ (Backend Tasks + Auth contra Atlas; **avatar 2D+3D TERMINADO**;
-  **auth en el cliente** listo, T-14b). Próximo: **Fase 3 realtime** (gateway Socket.IO con auth de
-  handshake usando el token del login) → eventos → `AvatarState`.
+  **auth en el cliente** listo, T-14b). **En curso: FE-2 — Home** (pantalla base del producto, se
+  itera hasta completarla; ver Fase FE y `FRONTEND.md` §5.1). Luego: **Fase 3 realtime** + backend.
 
 **Documentos del proyecto:**
 - [`SETUP.md`](./SETUP.md) — bootstrap del monorepo NX (paso a paso).
@@ -147,11 +147,11 @@ dominio. Un `scope:X` no importa `type:feature` de otro `scope:Y`.
 Todo lo que se **ve en pantalla** (estructura del cliente, estilos, sistema de diseño y roadmap
 visual) vive en su documento propio: **[`FRONTEND.md`](./FRONTEND.md)**. Resumen:
 
-- **App delgada** (`apps/client`) + UI en `libs/*/ui`; **CSS Modules** por componente (sin framework CSS).
-- **Sistema de diseño** (tokens por variables CSS: color/tipografía/espaciado/radios) — a construir.
-- **Roadmap visual (FE-1…):** login/registro con diseño → vista Home → tokens/tema → marca → a11y.
-- Estado hoy: **FE-1** (login/registro split-screen de marca) y **FE-3** (tokens + tema claro/oscuro)
-  **hechos**; avatar **terminado**. **Próximo: FE-2 (vista Home).**
+- **App delgada** (`apps/client`) + UI en `libs/*/ui`; **CSS Modules** + **tokens** de marca (variables CSS).
+- **Vistas independientes/aisladas:** cada pantalla es un módulo autocontenido (error boundary + carga
+  diferida) → si una falla, no tumba el resto. Ver `FRONTEND.md` §2.1.
+- **Fase de trabajo:** ver **Fase FE** en el backlog (§6). Estado: **FE-1** (acceso) y **FE-3** (tema)
+  hechos; avatar **terminado**. **En curso: FE-2 — Home (pantalla base)**, la vista clave antes de backend.
 
 ---
 
@@ -361,6 +361,19 @@ Estado: `[ ]` pendiente · `[~]` en curso · `[x]` hecho.
   → **AV-5…AV-8 ✅ (personaje TERMINADO, 2026-07-12)**. Ver [`AVATAR.md`](./AVATAR.md) / [`AVATAR-ANIMACIONES.md`](./AVATAR-ANIMACIONES.md).
 - [ ] **T-22b** *(futuro)* Reaccionar a **eventos realtime/acciones** (**AV-6**, tras Fase 3): mapear
   eventos → `AvatarState` para que el muñeco cambie de emoción solo.
+
+### Fase FE — Frontend / Vistas (UI) 🎨
+
+> Gobernada por **[`FRONTEND.md`](./FRONTEND.md)** (rama de este plan). Principio: cada **vista es
+> independiente/aislada** (error boundary + carga diferida) → si una falla, no tumba el resto.
+
+- [x] **FE-1** **Acceso** (login/registro): rediseño split-screen de marca, claro/oscuro (ver T-14b).
+- [x] **FE-3** **Tokens + tema** claro/oscuro (`ThemeToggle`, logo por tema, fuente Exo 2).
+- [~] **FE-2** **Home (pantalla base)** ⭐ — la vista **base del producto**: sobre ella se conectan
+  tareas, recordatorios, notificaciones y el avatar reactivo. **Se construye iterando** hasta
+  completarla; detalle e iteraciones (H-0…H-4) en [`FRONTEND.md`](./FRONTEND.md) §5.1. **Prioritaria
+  antes de retomar backend.**
+- [ ] **FE-4/FE-5** marca (metadata/favicon) + responsive/accesibilidad.
 
 ### Fase 6 — NLU (opcional)
 - [ ] **T-23** `LlmService` con interfaz `NluPort` (provider-agnostic), keys por env.

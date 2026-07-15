@@ -45,6 +45,18 @@ App delgada + UI en libs (D-06). Todo componente con estado/efectos lleva `'use 
 | `libs/avatar/ui` (`@asistente/avatar-ui`) | Avatar 2D (rig por capas) + 3D (R3F), máquina de estados, partes, gestos. |
 | `libs/shared/ui` (`@asistente/shared-ui`) | Átomos/utilidades UI compartidas (poco poblada; candidata para los tokens/átomos). |
 
+### 2.1 Vistas independientes (aisladas) 🔒
+
+Cada **vista/pantalla** (acceso, Home, …) es un **módulo propio y autocontenido** (screaming
+modular). **Regla dura: si una vista falla, no debe tumbar el resto de la app.**
+
+- **Aislamiento por error:** cada vista se envuelve en un **error boundary**; si lanza, muestra un
+  fallback local y las demás siguen vivas.
+- **Carga diferida:** las vistas pesadas (p. ej. las que traen el 3D/WebGL) se montan con
+  `next/dynamic`/lazy, para no arrastrar su código —ni sus fallos— a otras.
+- **Sin acoplamiento cruzado:** una vista no importa el interior de otra; comparten solo vía
+  `shared`/contextos (auth, tema). Se respetan las fronteras de módulos NX (§3.5 de `PLAN.md`).
+
 ---
 
 ## 3. Convenciones de estilo
@@ -117,12 +129,33 @@ Estado: `[ ]` pendiente · `[~]` en curso · `[x]` hecho.
 - [x] **FE-1 — Login / Registro con diseño.** Rediseño **split-screen** de marca: panel izquierdo
       (logo + tarjeta con el modelo 3D feliz) y derecho (tabs login/registro, campos con iconos,
       mostrar/ocultar contraseña, transición suave). Claro/oscuro. **Hecho** (afinado con el usuario).
-- [ ] **FE-2 — Vista Home.** Dashboard con el avatar como protagonista + secciones (tareas, etc.).
+- [~] **FE-2 — Vista Home (pantalla base).** Dashboard con el avatar como protagonista + secciones
+      (tareas, etc.). **Fase propia detallada en §5.1** — se itera hasta completarla. **En curso.**
 - [x] **FE-3 — Tokens + tema claro/oscuro.** Variables CSS en `global.css` (oscuro + `[data-theme='light']`),
       `ThemeProvider`/`useTheme` (persiste en `localStorage`, script anti-flash), `ThemeToggle` (sol/luna).
       Logo sensible al tema (`Logotipo Final` oscuro / `LogoClaro` claro), **solo en el panel izquierdo**.
 - [ ] **FE-4 — Layout & marca.** `metadata` real (título/descr.), favicon, tipografía.
 - [ ] **FE-5 — Responsive + a11y pass.** Revisión de breakpoints, foco y contraste.
+
+### 5.1 Fase FE-2 — Home (pantalla base) 🏠 — EN CURSO
+
+La **Home** es la pantalla principal tras el login y **la base del producto**: sobre ella se
+conectará el backend (tareas, recordatorios, notificaciones) y el avatar reactivo. Es la vista más
+importante antes de retomar backend. Se construye **iterando varias veces** con el usuario (yo no
+veo el navegador → cada paso se valida visualmente). Es una **vista independiente/aislada** (§2.1).
+
+Iteraciones previstas (se refinan sobre la marcha, no son fijas):
+
+- [ ] **H-0 — Estructura aislada.** La Home como vista propia y autocontenida (módulo + **error
+      boundary** + carga diferida), montada tras el login en lugar del playground de avatar. Shell base.
+- [ ] **H-1 — Layout de marca.** Distribución (barra/nav + área principal) con el **avatar** como
+      presencia protagonista. Según el diseño/mockup que dé el usuario.
+- [ ] **H-2 — Secciones (placeholders).** Zonas/tarjetas para **tareas**, **recordatorios** y
+      **notificaciones** con estados vacíos, listas para cablear al backend.
+- [ ] **H-3 — Avatar integrado.** El avatar presente (idle) y preparado para reaccionar a eventos/estado.
+- [ ] **H-4 — Pulido.** Tokens, responsive, a11y y coherencia claro/oscuro.
+
+> Resumen en [`PLAN.md`](./PLAN.md) (fase Frontend); el detalle fino y el avance por iteración, aquí.
 
 ---
 
@@ -134,6 +167,9 @@ Estado: `[ ]` pendiente · `[~]` en curso · `[x]` hecho.
 - **FD-03 Tema oscuro por defecto (principal)** · decisión de marca; el claro es secundario.
 - **FD-04 Marca BotCito** · primario `#44237B` + terciario `#3944E7`; fuente **Exo 2**; logo con dos
   variantes (oscuro/claro). Ver §4.
+- **FD-05 Vistas independientes/aisladas** · cada pantalla es un módulo autocontenido con error
+  boundary y carga diferida → si una falla, no tumba el resto. *Pro:* robustez y desacople.
+  *Con:* algo más de estructura por vista (se paga una vez). Ver §2.1.
 
 ---
 
@@ -148,5 +184,9 @@ Estado: `[ ]` pendiente · `[~]` en curso · `[x]` hecho.
   **rediseño split-screen** (según nuevo mockup del usuario): panel izquierdo (logo + tarjeta con el
   modelo 3D **feliz**, mirada al cursor) + derecho (tabs, campos con iconos SVG, ojo, transición suave).
 - 2026-07-13 — **FE-3 tema claro/oscuro** con `ThemeToggle`; logo sensible al tema. Ajustes finales:
-  logo claro = **`LogoClaro.png`** (mismo alto que el oscuro) y logo **solo en el panel izquierdo**.
-  Bug de mirada del bot (eje Y invertido) corregido en `usePointerRotation`.
+  logo claro = **`LogotipoClaroFinal.png`** (mismo estilo/tamaño que el oscuro) y logo **solo en el
+  panel izquierdo**. Bug de mirada del bot (eje Y invertido) corregido en `usePointerRotation`.
+  En oscuro se invirtieron los lados (izq. oscuro / der. morado).
+- 2026-07-13 — Arranca **FE-2 Home (pantalla base)**: se añade su fase propia con iteraciones (§5.1)
+  y el principio de **vistas independientes/aisladas** (§2.1, FD-05). Es la vista clave antes de
+  retomar backend; se itera hasta completarla.
