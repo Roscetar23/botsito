@@ -11,7 +11,7 @@
 
 ## 1. Estado actual (qué se ve hoy)
 
-Flujo de la pantalla principal (`apps/client/src/app/page.tsx`):
+Flujo de las pantallas autenticadas (`apps/client/src/app/(app)/layout.tsx`):
 
 ```
 <AppShell>                            ← ThemeProvider + AuthProvider, puertea por sesión
@@ -20,8 +20,14 @@ Flujo de la pantalla principal (`apps/client/src/app/page.tsx`):
  │    ├─ izq: AccessPanel (logo + tarjeta con MODELO 3D feliz + "acceso seguro")
  │    └─ der: header (toggle de tema) + AuthPanel (portal, tabs login/registro, campos)
  └─ CON sesión → HomeView: barra lateral colapsable (logo + Inicio/Calendario + usuario/salir)
-                 + topbar (toggle de tema) + Visualizer (avatar 2D/3D con emociones, aislado)
+                 + topbar (toggle de tema) + la vista de la ruta activa:
+                    ├─ `/`           → Visualizer (avatar 2D/3D con emociones, aislado)
+                    └─ `/calendario` → CalendarView (rejilla del mes + modal del día)
 ```
+
+**Rutas:** el grupo `(app)` monta el shell una sola vez; al navegar solo se recrea el `main`, así
+la barra lateral conserva su estado (p. ej. colapsada). El item activo se deriva de `usePathname()`,
+no de estado local → sobrevive a recargas y al botón "atrás".
 
 - **Acceso (login/registro):** rediseño **split-screen** de marca (BotCito). Panel izquierdo con el
   **modelo 3D real** (feliz, mirada al cursor); derecho con **tabs** login/registro, campos con iconos
@@ -41,7 +47,7 @@ App delgada + UI en libs (D-06). Todo componente con estado/efectos lleva `'use 
 
 | Lib / carpeta | Qué contiene |
 |---|---|
-| `apps/client/src/app` | Composición y rutas: `page.tsx`, `layout.tsx`, `_components/*` (app-shell, **`home/`** [vista aislada: view/sidebar/topbar/nav/user/visualizer-placeholder], view-boundary, avatar-playground, three-controls, state-buttons, mode-toggle, avatar-3d-lazy). |
+| `apps/client/src/app` | Composición y rutas: `layout.tsx`, grupo **`(app)/`** (`layout` = shell, `page` = Inicio, `calendario/page`), `_components/*` (app-shell, **`home/`** [shell: view/sidebar/topbar/nav/user + visualizer], **`calendar/`** [vista aislada: view/card/grid-cell/day-modal + hook y utilidades de fecha], view-boundary, avatar-playground, three-controls, state-buttons, mode-toggle, avatar-3d-lazy). |
 | `libs/auth/ui` (`@asistente/auth-ui`) | `AuthPanel`, `AuthProvider`/`useAuth`, cliente API, storage de tokens. |
 | `libs/avatar/ui` (`@asistente/avatar-ui`) | Avatar 2D (rig por capas) + 3D (R3F), máquina de estados, partes, gestos. |
 | `libs/shared/ui` (`@asistente/shared-ui`) | Átomos/utilidades UI compartidas (poco poblada; candidata para los tokens/átomos). |
@@ -137,6 +143,9 @@ Estado: `[ ]` pendiente · `[~]` en curso · `[x]` hecho.
       Logo sensible al tema (`Logotipo Final` oscuro / `LogoClaro` claro), **solo en el panel izquierdo**.
 - [ ] **FE-4 — Layout & marca.** `metadata` real (título/descr.), favicon, tipografía.
 - [ ] **FE-5 — Responsive + a11y pass.** Revisión de breakpoints, foco y contraste.
+- [~] **FE-6 — Vista Calendario.** Ruta `/calendario` con la rejilla del mes y el modal de la agenda
+      del día, según el mockup del usuario (`myDesign/Vistas/Calendario/`). **Maqueta hecha con datos
+      de ejemplo**; falta el backend (ver §5.2).
 
 ### 5.1 Fase FE-2 — Home (pantalla base) 🏠 — EN CURSO
 
@@ -159,6 +168,29 @@ Iteraciones previstas (se refinan sobre la marcha, no son fijas):
 - [ ] **H-4 — Pulido.** Tokens, responsive, a11y y coherencia claro/oscuro.
 
 > Resumen en [`PLAN.md`](./PLAN.md) (fase Frontend); el detalle fino y el avance por iteración, aquí.
+
+### 5.2 Fase FE-6 — Vista Calendario 📅 — EN CURSO
+
+Ruta `/calendario`, según el mockup del usuario (`myDesign/Vistas/Calendario/CalendarioView.png` y
+`ModalCalendario.png`). Vista independiente (§2.1): módulo `calendar/`, `ViewBoundary` propio y
+carga diferida con `ssr: false` (la rejilla depende de la fecha/huso del navegador; renderizarla en
+servidor daría un HTML distinto al del cliente).
+
+- [x] **C-1 — Maqueta.** Cabecera de página + tarjeta "Planificador" (`‹ Hoy ›`, rejilla LUN–DOM de
+      seis semanas, hoy en azul terciario, chips de eventos en morado) + modal "Agenda del día" con
+      estado vacío. Semana en lunes, textos en español, sin librería de fechas.
+- [ ] **C-2 — Backend.** Hoy los eventos son **datos de ejemplo** (`calendar-events.ts`). Conectarlos
+      exige **construir antes el dominio `reminders`** (T-17/T-18 del PLAN): `libs/reminders/**` es
+      todavía el scaffold del generador. Entonces: `CalendarEvent` → `Reminder` de
+      `@asistente/reminders-model`, `useCalendarMonth` lee de la API y se habilita "Crear recordatorio"
+      (hoy deshabilitado a propósito, para no prometer lo que no hay).
+
+**Desviaciones del mockup** (decididas con el usuario):
+- **Topbar mínima** (solo toggle de tema): se respeta la decisión de H-1; fuera el "+ Nuevo proyecto"
+  y el "BOTCITO STUDIO / Espacio de creación" de la plantilla. La topbar es del shell y afectaría a Inicio.
+- **Copy del dominio** en vez del de estudio de diseño ("Organiza tus recordatorios…", no "sesiones de diseño").
+- **Punto de la leyenda en azul terciario** (`--brand-accent`) en vez del verde del mockup: el verde no
+  está en la identidad de marca (§4.1).
 
 ---
 
@@ -209,3 +241,9 @@ Iteraciones previstas (se refinan sobre la marcha, no son fijas):
   (`overflow:hidden`, no cubre la barra lateral/topbar). 2D sin cambios. En la lib del avatar,
   `usePointerViewportTarget` normaliza el cursor al **rect del `<canvas>`** (antes a la ventana) para que
   el seguimiento sea correcto con el canvas acotado; a pantalla completa queda idéntico (solo lo usa `RoamGroup`).
+- 2026-07-15 — **FE-6 · vista Calendario (maqueta)**: se introducen **rutas reales** — grupo `(app)` con
+  el shell en su `layout`, `/` = Inicio y `/calendario` = calendario; la barra lateral pasa a `<Link>` +
+  `usePathname()` (antes botones sin handler) y cada vista trae su propio `ViewBoundary`. Nuevo módulo
+  `calendar/` según el mockup: rejilla del mes (lunes primero, hoy en azul terciario, chips morados) y
+  modal de la agenda del día con estado vacío. Eventos = **datos de ejemplo**; el dominio `reminders`
+  del backend **no existe todavía** (es scaffold), así que "Crear recordatorio" queda deshabilitado. Ver §5.2.

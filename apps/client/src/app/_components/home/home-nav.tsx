@@ -1,33 +1,47 @@
 'use client';
 
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import styles from './home.module.css';
 
 interface HomeNavProps {
   collapsed: boolean;
 }
 
+/** Rutas de la barra lateral. El icono se pinta por `key`. */
+const ITEMS = [
+  { href: '/', label: 'Inicio', icon: HomeIcon },
+  { href: '/calendario', label: 'Calendario', icon: CalendarIcon },
+] as const;
+
 /**
- * Navegación de la Home: "Inicio" (activo/resaltado por ahora, siempre) y
- * "Calendario" (inactivo, todavía sin ruta). Colapsada, se ocultan las
- * etiquetas y quedan solo los iconos con `title`/`aria-label` de tooltip.
+ * Navegación de la Home. El item activo se deriva de la URL (`usePathname`),
+ * no de estado local, para que sobreviva a recargas y al botón "atrás".
+ * Colapsada, se ocultan las etiquetas y quedan solo los iconos con
+ * `title`/`aria-label` de tooltip.
  */
 export function HomeNav({ collapsed }: HomeNavProps) {
+  const pathname = usePathname();
+
   return (
     <nav className={styles.nav} aria-label="Navegación principal">
-      <button
-        type="button"
-        className={`${styles.navItem} ${styles.navItemActive}`}
-        aria-current="page"
-        aria-label="Inicio"
-        title="Inicio"
-      >
-        <HomeIcon />
-        {!collapsed && <span>Inicio</span>}
-      </button>
-      <button type="button" className={styles.navItem} aria-label="Calendario" title="Calendario">
-        <CalendarIcon />
-        {!collapsed && <span>Calendario</span>}
-      </button>
+      {!collapsed && <p className={styles.navSectionLabel}>Espacio de trabajo</p>}
+      {ITEMS.map(({ href, label, icon: Icon }) => {
+        const active = pathname === href;
+        return (
+          <Link
+            key={href}
+            href={href}
+            className={`${styles.navItem} ${active ? styles.navItemActive : ''}`.trim()}
+            aria-current={active ? 'page' : undefined}
+            aria-label={label}
+            title={label}
+          >
+            <Icon />
+            {!collapsed && <span>{label}</span>}
+          </Link>
+        );
+      })}
     </nav>
   );
 }

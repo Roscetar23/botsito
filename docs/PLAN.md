@@ -373,6 +373,9 @@ Estado: `[ ]` pendiente · `[~]` en curso · `[x]` hecho.
   tareas, recordatorios, notificaciones y el avatar reactivo. **Se construye iterando** hasta
   completarla; detalle e iteraciones (H-0…H-4) en [`FRONTEND.md`](./FRONTEND.md) §5.1. **Prioritaria
   antes de retomar backend.**
+- [~] **FE-6** **Calendario** — ruta `/calendario` (rejilla del mes + modal del día) según el mockup
+  del usuario. Maqueta hecha con **datos de ejemplo**; conectarla exige construir antes **T-17/T-18**
+  (el dominio `reminders` es todavía scaffold). Detalle en [`FRONTEND.md`](./FRONTEND.md) §5.2.
 - [ ] **FE-4/FE-5** marca (metadata/favicon) + responsive/accesibilidad.
 
 ### Fase 6 — NLU (opcional)
