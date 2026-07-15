@@ -5,25 +5,35 @@ import type { AvatarState } from '@asistente/avatar-model';
 // `Avatar` (2D) es SSR-safe y se importa estático, como en `avatar-playground.tsx`.
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import { Avatar } from '@asistente/avatar-ui';
-import { Avatar3DLazy } from '../avatar-3d-lazy';
 import { ModeToggle } from '../mode-toggle';
 import type { AvatarMode } from '../mode-toggle';
 import { StateButtons } from '../state-buttons';
+import { VisualizerRoam } from './visualizer-roam';
 import styles from './visualizer.module.css';
 
 const AVATAR_SIZE = 320;
-const CAMERA_Z = 12.5;
 
 /**
- * Área principal de la Home: el avatar (2D o 3D, alternable con
- * `<ModeToggle>`) reacciona a los botones de emoción (`<StateButtons>`). La
- * misma `emotion` alimenta ambos modos, así que no se pierde al alternar.
- * Sin controles de calibración manual (eso vive solo en
- * `avatar-playground.tsx`, que queda de referencia sin usarse aquí).
+ * Área principal de la Home. En 2D: tarjeta compacta centrada con el avatar
+ * y los botones de emoción (sin cambios). En 3D: el robot deambula llenando
+ * el `main` de la Home, delegado a `VisualizerRoam`. El estado (`mode` y
+ * `emotion`) vive aquí porque lo comparten ambas presentaciones: la misma
+ * `emotion` no se pierde al alternar de modo.
  */
 export function Visualizer() {
   const [mode, setMode] = useState<AvatarMode>('2d');
   const [emotion, setEmotion] = useState<AvatarState>('idle');
+
+  if (mode === '3d') {
+    return (
+      <VisualizerRoam
+        mode={mode}
+        onModeChange={setMode}
+        emotion={emotion}
+        onEmotionChange={setEmotion}
+      />
+    );
+  }
 
   return (
     <section className={styles.card}>
@@ -36,17 +46,7 @@ export function Visualizer() {
       </header>
 
       <div className={styles.stage}>
-        {mode === '2d' ? (
-          <Avatar state={emotion} size={AVATAR_SIZE} />
-        ) : (
-          <Avatar3DLazy
-            state={emotion}
-            playClip={false}
-            interactive
-            size={AVATAR_SIZE}
-            cameraZ={CAMERA_Z}
-          />
-        )}
+        <Avatar state={emotion} size={AVATAR_SIZE} />
       </div>
 
       <StateButtons active={emotion} onSelect={setEmotion} />

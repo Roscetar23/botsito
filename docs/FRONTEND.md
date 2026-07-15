@@ -203,3 +203,9 @@ Iteraciones previstas (se refinan sobre la marcha, no son fijas):
   cursor) + **botones de emoción** (la misma `emotion` alimenta ambos modos). Sin calibración manual.
   Los estilos compartidos de `ModeToggle`/`StateButtons` pasan a tokens de marca (theme-aware). Se borra
   el placeholder; `avatar-playground.tsx` queda de referencia, sin usarse.
+- 2026-07-15 — **FE-2 · roam 3D en el `main`**: en 3D el visualizador pasa a un **campo de roam**
+  (`VisualizerRoam`) que llena el área principal: el robot **deambula siguiendo el cursor y "camina"**
+  (manos), con el toggle y las emociones **flotando** encima (`pointer-events`); acotado al `main`
+  (`overflow:hidden`, no cubre la barra lateral/topbar). 2D sin cambios. En la lib del avatar,
+  `usePointerViewportTarget` normaliza el cursor al **rect del `<canvas>`** (antes a la ventana) para que
+  el seguimiento sea correcto con el canvas acotado; a pantalla completa queda idéntico (solo lo usa `RoamGroup`).
