@@ -113,6 +113,15 @@ export interface Avatar3DProps {
    * en pruebas qué mueve la animación de Blender vs los gestos por código.
    */
   playClip?: boolean;
+  /**
+   * Nonce edge-triggered del gesto de "toque" (mano derecha): cada vez que
+   * cambia a un valor NUEVO se dispara UNA vez un impulso corto de la mano,
+   * pensado para que el front lo accione cuando el robot llega a su
+   * `target` en modo `roam` (p.ej. una celda del calendario) — el avatar no
+   * sabe que ha llegado, solo reacciona al nonce. `undefined` (default) =
+   * nunca. Se apaga con `prefers-reduced-motion`. Ver `usePressGesture`.
+   */
+  pressTrigger?: number;
 }
 
 /** Velocidad del lerp de la rotación hacia el cursor (más alto = más ágil). */
@@ -183,6 +192,7 @@ export function Avatar3D({
   mouth = true,
   walk = true,
   playClip = true,
+  pressTrigger,
 }: Avatar3DProps) {
   const reducedMotion = Boolean(useReducedMotion());
   const roamEnabled = roam && !reducedMotion;
@@ -225,6 +235,7 @@ export function Avatar3D({
                   eyebrowAngry={g(flags.eyebrowAngry)}
                   mouth={g(flags.mouth)}
                   walk={walkActive}
+                  pressTrigger={reducedMotion ? undefined : pressTrigger}
                 />
               </Float>
             </CursorFollowGroup>

@@ -185,12 +185,14 @@ servidor daría un HTML distinto al del cliente).
       `@asistente/reminders-model`, `useCalendarMonth` lee de la API y se habilita "Crear recordatorio"
       (hoy deshabilitado a propósito, para no prometer lo que no hay).
 
-- [~] **C-3 — El robot sobre el calendario.** El modelo 3D flota **en reposo** arriba de la vista y
-      —siguiente paso— viajará al día que se clique, lo "tocará" con la mano para abrir el modal y
-      volverá arriba al cerrar. Capa **decorativa** (`pointer-events:none`, `aria-hidden`) con
-      **boundary propio y silencioso**: nunca puede tumbar el calendario ni bloquear el modal.
-      Habilitado por `Avatar3D#target` (destino arbitrario en modo `roam`). **Reposo hecho**; falta la
-      coreografía (gesto `press` procedural + capa por encima del `.overlay` del modal).
+- [x] **C-3 — El robot sobre el calendario.** El modelo 3D flota **en reposo** arriba de la vista; al
+      clicar un día **viaja** hasta su celda (moviendo las manos: la velocidad alimenta el columpio), la
+      **"toca"** con la mano y con ese toque **se abre el modal**; sigue flotando ahí **por encima** del
+      overlay y al cerrar **vuelve al reposo**. Capa **decorativa** (`pointer-events:none`, `aria-hidden`)
+      con **boundary propio y silencioso**. El robot **nunca bloquea la UI**: el timer de apertura vive
+      fuera de la capa 3D y con `prefers-reduced-motion` el modal abre al instante, sin coreografía.
+      Piezas: `Avatar3D#target` (destino arbitrario) + `Avatar3D#pressTrigger` (nonce → `usePressGesture`)
+      + `use-robot-choreography.ts`. **Hecho.**
 
 **Desviaciones del mockup** (decididas con el usuario):
 - **Topbar mínima** (solo toggle de tema): se respeta la decisión de H-1; fuera el "+ Nuevo proyecto"
@@ -261,3 +263,12 @@ servidor daría un HTML distinto al del cliente).
   cursor) hace que `RoamGroup` viaje a un punto fijo en vez de perseguir el ratón; **sin `target`, todo
   idéntico**. Reutiliza el ease/velocidad/orientación de siempre: al llegar, la velocidad cae sola a ~0 →
   dejan de moverse las manos y queda flotando. Falta la coreografía (viajar al día + tocar + abrir).
+- 2026-07-15 — **FE-6 C-3 · la coreografía**: al clicar un día el robot **viaja** a su celda, la **toca**
+  con la mano y con ese toque **se abre el modal**; sigue flotando ahí (capa a `z-index:30`, por encima
+  del `.overlay`) y **vuelve al reposo** al cerrar. Nuevo en la lib del avatar: `usePressGesture` (impulso
+  procedural de una sola pasada, 400 ms, mano derecha, que **restaura la pose base** al terminar) y
+  `Avatar3D#pressTrigger` (**nonce edge-triggered**: el avatar no sabe que ha llegado — lo dispara el
+  front). En `RoamGroup`, el modo `target` pasa a usar la **amplitud completa**: el `EDGE_MARGIN` (útil en
+  roam libre para que el bot no se salga persiguiendo el cursor) comprimía el mapeo ~35% y dejaba al robot
+  **una fila por encima** del día clicado. El roam libre de la Home no cambia. El robot es **decorativo**:
+  el modal abre siempre (timer fuera de la capa 3D; al instante con `prefers-reduced-motion`).

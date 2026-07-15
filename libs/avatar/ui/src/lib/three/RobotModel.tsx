@@ -8,6 +8,7 @@ import { useBlinkGesture } from './useBlinkGesture.js';
 import { useEyebrowGesture } from './useEyebrowGesture.js';
 import { useMouthGesture } from './useMouthGesture.js';
 import { useWalkSwing } from './useWalkSwing.js';
+import { usePressGesture } from './usePressGesture.js';
 import { useRoamSpeed } from './roamSpeedContext.js';
 import { useHandBones } from './handBonesContext.js';
 
@@ -45,6 +46,12 @@ export interface RobotModelProps {
   mouth?: boolean;
   /** Balanceo de manos al desplazarse (columpio adelante/atrás, según velocidad). */
   walk?: boolean;
+  /**
+   * Nonce edge-triggered del gesto de "toque" (mano derecha, `Hueso.001`):
+   * cada valor NUEVO dispara un impulso corto una vez. `undefined` = nunca.
+   * Ver `usePressGesture`.
+   */
+  pressTrigger?: number;
 }
 
 /**
@@ -81,6 +88,7 @@ export function RobotModel({
   eyebrowAngry = true,
   mouth = true,
   walk = true,
+  pressTrigger,
 }: RobotModelProps) {
   const { scene, animations } = useGLTF(url);
   const groupRef = useModelAnimation({ animations, clip, playing });
@@ -125,6 +133,13 @@ export function RobotModel({
   // mientras se mueve; alternado (fase π) como los brazos al andar.
   useWalkSwing(groupRef, 'Hueso.001', roamSpeed, walk, 0);
   useWalkSwing(groupRef, 'Hueso', roamSpeed, walk, Math.PI);
+  // Toque/pulsación: mano derecha (`Hueso.001`), la misma que lidera el
+  // saludo — es la mano "expresiva" ya establecida (única mano en `notify`/
+  // `happy`), así que reutilizarla para el toque mantiene la lectura
+  // consistente ("es la mano con la que el robot actúa"). Se llama al final
+  // para tener la última palabra si coincidiera con el saludo o el columpio
+  // (en el uso real no coincide: `state="idle"` los apaga a ambos).
+  usePressGesture(groupRef, 'Hueso.001', pressTrigger);
 
   return (
     <Center>

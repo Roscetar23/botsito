@@ -8,7 +8,7 @@ import styles from './calendar.module.css';
 
 interface CalendarCardProps {
   month: CalendarMonth;
-  onSelectDay: (day: CalendarDay) => void;
+  onSelectDay: (day: CalendarDay, rect: DOMRect) => void;
 }
 
 /**

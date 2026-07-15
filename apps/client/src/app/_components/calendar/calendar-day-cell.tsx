@@ -7,7 +7,8 @@ import styles from './calendar.module.css';
 interface CalendarDayCellProps {
   day: CalendarDay;
   events: CalendarEvent[];
-  onSelect: (day: CalendarDay) => void;
+  /** `rect` es el `getBoundingClientRect()` del botón: alimenta el target del robot. */
+  onSelect: (day: CalendarDay, rect: DOMRect) => void;
 }
 
 /** Cuántos chips caben antes de resumir el resto en "+N". */
@@ -31,7 +32,12 @@ export function CalendarDayCell({ day, events, onSelect }: CalendarDayCellProps)
     .join(' ');
 
   return (
-    <button type="button" className={classes} onClick={() => onSelect(day)} aria-label={label(day, events.length)}>
+    <button
+      type="button"
+      className={classes}
+      onClick={(event) => onSelect(day, event.currentTarget.getBoundingClientRect())}
+      aria-label={label(day, events.length)}
+    >
       <span className={styles.dayNumber}>{day.dayOfMonth}</span>
 
       <span className={styles.chips}>

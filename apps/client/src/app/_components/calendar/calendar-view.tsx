@@ -1,24 +1,26 @@
 'use client';
 
-import { useState } from 'react';
 import { CalendarCard } from './calendar-card';
 import { CalendarRobot } from './calendar-robot';
 import { DayModal } from './day-modal';
 import { useCalendarMonth } from './use-calendar-month';
-import type { CalendarDay } from './calendar-dates';
+import { useRobotChoreography } from './use-robot-choreography';
 import styles from './calendar.module.css';
 
 /**
- * Vista Calendario: cabecera de página, tarjeta del planificador y el modal
- * con la agenda del día seleccionado. Módulo autocontenido (§2.1 de
- * FRONTEND.md): no conoce nada del resto de la Home.
+ * Vista Calendario: cabecera de página, tarjeta del planificador, el modal
+ * con la agenda del día seleccionado y el robot 3D decorativo que "camina"
+ * hasta el día elegido antes de abrir su modal (orquestado en
+ * `useRobotChoreography`). Módulo autocontenido (§2.1 de FRONTEND.md): no
+ * conoce nada del resto de la Home.
  */
 export function CalendarView() {
   const month = useCalendarMonth();
-  const [selected, setSelected] = useState<CalendarDay | null>(null);
+  const { viewRef, selected, robotTarget, pressTrigger, handleSelectDay, handleCloseModal } =
+    useRobotChoreography();
 
   return (
-    <section className={styles.view}>
+    <section ref={viewRef} className={styles.view}>
       <header className={styles.pageHeader}>
         <div>
           <p className={styles.eyebrow}>Planificación personal</p>
@@ -32,17 +34,17 @@ export function CalendarView() {
         </p>
       </header>
 
-      <CalendarCard month={month} onSelectDay={setSelected} />
+      <CalendarCard month={month} onSelectDay={handleSelectDay} />
 
       {selected && (
         <DayModal
           day={selected}
           events={month.events[selected.key] ?? []}
-          onClose={() => setSelected(null)}
+          onClose={handleCloseModal}
         />
       )}
 
-      <CalendarRobot />
+      <CalendarRobot target={robotTarget} pressTrigger={pressTrigger} />
     </section>
   );
 }

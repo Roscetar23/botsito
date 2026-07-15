@@ -34,7 +34,13 @@ const ROAM_TARGET_HEIGHT = 2;
 const MODEL_HEIGHT = 5.54;
 const ROAM_SCALE = ROAM_TARGET_HEIGHT / MODEL_HEIGHT;
 
-/** Margen respecto al borde del viewport para que no se salga de pantalla. */
+/**
+ * Margen respecto al borde del viewport para que no se salga de pantalla.
+ * Solo se aplica en roam **libre** (persiguiendo el cursor): el cursor puede
+ * llegar exactamente a ±1 en el borde del canvas, y sin margen el modelo
+ * (con su propio ancho visual) asomaría fuera. En modo `target` NO se
+ * aplica — ver el JSDoc de `RoamGroup`.
+ */
 const EDGE_MARGIN = ROAM_TARGET_HEIGHT * 0.6;
 
 /** Velocidad del ease hacia el cursor (bajo = va con lag, no pegado). */
@@ -51,9 +57,18 @@ const SPEED_SMOOTH = 8;
  * lerp suave (con lag, no queda pegado) la posición del cursor **o**, si
  * el llamador pasa `target`, un punto fijo arbitrario (misma convención
  * normalizada -1..1 que el cursor) — pensado para "ve a esta celda del
- * calendario". Clamp dentro del área visible con margen (el objetivo ya
- * viene clamp desde el cursor/target normalizado, así que el ease nunca se
- * pasa de los bordes). Encima, orienta el personaje según su
+ * calendario". El mapeo normalizado→mundo usa dos amplitudes distintas según
+ * el modo (ver `EDGE_MARGIN` más abajo): en roam libre (persiguiendo el
+ * cursor) se resta un margen para que el modelo no asome por el borde del
+ * canvas cuando el cursor llega a ±1; en modo `target` se usa la amplitud
+ * **completa** (sin margen), porque el llamador ya calculó `target`
+ * normalizando el centro de un punto concreto (p.ej. una celda del
+ * calendario) contra el rect del canvas, y espera aterrizar EXACTAMENTE ahí
+ * — restar un margen comprimiría el mapeo y el robot se quedaría corto
+ * (aterrizando hacia el centro, no sobre el punto pedido). El clamp del
+ * normalizado a ±1 (cursor o `target`) sigue garantizando que el ease nunca
+ * se pasa de los bordes; lo que cambia entre modos es **a qué distancia del
+ * borde equivale ese ±1**. Encima, orienta el personaje según su
  * **desplazamiento** (`useFlightOrientation`, no según el cursor — eso
  * lo desactiva el llamador en modo roam) y añade una sombra de contacto
  * (`ShadowBlob`) que lo acompaña. La levitación (`Float`) va *dentro* de
@@ -89,8 +104,16 @@ export function RoamGroup({ enabled, children, target }: RoamGroupProps) {
 
     group.scale.setScalar(ROAM_SCALE);
 
-    const amplitudeX = Math.max(0, viewport.width / 2 - EDGE_MARGIN);
-    const amplitudeY = Math.max(0, viewport.height / 2 - EDGE_MARGIN);
+    // Amplitud completa (sin `EDGE_MARGIN`) en modo `target`: el llamador
+    // pide un punto concreto y espera aterrizar ahí, no cerca del centro
+    // (ver comentario de `EDGE_MARGIN` y el JSDoc de esta función). Con
+    // roam libre, resta el margen de siempre.
+    const amplitudeX = target
+      ? viewport.width / 2
+      : Math.max(0, viewport.width / 2 - EDGE_MARGIN);
+    const amplitudeY = target
+      ? viewport.height / 2
+      : Math.max(0, viewport.height / 2 - EDGE_MARGIN);
     // `target` (si viene) manda sobre el cursor; misma convención normalizada.
     const normX = target ? target.x : pointer.current.x;
     const normY = target ? target.y : pointer.current.y;

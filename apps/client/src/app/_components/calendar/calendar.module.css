@@ -8,13 +8,17 @@
   gap: 1.5rem;
 }
 
-/* Robot decorativo (reposo): cubre toda la vista (cabecera + tarjeta), por
- * encima del contenido pero por debajo del modal (`.overlay`, z-index: 20).
- * `pointer-events: none` para que las celdas de día sigan clicables. */
+/* Robot decorativo: cubre toda la vista (cabecera + tarjeta) y queda POR
+ * ENCIMA del modal (`.overlay`, z-index: 20) para que se lea flotando junto
+ * al día mientras el modal está abierto. `.view` es `position:relative` sin
+ * `z-index` propio (no crea stacking context), así que ambas capas
+ * comparten el mismo contexto de apilamiento y este `z-index` manda.
+ * `pointer-events: none` para que las celdas de día (y el modal) sigan
+ * clicables debajo. */
 .robotLayer {
   position: absolute;
   inset: 0;
-  z-index: 5;
+  z-index: 30;
   pointer-events: none;
 }
 
