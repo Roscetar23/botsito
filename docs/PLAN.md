@@ -150,7 +150,8 @@ visual) vive en su documento propio: **[`FRONTEND.md`](./FRONTEND.md)**. Resumen
 - **App delgada** (`apps/client`) + UI en `libs/*/ui`; **CSS Modules** por componente (sin framework CSS).
 - **Sistema de diseño** (tokens por variables CSS: color/tipografía/espaciado/radios) — a construir.
 - **Roadmap visual (FE-1…):** login/registro con diseño → vista Home → tokens/tema → marca → a11y.
-- Estado hoy: auth (login/registro) funcional con diseño **básico**; avatar **terminado**. **En curso: FE-1.**
+- Estado hoy: **FE-1** (login/registro split-screen de marca) y **FE-3** (tokens + tema claro/oscuro)
+  **hechos**; avatar **terminado**. **Próximo: FE-2 (vista Home).**
 
 ---
 

@@ -14,20 +14,23 @@
 Flujo de la pantalla principal (`apps/client/src/app/page.tsx`):
 
 ```
-<main "Asistente">
- └─ <AppShell>                       ← puertea por sesión (useAuth)
-     ├─ cargando…                    (rehidratando sesión)
-     ├─ <AuthPanel>                  ← SIN sesión: login / registro
-     └─ cabecera "Sesión: … / Salir" + <AvatarPlayground>   ← CON sesión
+<AppShell>                            ← ThemeProvider + AuthProvider, puertea por sesión
+ ├─ cargando…                         (rehidratando sesión)
+ ├─ SIN sesión → pantalla split:
+ │    ├─ izq: AccessPanel (logo + tarjeta con MODELO 3D feliz + "acceso seguro")
+ │    └─ der: header (toggle de tema) + AuthPanel (portal, tabs login/registro, campos)
+ └─ CON sesión → topbar (logo + usuario + toggle + salir) + AvatarPlayground
 ```
 
-- **Auth (login/registro):** `@asistente/auth-ui` → `AuthPanel` (card oscura, acento morado `#7c5cff`,
-  toggle login↔registro, errores legibles). **Funcional, diseño básico** — es lo próximo a pulir.
+- **Acceso (login/registro):** rediseño **split-screen** de marca (BotCito). Panel izquierdo con el
+  **modelo 3D real** (feliz, mirada al cursor); derecho con **tabs** login/registro, campos con iconos
+  SVG, mostrar/ocultar contraseña y transición suave al alternar. `@asistente/auth-ui` = el formulario;
+  `AccessPanel`/`AppShell` (en `apps/client`) = el layout y el 3D. **Funcional y con diseño.**
+- **Tema claro/oscuro:** `ThemeProvider`/`useTheme` + `ThemeToggle` (oscuro por defecto). Ver §4/§FE-3.
 - **Avatar:** `@asistente/avatar-ui` → `AvatarPlayground` (toggle 2D/3D, emociones, controles). **TERMINADO**
   visualmente (ver [`AVATAR.md`](./AVATAR.md) / [`AVATAR-ANIMACIONES.md`](./AVATAR-ANIMACIONES.md)).
-- **Estilos:** **CSS Modules por componente**, sin framework CSS. `global.css` es el reset base
-  (preflight de create-nx). **Aún no hay sistema de diseño** (tokens): colores/espaciados ad-hoc.
-- **Pendiente cosmético:** `layout.tsx` tiene metadata genérica ("Welcome to client") y no hay favicon/tema.
+- **Estilos:** **CSS Modules por componente** + **tokens** (variables CSS) de marca en `global.css`.
+  Tipografía **Exo 2**, metadata real ("BotCito").
 
 ---
 
@@ -78,11 +81,16 @@ Fuente: `myDesign/IdentidadDeMarca/Colores.png` y `myDesign/Logotipo/`. **Tema o
 ### 4.3 Logotipo (dos variantes por tema)
 
 Robot con audífonos morados + dos "ojos" (uno blanco, uno azul terciario) + wordmark **"BotCito"**.
+Lo pinta `BrandLogo` (sensible al tema, `<img>` con alto fijo → mismo tamaño en ambos temas).
+En la pantalla de acceso aparece **solo en el panel izquierdo**; con sesión, en el topbar.
 
 | Archivo fuente | Tema | Texto | Copia en el cliente |
 |---|---|---|---|
 | `myDesign/Logotipo/Logotipo Final.png` | **Oscuro** (principal) | blanco | `apps/client/public/brand/logo-dark.png` |
-| `myDesign/Logotipo/Group 3.png` | **Claro** | oscuro (`#1E1E1E`) | `apps/client/public/brand/logo-light.png` |
+| `myDesign/Logotipo/LogoClaro.png` | **Claro** | oscuro (`#1E1E1E`) | `apps/client/public/brand/logo-light.png` |
+
+> Variantes de **icono sin texto** disponibles (`Frame.png`/`logoBotcito 1.png` → `icon-dark/-light.png`),
+> hoy sin uso activo tras el rediseño split.
 
 ### 4.4 Tokens (variables CSS — tema oscuro por defecto)
 
@@ -106,12 +114,13 @@ Viven en `global.css` (o `theme.css`); si crecen los átomos (botón/input/card)
 
 Estado: `[ ]` pendiente · `[~]` en curso · `[x]` hecho.
 
-- [~] **FE-1 — Login / Registro con diseño.** Pulir la vista de acceso (layout, jerarquía, estados,
-      validación, marca). **En curso.**
+- [x] **FE-1 — Login / Registro con diseño.** Rediseño **split-screen** de marca: panel izquierdo
+      (logo + tarjeta con el modelo 3D feliz) y derecho (tabs login/registro, campos con iconos,
+      mostrar/ocultar contraseña, transición suave). Claro/oscuro. **Hecho** (afinado con el usuario).
 - [ ] **FE-2 — Vista Home.** Dashboard con el avatar como protagonista + secciones (tareas, etc.).
 - [x] **FE-3 — Tokens + tema claro/oscuro.** Variables CSS en `global.css` (oscuro + `[data-theme='light']`),
       `ThemeProvider`/`useTheme` (persiste en `localStorage`, script anti-flash), `ThemeToggle` (sol/luna).
-      Logo sensible al tema (`Logotipo Final` oscuro / `Group 3` claro) en ambos lados del split.
+      Logo sensible al tema (`Logotipo Final` oscuro / `LogoClaro` claro), **solo en el panel izquierdo**.
 - [ ] **FE-4 — Layout & marca.** `metadata` real (título/descr.), favicon, tipografía.
 - [ ] **FE-5 — Responsive + a11y pass.** Revisión de breakpoints, foco y contraste.
 
@@ -135,3 +144,9 @@ Estado: `[ ]` pendiente · `[~]` en curso · `[x]` hecho.
 - 2026-07-12 — **Identidad de marca añadida** (§4): colores exactos (primario `#44237B`, terciario
   `#3944E7`, secundarios `#1E1E1E`/`#FFFFFF`), fuente **Exo 2**, logo en dos variantes (oscuro=principal
   / claro). Guía de layout del login por captura del usuario. Arranca la implementación de **FE-1**.
+- 2026-07-13 — **FE-1 login/registro** con marca: primero card centrada + bot 3D al lado; luego
+  **rediseño split-screen** (según nuevo mockup del usuario): panel izquierdo (logo + tarjeta con el
+  modelo 3D **feliz**, mirada al cursor) + derecho (tabs, campos con iconos SVG, ojo, transición suave).
+- 2026-07-13 — **FE-3 tema claro/oscuro** con `ThemeToggle`; logo sensible al tema. Ajustes finales:
+  logo claro = **`LogoClaro.png`** (mismo alto que el oscuro) y logo **solo en el panel izquierdo**.
+  Bug de mirada del bot (eje Y invertido) corregido en `usePointerRotation`.
