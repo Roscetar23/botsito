@@ -7,6 +7,13 @@ import styles from './view-boundary.module.css';
 interface ViewBoundaryProps {
   /** Nombre de la vista aislada; se usa en el fallback y en el log de error. */
   name?: string;
+  /**
+   * Fallback a mostrar si `children` falla. Por defecto, el mensaje +
+   * "Reintentar" de abajo. Pasa `null` para un fallo silencioso (nada
+   * visible), útil para capas puramente decorativas (p. ej. el robot 3D
+   * flotando sobre el calendario) que nunca deben notarse si petan.
+   */
+  fallback?: ReactNode;
   children: ReactNode;
 }
 
@@ -35,6 +42,9 @@ export class ViewBoundary extends Component<ViewBoundaryProps, ViewBoundaryState
 
   override render(): ReactNode {
     if (!this.state.hasError) return this.props.children;
+    // `undefined` (prop no pasada) usa el fallback por defecto de abajo;
+    // `null` (pasado explícito) es un fallo silencioso a propósito.
+    if (this.props.fallback !== undefined) return this.props.fallback;
 
     return (
       <div className={styles.fallback}>

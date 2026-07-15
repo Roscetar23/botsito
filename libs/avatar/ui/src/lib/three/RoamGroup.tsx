@@ -15,6 +15,17 @@ import { HandShadows } from './HandShadows.js';
 export interface RoamGroupProps {
   enabled: boolean;
   children: ReactNode;
+  /**
+   * Objetivo fijo, normalizado igual que el cursor (x: -1 izq. → +1 der.,
+   * y: -1 arriba → +1 abajo, relativo al rect del canvas). Si viene
+   * definido (no `null`/`undefined`), el ease persigue este punto en vez
+   * del cursor — pensado para "ve aquí" (p.ej. una celda de calendario).
+   * Sin `target`, comportamiento idéntico al de siempre (persigue el
+   * cursor). No cambia nada más: mismo ease, misma `speedRef`/gestos de
+   * caminar, misma orientación por vuelo — al llegar, la velocidad cae
+   * sola a ~0 y el robot queda flotando quieto.
+   */
+  target?: { x: number; y: number } | null;
 }
 
 /** Altura objetivo del modelo mientras deambula (unidades del mundo). */
@@ -36,10 +47,12 @@ const SPEED_SMOOTH = 8;
 
 /**
  * Deambula por todo el viewport visible del `<Canvas>` (pensado para un
- * canvas a pantalla completa): escala el modelo pequeño y persigue la
- * posición del cursor con un lerp suave (con lag, no queda pegado al
- * puntero), clamp dentro del área visible con margen (el objetivo ya
- * viene clamp desde el cursor normalizado, así que el ease nunca se
+ * canvas a pantalla completa): escala el modelo pequeño y persigue con un
+ * lerp suave (con lag, no queda pegado) la posición del cursor **o**, si
+ * el llamador pasa `target`, un punto fijo arbitrario (misma convención
+ * normalizada -1..1 que el cursor) — pensado para "ve a esta celda del
+ * calendario". Clamp dentro del área visible con margen (el objetivo ya
+ * viene clamp desde el cursor/target normalizado, así que el ease nunca se
  * pasa de los bordes). Encima, orienta el personaje según su
  * **desplazamiento** (`useFlightOrientation`, no según el cursor — eso
  * lo desactiva el llamador en modo roam) y añade una sombra de contacto
@@ -50,11 +63,13 @@ const SPEED_SMOOTH = 8;
  * llamador) el grupo queda centrado, sin rotación, a escala normal y sin
  * sombra — el comportamiento "en caja" de siempre.
  */
-export function RoamGroup({ enabled, children }: RoamGroupProps) {
+export function RoamGroup({ enabled, children, target }: RoamGroupProps) {
   const groupRef = useRef<Group>(null);
   const { viewport } = useThree();
   const flight = useFlightOrientation();
-  const pointer = usePointerViewportTarget(enabled);
+  // Con `target` no hace falta escuchar el cursor: se desactiva el listener
+  // (ver `usePointerViewportTarget`), su valor simplemente no se usa abajo.
+  const pointer = usePointerViewportTarget(enabled && !target);
   /** Velocidad normalizada 0..1, compartida por contexto a los gestos hijos. */
   const speedRef = useRef(0);
   /** Huesos de mano (los puebla `RobotModel`), para las sombras de mano. */
@@ -76,8 +91,11 @@ export function RoamGroup({ enabled, children }: RoamGroupProps) {
 
     const amplitudeX = Math.max(0, viewport.width / 2 - EDGE_MARGIN);
     const amplitudeY = Math.max(0, viewport.height / 2 - EDGE_MARGIN);
-    const targetX = pointer.current.x * amplitudeX;
-    const targetY = -pointer.current.y * amplitudeY;
+    // `target` (si viene) manda sobre el cursor; misma convención normalizada.
+    const normX = target ? target.x : pointer.current.x;
+    const normY = target ? target.y : pointer.current.y;
+    const targetX = normX * amplitudeX;
+    const targetY = -normY * amplitudeY;
 
     // Posición previa (antes del ease) para medir el desplazamiento del frame.
     const prevX = group.position.x;

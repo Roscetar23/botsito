@@ -36,6 +36,16 @@ export interface Avatar3DProps {
   /** Deambula (solo posición) por todo el viewport visible del canvas. */
   roam?: boolean;
   /**
+   * Destino fijo para el modo `roam`, normalizado igual que el cursor
+   * (x: -1 izq. → +1 der., y: -1 arriba → +1 abajo, relativo al rect del
+   * canvas). Con `target` definido, `RoamGroup` viaja hacia ese punto en
+   * vez de perseguir el cursor (p.ej. "ve a esta celda del calendario");
+   * `null`/`undefined` (default) mantiene el comportamiento de siempre.
+   * `roam` sigue siendo la puerta del modo (escala + sombra + movimiento);
+   * `target` solo cambia el destino, no la mecánica.
+   */
+  target?: { x: number; y: number } | null;
+  /**
    * Clip del GLB a reproducir (por nombre exacto). Sin especificar, se
    * reproduce el primero disponible (`Esqueleto_acción`). Preparado para
    * un futuro mapeo `AvatarState → clip`; hoy nadie lo pasa.
@@ -160,6 +170,7 @@ export function Avatar3D({
   interactive = true,
   fullscreen = false,
   roam = false,
+  target,
   clip,
   gestures = true,
   gesturesLeft = true,
@@ -197,7 +208,7 @@ export function Avatar3D({
         <directionalLight position={[4, 6, 5]} intensity={1.1} />
         <directionalLight position={[-4, -2, -3]} intensity={0.4} />
         <Suspense fallback={null}>
-          <RoamGroup enabled={roamEnabled}>
+          <RoamGroup enabled={roamEnabled} target={target}>
             <CursorFollowGroup enabled={rotationEnabled}>
               <Float speed={reducedMotion ? 0 : 2} rotationIntensity={0.3} floatIntensity={0.6}>
                 <RobotModel

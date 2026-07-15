@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { CalendarCard } from './calendar-card';
+import { CalendarRobot } from './calendar-robot';
 import { DayModal } from './day-modal';
 import { useCalendarMonth } from './use-calendar-month';
 import type { CalendarDay } from './calendar-dates';
@@ -40,6 +41,8 @@ export function CalendarView() {
           onClose={() => setSelected(null)}
         />
       )}
+
+      <CalendarRobot />
     </section>
   );
 }

@@ -185,6 +185,13 @@ servidor daría un HTML distinto al del cliente).
       `@asistente/reminders-model`, `useCalendarMonth` lee de la API y se habilita "Crear recordatorio"
       (hoy deshabilitado a propósito, para no prometer lo que no hay).
 
+- [~] **C-3 — El robot sobre el calendario.** El modelo 3D flota **en reposo** arriba de la vista y
+      —siguiente paso— viajará al día que se clique, lo "tocará" con la mano para abrir el modal y
+      volverá arriba al cerrar. Capa **decorativa** (`pointer-events:none`, `aria-hidden`) con
+      **boundary propio y silencioso**: nunca puede tumbar el calendario ni bloquear el modal.
+      Habilitado por `Avatar3D#target` (destino arbitrario en modo `roam`). **Reposo hecho**; falta la
+      coreografía (gesto `press` procedural + capa por encima del `.overlay` del modal).
+
 **Desviaciones del mockup** (decididas con el usuario):
 - **Topbar mínima** (solo toggle de tema): se respeta la decisión de H-1; fuera el "+ Nuevo proyecto"
   y el "BOTCITO STUDIO / Espacio de creación" de la plantilla. La topbar es del shell y afectaría a Inicio.
@@ -247,3 +254,10 @@ servidor daría un HTML distinto al del cliente).
   `calendar/` según el mockup: rejilla del mes (lunes primero, hoy en azul terciario, chips morados) y
   modal de la agenda del día con estado vacío. Eventos = **datos de ejemplo**; el dominio `reminders`
   del backend **no existe todavía** (es scaffold), así que "Crear recordatorio" queda deshabilitado. Ver §5.2.
+- 2026-07-15 — **FE-6 C-3 · robot en reposo sobre el calendario**: el modelo 3D flota quieto arriba de la
+  vista (`CalendarRobot`: capa `absolute` + `pointer-events:none` + `aria-hidden`, con `ViewBoundary`
+  propio y `fallback={null}` → si el WebGL falla, ni se nota ni se lleva el calendario por delante).
+  Lo habilita una prop nueva de la lib del avatar: **`Avatar3D#target`** (`{x,y}` normalizado igual que el
+  cursor) hace que `RoamGroup` viaje a un punto fijo en vez de perseguir el ratón; **sin `target`, todo
+  idéntico**. Reutiliza el ease/velocidad/orientación de siempre: al llegar, la velocidad cae sola a ~0 →
+  dejan de moverse las manos y queda flotando. Falta la coreografía (viajar al día + tocar + abrir).

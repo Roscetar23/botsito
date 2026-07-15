@@ -1,10 +1,21 @@
 /* ===== Vista ===== */
 .view {
+  position: relative;
   flex: 1;
   min-width: 0;
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+}
+
+/* Robot decorativo (reposo): cubre toda la vista (cabecera + tarjeta), por
+ * encima del contenido pero por debajo del modal (`.overlay`, z-index: 20).
+ * `pointer-events: none` para que las celdas de día sigan clicables. */
+.robotLayer {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
 }
 
 .loading {
