@@ -109,7 +109,9 @@ Estado: `[ ]` pendiente · `[~]` en curso · `[x]` hecho.
 - [~] **FE-1 — Login / Registro con diseño.** Pulir la vista de acceso (layout, jerarquía, estados,
       validación, marca). **En curso.**
 - [ ] **FE-2 — Vista Home.** Dashboard con el avatar como protagonista + secciones (tareas, etc.).
-- [ ] **FE-3 — Tokens/tema compartido.** Extraer las variables de §4 y (opcional) átomos en `shared-ui`.
+- [x] **FE-3 — Tokens + tema claro/oscuro.** Variables CSS en `global.css` (oscuro + `[data-theme='light']`),
+      `ThemeProvider`/`useTheme` (persiste en `localStorage`, script anti-flash), `ThemeToggle` (sol/luna).
+      Logo sensible al tema (`Logotipo Final` oscuro / `Group 3` claro) en ambos lados del split.
 - [ ] **FE-4 — Layout & marca.** `metadata` real (título/descr.), favicon, tipografía.
 - [ ] **FE-5 — Responsive + a11y pass.** Revisión de breakpoints, foco y contraste.
 
