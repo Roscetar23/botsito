@@ -41,7 +41,6 @@ function AuthGate({ children }: { children: ReactNode }) {
         <AccessPanel />
         <div className={styles.formSide}>
           <div className={styles.formHeader}>
-            <BrandLogo height={40} />
             <ThemeToggle />
           </div>
           <div className={styles.formCenter}>
