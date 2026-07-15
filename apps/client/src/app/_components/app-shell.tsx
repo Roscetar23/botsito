@@ -2,17 +2,17 @@
 
 import type { ReactNode } from 'react';
 import { AuthProvider, AuthPanel, useAuth } from '@asistente/auth-ui';
-import { BrandLogo } from './brand-logo';
 import { AccessPanel } from './access-panel';
 import { ThemeProvider } from './theme';
 import { ThemeToggle } from './theme-toggle';
+import { HomeView } from './home/home-view';
 import styles from './app-shell.module.css';
 
 /**
  * Envuelve la app con tema + sesión y **puertea el acceso**: sin sesión,
  * pantalla split (panel de marca + modelo 3D a la izquierda, formulario a la
- * derecha con logo y toggle de tema); con sesión, una barra con el usuario,
- * el toggle y "salir". El `accessToken` de `useAuth` alimentará el realtime.
+ * derecha con logo y toggle de tema); con sesión, la Home (barra lateral +
+ * topbar + contenido). El `accessToken` de `useAuth` alimentará el realtime.
  */
 export function AppShell({ children }: { children: ReactNode }) {
   return (
@@ -25,7 +25,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 }
 
 function AuthGate({ children }: { children: ReactNode }) {
-  const { status, user, logout } = useAuth();
+  const { status, user } = useAuth();
 
   if (status === 'loading') {
     return (
@@ -51,19 +51,5 @@ function AuthGate({ children }: { children: ReactNode }) {
     );
   }
 
-  return (
-    <div className={styles.app}>
-      <header className={styles.topbar}>
-        <BrandLogo />
-        <span className={styles.session}>
-          <span className={styles.muted}>{user.displayName || user.email}</span>
-          <ThemeToggle />
-          <button type="button" className={styles.logout} onClick={logout}>
-            Salir
-          </button>
-        </span>
-      </header>
-      {children}
-    </div>
-  );
+  return <HomeView>{children}</HomeView>;
 }

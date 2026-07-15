@@ -1,0 +1,35 @@
+.fallback {
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 2rem;
+  text-align: center;
+}
+
+.muted {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.retry {
+  padding: 0.45rem 1.1rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.85rem;
+}
+
+.retry:hover {
+  background: var(--surface-2);
+}
+
+.retry:focus-visible {
+  outline: 2px solid var(--brand-primary-bright);
+  outline-offset: 2px;
+}

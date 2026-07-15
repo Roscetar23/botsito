@@ -19,7 +19,8 @@ Flujo de la pantalla principal (`apps/client/src/app/page.tsx`):
  ├─ SIN sesión → pantalla split:
  │    ├─ izq: AccessPanel (logo + tarjeta con MODELO 3D feliz + "acceso seguro")
  │    └─ der: header (toggle de tema) + AuthPanel (portal, tabs login/registro, campos)
- └─ CON sesión → topbar (logo + usuario + toggle + salir) + AvatarPlayground
+ └─ CON sesión → HomeView: barra lateral colapsable (logo + Inicio/Calendario + usuario/salir)
+                 + topbar (toggle de tema) + contenido aislado (placeholder → vista 2D/3D)
 ```
 
 - **Acceso (login/registro):** rediseño **split-screen** de marca (BotCito). Panel izquierdo con el
@@ -40,7 +41,7 @@ App delgada + UI en libs (D-06). Todo componente con estado/efectos lleva `'use 
 
 | Lib / carpeta | Qué contiene |
 |---|---|
-| `apps/client/src/app` | Composición y rutas: `page.tsx`, `layout.tsx`, `_components/*` (app-shell, avatar-playground, three-controls, state-buttons, mode-toggle, avatar-3d-lazy). |
+| `apps/client/src/app` | Composición y rutas: `page.tsx`, `layout.tsx`, `_components/*` (app-shell, **`home/`** [vista aislada: view/sidebar/topbar/nav/user/visualizer-placeholder], view-boundary, avatar-playground, three-controls, state-buttons, mode-toggle, avatar-3d-lazy). |
 | `libs/auth/ui` (`@asistente/auth-ui`) | `AuthPanel`, `AuthProvider`/`useAuth`, cliente API, storage de tokens. |
 | `libs/avatar/ui` (`@asistente/avatar-ui`) | Avatar 2D (rig por capas) + 3D (R3F), máquina de estados, partes, gestos. |
 | `libs/shared/ui` (`@asistente/shared-ui`) | Átomos/utilidades UI compartidas (poco poblada; candidata para los tokens/átomos). |
@@ -146,10 +147,11 @@ veo el navegador → cada paso se valida visualmente). Es una **vista independie
 
 Iteraciones previstas (se refinan sobre la marcha, no son fijas):
 
-- [ ] **H-0 — Estructura aislada.** La Home como vista propia y autocontenida (módulo + **error
-      boundary** + carga diferida), montada tras el login en lugar del playground de avatar. Shell base.
-- [ ] **H-1 — Layout de marca.** Distribución (barra/nav + área principal) con el **avatar** como
-      presencia protagonista. Según el diseño/mockup que dé el usuario.
+- [x] **H-0 — Estructura aislada.** La Home como vista propia y autocontenida (módulo `home/` +
+      **error boundary** `ViewBoundary`), montada tras el login en lugar del playground. **Hecho** (Commit A).
+- [~] **H-1 — Layout de marca.** Distribución (barra lateral colapsable + topbar + área principal)
+      según el mockup del usuario. **Shell hecho** (sidebar Inicio/Calendario + usuario/cerrar sesión;
+      topbar solo con toggle de tema). Falta el **avatar** como presencia protagonista en el `main`.
 - [ ] **H-2 — Secciones (placeholders).** Zonas/tarjetas para **tareas**, **recordatorios** y
       **notificaciones** con estados vacíos, listas para cablear al backend.
 - [ ] **H-3 — Avatar integrado.** El avatar presente (idle) y preparado para reaccionar a eventos/estado.
@@ -190,3 +192,8 @@ Iteraciones previstas (se refinan sobre la marcha, no son fijas):
 - 2026-07-13 — Arranca **FE-2 Home (pantalla base)**: se añade su fase propia con iteraciones (§5.1)
   y el principio de **vistas independientes/aisladas** (§2.1, FD-05). Es la vista clave antes de
   retomar backend; se itera hasta completarla.
+- 2026-07-15 — **FE-2 H-0/H-1 (Commit A) — shell de la Home**: vista aislada (`home/` + `ViewBoundary`),
+  montada tras el login en vez del playground. **Barra lateral colapsable** (logo esquina sup. izq. como
+  el login + chevron; riel de iconos al cerrar) con **Inicio** (activo) y **Calendario**; abajo, usuario
+  (iniciales+nombre reales) + **Cerrar sesión**. **Topbar mínima** (solo toggle de tema; fuera "Nuevo
+  proyecto"). `main` = placeholder del visualizador. Falta llevar la **vista 2D/3D** al `main` (Commit B).

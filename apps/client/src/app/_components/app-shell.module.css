@@ -41,46 +41,6 @@
   }
 }
 
-/* ===== App con sesión ===== */
-.app {
-  min-height: 100vh;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-}
-
-.topbar {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  padding: 1rem 1.5rem;
-  border-bottom: 1px solid var(--border, rgba(255, 255, 255, 0.08));
-}
-
-.session {
-  display: flex;
-  align-items: center;
-  gap: 0.9rem;
-  font-size: 0.9rem;
-}
-
-.logout {
-  padding: 0.4rem 0.9rem;
-  border: 1px solid var(--border, rgba(255, 255, 255, 0.25));
-  border-radius: 8px;
-  background: transparent;
-  color: inherit;
-  cursor: pointer;
-  font: inherit;
-  font-size: 0.85rem;
-}
-
-.logout:hover {
-  background: var(--surface-2, rgba(255, 255, 255, 0.08));
-}
-
 .centered {
   display: flex;
   align-items: center;

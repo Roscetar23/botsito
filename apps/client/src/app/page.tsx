@@ -1,10 +1,10 @@
 import { AppShell } from './_components/app-shell';
-import { AvatarPlayground } from './_components/avatar-playground';
+import { VisualizerPlaceholder } from './_components/home/visualizer-placeholder';
 
 export default function Index() {
   return (
     <AppShell>
-      <AvatarPlayground />
+      <VisualizerPlaceholder />
     </AppShell>
   );
 }
