@@ -272,3 +272,12 @@ servidor daría un HTML distinto al del cliente).
   roam libre para que el bot no se salga persiguiendo el cursor) comprimía el mapeo ~35% y dejaba al robot
   **una fila por encima** del día clicado. El roam libre de la Home no cambia. El robot es **decorativo**:
   el modal abre siempre (timer fuera de la capa 3D; al instante con `prefers-reduced-motion`).
+- 2026-07-15 — **Bug (gotcha de R3F)**: el `<Canvas>` de R3F fija `pointer-events: auto` **inline** en su
+  div (*"or else the canvas will block events from reaching the event source"*, comentario de su propio
+  fuente). Un inline gana al `pointer-events: none` que hereda de la capa contenedora → la capa del robot,
+  que cubre toda la vista a `z-index:30`, **dejaba todos los días sin poder clicarse**. `Avatar3D` pasa
+  ahora `style={{ pointerEvents: 'none' }}` al `<Canvas>`: su `style` hace spread **después** de su
+  `pointerEvents` interno, así que lo sobrescribe **sin `!important`**. Es seguro e incondicional porque
+  **nada del avatar usa eventos de puntero del canvas** (`usePointerRotation` y `usePointerViewportTarget`
+  escuchan en `window`; no hay meshes clicables ni `OrbitControls`). Arreglaba también el mismo bug
+  **latente en la Home**, donde no se notaba porque los controles flotan por encima del canvas.

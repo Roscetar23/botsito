@@ -213,7 +213,22 @@ export function Avatar3D({
 
   return (
     <div style={containerStyle}>
-      <Canvas camera={{ position: [0, 0, cameraZ], fov: 42 }}>
+      <Canvas
+        camera={{ position: [0, 0, cameraZ], fov: 42 }}
+        // `pointerEvents: 'none'` es OBLIGATORIO, no cosmético: R3F le mete
+        // `pointerEvents: 'auto'` inline al div del `<Canvas>` ("or else the
+        // canvas will block events from reaching the event source", su propio
+        // comentario en el fuente), y un inline gana al `pointer-events: none`
+        // que el contenedor del cliente (p.ej. la capa del avatar flotando
+        // sobre el Calendario) intente heredarle por CSS. Sin este override,
+        // el canvas se come TODOS los clics de lo que hay debajo. Es seguro
+        // (y debe ser el default): nada en este árbol usa eventos de puntero
+        // del canvas — `usePointerRotation`/`usePointerViewportTarget`
+        // escuchan en `window`, no hay `onClick`/`onPointerOver` en ningún
+        // mesh ni `OrbitControls`. El `style` de R3F hace spread DESPUÉS de su
+        // `pointerEvents` interno, así que esta prop lo sobrescribe limpio.
+        style={{ pointerEvents: 'none' }}
+      >
         <ambientLight intensity={0.7} />
         <directionalLight position={[4, 6, 5]} intensity={1.1} />
         <directionalLight position={[-4, -2, -3]} intensity={0.4} />
