@@ -12,6 +12,19 @@ interface CalendarRobotProps {
 }
 
 /**
+ * Tamaño aparente del robot: con `fov=42°` (el default de `Avatar3D`),
+ * `viewport.height ≈ 2·cameraZ·tan(21°) ≈ 0.768·cameraZ`. El robot en roam
+ * mide `ROAM_TARGET_HEIGHT = 2` unidades de mundo, así que ocupa
+ * `2 / (0.768·cameraZ) ≈ 2.6 / cameraZ` del alto del canvas. El default de
+ * la lib (`cameraZ = 9`) da ~29% — demasiado grande aquí. Con `cameraZ = 20`
+ * baja a ~13% (en una vista de ~700px, ~90px de alto): se lee claramente
+ * pequeño y decorativo. No afecta al mapeo de `target`: en modo `target` la
+ * amplitud es `viewport/2`, que escala igual con `cameraZ`, así que ±1
+ * sigue siendo el borde del canvas.
+ */
+const CAMERA_Z = 20;
+
+/**
  * Robot 3D decorativo sobre el calendario: flota en reposo arriba, viaja a
  * la celda elegida y la "toca" (coreografía orquestada en
  * `useRobotChoreography`, fuera de esta capa). Capa `absolute` con
@@ -28,6 +41,7 @@ export function CalendarRobot({ target, pressTrigger }: CalendarRobotProps) {
         <Avatar3DLazy
           fullscreen
           roam
+          cameraZ={CAMERA_Z}
           target={target}
           pressTrigger={pressTrigger}
           state="idle"

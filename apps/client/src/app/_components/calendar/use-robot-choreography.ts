@@ -10,8 +10,23 @@ export interface RobotTarget {
   y: number;
 }
 
-/** Reposo: arriba a la derecha, sin tapar el título "Calendario de {mes}.". */
-export const REST_TARGET: RobotTarget = { x: 0.6, y: -0.8 };
+/**
+ * Reposo: junto a la fila de nombres de día (LUN…DOM), pegado a la derecha.
+ * `REST_TARGET` se normaliza contra el rect de TODA `.view` (cabecera de
+ * página + tarjeta), así que hay que estimar a qué fracción de ese alto cae
+ * la fila de weekdays. De arriba abajo (con la fuente base de 16px):
+ *  - `.pageHeader` (eyebrow + `h1` 2rem + subtítulo): ~82px.
+ *  - `gap` de `.view`: 1.5rem ≈ 24px.
+ *  - `.card` hasta el borde superior de `.weekdays` (borde + `.cardHeader`
+ *    con su padding 1.15rem): ~82px.
+ *  - `.weekdays` (padding 0.7rem + una línea ~0.68rem): ~36px de alto.
+ *  - `.grid`: 6 semanas × 118px ≈ 713px (domina el resto de la altura).
+ * Centro de `.weekdays` ≈ (82+24+82+36/2) ≈ 206px de ~940px totales → ~22%
+ * desde arriba → `y = 0.22·2 - 1 ≈ -0.55`. `x = 0.82`: claramente a la
+ * derecha (la fila cubre todo el ancho de la tarjeta) con margen frente al
+ * `overflow:hidden` de `.robotLayer`.
+ */
+export const REST_TARGET: RobotTarget = { x: 0.82, y: -0.55 };
 
 // El ease del roam es exponencial con constante de tiempo ~0.55s, así que a
 // los ~520ms ya lee como "llegó" (el tiempo hasta "cerca" es casi
