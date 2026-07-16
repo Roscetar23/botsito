@@ -14,10 +14,11 @@ export interface RobotTarget {
  * Reposo: arriba del todo, pegado a la derecha. `y: -1` es el borde
  * superior exacto del canvas (en modo `target` la amplitud es completa), así
  * que `-0.92` lo deja prácticamente arriba del todo sin llegar a clipar
- * contra el `overflow: hidden` de `.robotLayer`. `x: 0.82` lo mantiene claro
- * a la derecha (mismo valor que antes).
+ * contra el `overflow: hidden` de `.robotLayer`. `x: 0.6` lo deja a la
+ * derecha pero algo más adentro que el `0.82` inicial (afinado a ojo con el
+ * usuario).
  */
-export const REST_TARGET: RobotTarget = { x: 0.82, y: -0.92 };
+export const REST_TARGET: RobotTarget = { x: 0.6, y: -0.92 };
 
 /**
  * Con el modal abierto: el robot se aparta a su izquierda en vez de tapar el

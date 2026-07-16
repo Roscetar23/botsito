@@ -15,15 +15,18 @@ interface CalendarRobotProps {
  * Tamaño aparente del robot: con `fov=42°` (el default de `Avatar3D`),
  * `viewport.height ≈ 2·cameraZ·tan(21°) ≈ 0.768·cameraZ`. El robot en roam
  * mide `ROAM_TARGET_HEIGHT = 2` unidades de mundo, así que ocupa
- * `2 / (0.768·cameraZ) ≈ 2.6 / cameraZ` del alto del canvas. El default de
- * la lib (`cameraZ = 9`) da ~29%; `cameraZ = 20` seguía leyéndose "del mismo
- * tamaño" a ojo del usuario. Con `cameraZ = 45` baja a ~5.8% (en una vista
- * de ~940px, ~55px de alto): ahora sí se lee claramente pequeño y
- * decorativo. No afecta al mapeo de `target`: en modo `target` la amplitud
- * es `viewport/2`, que escala igual con `cameraZ`, así que ±1 sigue siendo
- * el borde del canvas.
+ * `2 / (0.768·cameraZ) ≈ 2.6 / cameraZ` del alto del canvas. Calibrado a ojo
+ * con el usuario: el default de la lib (`cameraZ = 9`) da ~29% (demasiado
+ * grande) y `45` daba ~5.8% (demasiado pequeño); `28` deja ~9.3% (~87px en
+ * una vista de ~940px). No afecta al mapeo de `target`: en modo `target` la
+ * amplitud es `viewport/2`, que escala igual con `cameraZ`, así que ±1 sigue
+ * siendo el borde del canvas.
+ *
+ * OJO al retocarlo: R3F crea la cámara del `<Canvas>` **solo al montar**, así
+ * que este número exige **recarga dura** para verse — con hot-reload se
+ * conserva la cámara anterior y parece que el cambio no hace nada.
  */
-const CAMERA_Z = 45;
+const CAMERA_Z = 28;
 
 /**
  * Robot 3D decorativo sobre el calendario: flota en reposo arriba, viaja a
