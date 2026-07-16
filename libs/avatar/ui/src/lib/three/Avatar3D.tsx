@@ -46,6 +46,22 @@ export interface Avatar3DProps {
    */
   target?: { x: number; y: number } | null;
   /**
+   * Con `true`, el robot hace de "billboard": encara la cámara SIEMPRE en
+   * modo `roam`, incluso en reposo lejos del centro del viewport (donde,
+   * por perspectiva, se le ve de perfil aunque su rotación sea ~identidad —
+   * ver el JSDoc de `RoamGroup` para el análisis geométrico completo). El
+   * ladeo al desplazarse (`useFlightOrientation`) NO se pierde: se sigue
+   * aplicando encima, como giro local relativo a "ya de cara a ti". Solo
+   * afecta a la ROTACIÓN del grupo; la posición sigue igual (ease,
+   * `speedRef`, sombras, escala de roam). Nota: el `<Float>` interno sigue
+   * con su leve `rotationIntensity` propio (vida ambiental) encima de
+   * esto — se le sigue viendo la cara, pero no es una rotación
+   * perfectamente estática; avisar si eso llegara a molestar. Default
+   * `false` (comportamiento de siempre — la Home/roam libre no lo pasan y
+   * queda intacta).
+   */
+  faceCamera?: boolean;
+  /**
    * Clip del GLB a reproducir (por nombre exacto). Sin especificar, se
    * reproduce el primero disponible (`Esqueleto_acción`). Preparado para
    * un futuro mapeo `AvatarState → clip`; hoy nadie lo pasa.
@@ -169,7 +185,9 @@ function CursorFollowGroup({ enabled, children }: CursorFollowGroupProps) {
  * quedar fijo en el centro — pensado como presencia ambiental, no como
  * un widget encajonado. En roam, la orientación la manda el movimiento
  * (`RoamGroup`/`useFlightOrientation`), así que el cursor-follow se
- * desactiva; en modo "caja" sigue igual que antes.
+ * desactiva; en modo "caja" sigue igual que antes. Con `faceCamera`, el
+ * billboard hacia cámara se compone ENCIMA de esa orientación por vuelo
+ * (ver `RoamGroup`), no la sustituye.
  */
 export function Avatar3D({
   size = 340,
@@ -180,6 +198,7 @@ export function Avatar3D({
   fullscreen = false,
   roam = false,
   target,
+  faceCamera = false,
   clip,
   gestures = true,
   gesturesLeft = true,
@@ -233,7 +252,7 @@ export function Avatar3D({
         <directionalLight position={[4, 6, 5]} intensity={1.1} />
         <directionalLight position={[-4, -2, -3]} intensity={0.4} />
         <Suspense fallback={null}>
-          <RoamGroup enabled={roamEnabled} target={target}>
+          <RoamGroup enabled={roamEnabled} target={target} faceCamera={faceCamera}>
             <CursorFollowGroup enabled={rotationEnabled}>
               <Float speed={reducedMotion ? 0 : 2} rotationIntensity={0.3} floatIntensity={0.6}>
                 <RobotModel

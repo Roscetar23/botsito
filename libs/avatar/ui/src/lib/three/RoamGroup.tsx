@@ -3,6 +3,7 @@
 import { useRef } from 'react';
 import type { ReactNode } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
+import { Euler, Quaternion } from 'three';
 import type { Group } from 'three';
 import { useFlightOrientation } from './useFlightOrientation.js';
 import { usePointerViewportTarget } from './usePointerViewportTarget.js';
@@ -26,6 +27,15 @@ export interface RoamGroupProps {
    * sola a ~0 y el robot queda flotando quieto.
    */
   target?: { x: number; y: number } | null;
+  /**
+   * Con `true`, el grupo hace de "billboard": encara la cámara SIEMPRE,
+   * incluso en reposo lejos del eje (ver el JSDoc de `RoamGroup` para el
+   * porqué geométrico completo). El ladeo por vuelo
+   * (`useFlightOrientation`) NO se pierde: se sigue aplicando encima, como
+   * rotación local relativa a "de cara a ti". Default `false`
+   * (comportamiento de siempre — Home/roam libre no lo pasan).
+   */
+  faceCamera?: boolean;
 }
 
 /** Altura objetivo del modelo mientras deambula (unidades del mundo). */
@@ -50,6 +60,9 @@ const POSITION_EASE_SPEED = 1.8;
 const SPEED_REFERENCE = 5;
 /** Suavizado de la señal de velocidad (independiente del framerate). */
 const SPEED_SMOOTH = 8;
+
+const eulerScratch = new Euler();
+const offsetScratch = new Quaternion();
 
 /**
  * Deambula por todo el viewport visible del `<Canvas>` (pensado para un
@@ -77,10 +90,35 @@ const SPEED_SMOOTH = 8;
  * Con `enabled=false` (incluye `prefers-reduced-motion`, decidido por el
  * llamador) el grupo queda centrado, sin rotación, a escala normal y sin
  * sombra — el comportamiento "en caja" de siempre.
+ *
+ * **`faceCamera` (billboard + vuelo encima):** en reposo lejos del centro
+ * (p.ej. `target` en una esquina del viewport) el robot queda fuera del eje
+ * de la cámara; como el ángulo fuera de eje es `atan(norm · tan(fov/2))`
+ * (NO depende de `cameraZ`: la posición en mundo escala con el viewport, que
+ * a su vez escala con `cameraZ`, y se cancela al dividir), con `fov=42°` y
+ * un `target` típico de esquina el desvío ronda ~25° combinados — se le ve
+ * de perfil, no de frente, aunque la ROTACIÓN del grupo sea ~identidad (el
+ * vuelo ya decae solo en reposo). No es un problema de rotación: es
+ * perspectiva. `faceCamera` corrige esto con un billboard real: cada frame,
+ * `group.lookAt(camera.position)` orienta el grupo hacia la cámara desde su
+ * posición actual (confirmado con el propio rig: con rotación identidad y
+ * la cámara en el eje +Z se ve la cara — el mismo caso que el login,
+ * `enabled=false` más abajo — así que el eje frontal del modelo es +Z local,
+ * justo el que `Object3D.lookAt` en un `Group` [no cámara] orienta hacia el
+ * target; confirmado también leyendo `Matrix4.lookAt`/`Object3D.lookAt` en
+ * el fuente de three: para no-cámaras compone la matriz con `eye=target,
+ * target=posición propia`, lo que deja el +Z local apuntando AL target —
+ * justo lo que ya sabíamos por el login). Encima de ese billboard se
+ * multiplica (post-multiply, rotación LOCAL relativa a "ya mirando a ti") el
+ * mismo `pitch/yaw/roll` de `useFlightOrientation` que se usa sin
+ * `faceCamera`, así que el ladeo al desplazarse se sigue leyendo igual, solo
+ * que ahora compuesto sobre una base que siempre encara cámara en vez de
+ * sobre los ejes de mundo. Sin `faceCamera`, comportamiento idéntico al de
+ * siempre (rotación = solo el vuelo, sin billboard).
  */
-export function RoamGroup({ enabled, children, target }: RoamGroupProps) {
+export function RoamGroup({ enabled, children, target, faceCamera = false }: RoamGroupProps) {
   const groupRef = useRef<Group>(null);
-  const { viewport } = useThree();
+  const { viewport, camera } = useThree();
   const flight = useFlightOrientation();
   // Con `target` no hace falta escuchar el cursor: se desactiva el listener
   // (ver `usePointerViewportTarget`), su valor simplemente no se usa abajo.
@@ -134,9 +172,23 @@ export function RoamGroup({ enabled, children, target }: RoamGroupProps) {
     const s = Math.min(1, SPEED_SMOOTH * delta);
     speedRef.current += (instNorm - speedRef.current) * s;
 
+    // El vuelo se calcula SIEMPRE (barato, y evita orientación obsoleta si
+    // `faceCamera` se alternara en caliente): lo que cambia es cómo se aplica.
     flight.update(group.position.x, group.position.y, delta);
     const { pitch, yaw, roll } = flight.orientation.current;
-    group.rotation.set(pitch, yaw, roll);
+
+    if (faceCamera) {
+      // Billboard: +Z local del grupo apunta a la cámara desde la posición
+      // YA actualizada de este frame (ver JSDoc de la función).
+      group.lookAt(camera.position);
+      // Vuelo como rotación LOCAL encima del billboard (post-multiply): el
+      // ladeo se sigue leyendo igual, relativo a "ya de cara a ti".
+      eulerScratch.set(pitch, yaw, roll);
+      offsetScratch.setFromEuler(eulerScratch);
+      group.quaternion.multiply(offsetScratch);
+    } else {
+      group.rotation.set(pitch, yaw, roll);
+    }
   });
 
   return (

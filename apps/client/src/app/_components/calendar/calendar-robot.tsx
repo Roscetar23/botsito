@@ -17,8 +17,9 @@ interface CalendarRobotProps {
  * mide `ROAM_TARGET_HEIGHT = 2` unidades de mundo, así que ocupa
  * `2 / (0.768·cameraZ) ≈ 2.6 / cameraZ` del alto del canvas. Calibrado a ojo
  * con el usuario: el default de la lib (`cameraZ = 9`) da ~29% (demasiado
- * grande) y `45` daba ~5.8% (demasiado pequeño); `28` deja ~9.3% (~87px en
- * una vista de ~940px). No afecta al mapeo de `target`: en modo `target` la
+ * grande), `45` daba ~5.8% (demasiado pequeño) y `28` ~9.3% (casi); `24`
+ * deja ~10.8% (~102px en una vista de ~940px). No afecta al mapeo de
+ * `target`: en modo `target` la
  * amplitud es `viewport/2`, que escala igual con `cameraZ`, así que ±1 sigue
  * siendo el borde del canvas.
  *
@@ -46,6 +47,13 @@ export function CalendarRobot({ target, pressTrigger }: CalendarRobotProps) {
           fullscreen
           roam
           walk={false}
+          // El reposo está en la esquina, ~25° fuera del eje de la cámara, así
+          // que sin esto se le vería el costado en vez de la cara (es
+          // perspectiva, no rotación: el ángulo sale de `atan(norm·tan(fov/2))`
+          // y por eso NO se arregla tocando `cameraZ`). Con `faceCamera` encara
+          // siempre a cámara y el ladeo del vuelo se compone encima, así que al
+          // desplazarse se sigue viendo igual de vivo.
+          faceCamera
           cameraZ={CAMERA_Z}
           target={target}
           pressTrigger={pressTrigger}
