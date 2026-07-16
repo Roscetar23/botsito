@@ -12,24 +12,37 @@ interface CalendarRobotProps {
 }
 
 /**
- * Tamaño aparente del robot: con `fov=42°` (el default de `Avatar3D`),
- * `viewport.height ≈ 2·cameraZ·tan(21°) ≈ 0.768·cameraZ`. El robot en roam
- * mide `ROAM_TARGET_HEIGHT = 2` unidades de mundo, así que ocupa
- * `2 / (0.768·cameraZ) ≈ 2.6 / cameraZ` del alto del canvas. Calibrado a ojo
- * con el usuario, valores realmente vistos: `9` (default de la lib) ~29%
- * (demasiado grande), `45` ~5.8% (demasiado pequeño), `28` ~9.3% (se quedaba
- * corto). `22` deja ~11.8% (~111px en una vista de ~940px).
+ * Cámara del robot: **teleobjetivo**. `viewport.height = 2·cameraZ·tan(fov/2)`,
+ * y el robot en roam mide `ROAM_TARGET_HEIGHT = 2` unidades de mundo, así que
+ * su tamaño aparente es `2 / (2·cameraZ·tan(fov/2))` del alto del canvas.
  *
- * No afecta al mapeo de `target`: en modo `target` la amplitud es
- * `viewport/2`, que escala igual con `cameraZ`, así que ±1 sigue siendo el
- * borde del canvas. Tampoco arregla el ángulo fuera de eje (ver `faceCamera`
- * abajo): ese sale de `atan(norm·tan(fov/2))` y es independiente de `cameraZ`.
+ * De ahí que `fov` y `cameraZ` vayan **en pareja**: bajar el `fov` y subir
+ * `cameraZ` en proporción **conserva el encuadre y el tamaño**, pero aplana la
+ * perspectiva. `fov=15°`/`cameraZ=64` da `2·64·tan7.5° ≈ 16.85`, prácticamente
+ * el mismo encuadre que el `fov=42°`/`cameraZ=22` anterior (`≈ 16.89`) → el
+ * robot sigue ocupando ~11.8% del alto (~111px en una vista de ~940px).
  *
- * OJO al retocarlo: R3F crea la cámara del `<Canvas>` **solo al montar**, así
- * que este número exige **recarga dura** para verse — con hot-reload se
- * conserva la cámara anterior y parece que el cambio no hace nada.
+ * **Por qué el teleobjetivo**: el reposo está muy fuera del eje de la cámara, y
+ * ahí `faceCamera` (billboard) deja un cizallamiento proyectivo residual que el
+ * usuario veía como "en diagonal". Ese artefacto escala con `tan(fov/2)` — y
+ * **no depende de `cameraZ`** (el ángulo fuera de eje es `atan(norm·tan(fov/2))`,
+ * donde la posición en mundo y la distancia de cámara se cancelan). Al pasar de
+ * `fov` 42° a 15°, cae ~2.8×: de ~5.5° a ~1.9°, ya imperceptible.
+ *
+ * Tamaño calibrado a ojo con el usuario (valores realmente vistos, todos con el
+ * `fov=42` de entonces): `cameraZ` 9 (default de la lib) ~29% (demasiado
+ * grande), 45 ~5.8% (demasiado pequeño), 28 ~9.3% (corto), 22 ~11.8%. Para
+ * retocar el tamaño ahora, mueve `CAMERA_Z` y deja el `fov` quieto.
+ *
+ * No afecta al mapeo de `target`: la amplitud en modo `target` es `viewport/2`,
+ * que escala igual, así que ±1 sigue siendo el borde del canvas.
+ *
+ * OJO al retocar cualquiera de los dos: R3F crea la cámara del `<Canvas>`
+ * **solo al montar**, así que exigen **recarga dura** para verse — con
+ * hot-reload se conserva la cámara anterior y parece que el cambio no hace nada.
  */
-const CAMERA_Z = 22;
+const CAMERA_FOV = 15;
+const CAMERA_Z = 64;
 
 /**
  * Robot 3D decorativo sobre el calendario: flota en reposo arriba, viaja a
@@ -56,6 +69,7 @@ export function CalendarRobot({ target, pressTrigger }: CalendarRobotProps) {
           // siempre a cámara y el ladeo del vuelo se compone encima, así que al
           // desplazarse se sigue viendo igual de vivo.
           faceCamera
+          fov={CAMERA_FOV}
           cameraZ={CAMERA_Z}
           target={target}
           pressTrigger={pressTrigger}

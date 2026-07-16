@@ -19,9 +19,34 @@ export interface Avatar3DProps {
   /**
    * Distancia de la cámara (eje Z). Mayor = más lejos = el modelo se ve más
    * pequeño con **más margen** (útil en modo caja para que no se corten las
-   * manos). Default 9.
+   * manos). Default 9. Relación útil para calibrar junto a `fov` (ver esa
+   * prop): `viewport.height = 2·cameraZ·tan(fov/2)`.
+   *
+   * OJO: R3F crea la cámara del `<Canvas>` **solo al montar** — cambiar
+   * `cameraZ` (o `fov`) en caliente no se refleja sin recarga dura; con
+   * hot-reload se conserva la cámara anterior y parece que el cambio no
+   * hace nada.
    */
   cameraZ?: number;
+  /**
+   * Campo de visión vertical de la cámara, en grados. Default 42 (el valor
+   * de siempre; con él, todo lo existente queda idéntico). De
+   * `viewport.height = 2·cameraZ·tan(fov/2)` salen dos consecuencias útiles
+   * para calibrar en modo `roam`:
+   * 1. El tamaño aparente del robot es `2 / (2·cameraZ·tan(fov/2))` (el
+   *    modelo mide 2 unidades tras `RoamGroup`/`ROAM_SCALE`) — bajar `fov` y
+   *    subir `cameraZ` en la misma proporción conserva el encuadre y el
+   *    tamaño, pero APLANA la perspectiva (teleobjetivo).
+   * 2. El ángulo fuera de eje de un `target`/reposo normalizado (y con él el
+   *    cizallamiento proyectivo de `faceCamera`, ver `RoamGroup`) es
+   *    `≈ atan(norm · tan(fov/2))` — depende SOLO de `fov` y de `norm`, NO
+   *    de `cameraZ` (se cancela). Por eso un `fov` menor (teleobjetivo)
+   *    reduce ese cizallamiento y tocar solo `cameraZ` no.
+   *
+   * Mismo aviso que `cameraZ`: la cámara del `<Canvas>` se crea solo al
+   * montar, así que cambiar `fov` en caliente exige recarga dura.
+   */
+  fov?: number;
   /**
    * Emoción/estado a expresar. Si se pasa, los gestos se derivan de él
    * (`gesturesForState`) y **anulan** las banderas individuales de gestos —
@@ -177,9 +202,11 @@ function CursorFollowGroup({ enabled, children }: CursorFollowGroupProps) {
  * No sustituye a `Avatar`; requiere WebGL, por lo que el front debe
  * montarlo con `next/dynamic(..., { ssr: false })`.
  *
- * Cámara a `position: [0, 0, 9]` + `fov: 42` deja el robot (≈5.5 de alto,
- * centrado por `RobotModel`) encuadrado con margen holgado en el modo
- * "caja" (`fullscreen`/`roam` en `false`, el comportamiento de siempre).
+ * Cámara por defecto a `position: [0, 0, 9]` + `fov: 42` deja el robot
+ * (≈5.5 de alto, centrado por `RobotModel`) encuadrado con margen holgado en
+ * el modo "caja" (`fullscreen`/`roam` en `false`, el comportamiento de
+ * siempre). `cameraZ`/`fov` son ajustables (ver esas props) para calibrar
+ * tamaño/perspectiva en modo `roam` sin tocar este default.
  *
  * Con `fullscreen`/`roam`, el canvas cubre toda la pantalla y el modelo
  * (escalado pequeño por `RoamGroup`) deambula por el viewport en vez de
@@ -194,6 +221,7 @@ export function Avatar3D({
   size = 340,
   assetUrl = '/avatar/botcito.glb',
   cameraZ = 9,
+  fov = 42,
   state,
   interactive = true,
   fullscreen = false,
@@ -234,7 +262,7 @@ export function Avatar3D({
   return (
     <div style={containerStyle}>
       <Canvas
-        camera={{ position: [0, 0, cameraZ], fov: 42 }}
+        camera={{ position: [0, 0, cameraZ], fov }}
         // `pointerEvents: 'none'` es OBLIGATORIO, no cosmético: R3F le mete
         // `pointerEvents: 'auto'` inline al div del `<Canvas>` ("or else the
         // canvas will block events from reaching the event source", su propio
