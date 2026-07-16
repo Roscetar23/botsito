@@ -52,13 +52,14 @@ export interface Avatar3DProps {
    * ver el JSDoc de `RoamGroup` para el análisis geométrico completo). El
    * ladeo al desplazarse (`useFlightOrientation`) NO se pierde: se sigue
    * aplicando encima, como giro local relativo a "ya de cara a ti". Solo
-   * afecta a la ROTACIÓN del grupo; la posición sigue igual (ease,
-   * `speedRef`, sombras, escala de roam). Nota: el `<Float>` interno sigue
-   * con su leve `rotationIntensity` propio (vida ambiental) encima de
-   * esto — se le sigue viendo la cara, pero no es una rotación
-   * perfectamente estática; avisar si eso llegara a molestar. Default
-   * `false` (comportamiento de siempre — la Home/roam libre no lo pasan y
-   * queda intacta).
+   * afecta a la ROTACIÓN del grupo (aparte de esto: el `<Float>` interno
+   * pasa `rotationIntensity` a 0 mientras `faceCamera` esté activo — un
+   * bamboleo que rota contradice "da siempre la cara"; ver fuente de drei,
+   * `Float` solo usa `rotationIntensity` para `rotation.x/y/z`, nunca para
+   * `position.y`, así que `floatIntensity` — el flotar arriba/abajo — sigue
+   * intacto). La posición del grupo en sí sigue igual (ease, `speedRef`,
+   * sombras, escala de roam). Default `false` (comportamiento de siempre —
+   * la Home/roam libre no lo pasan y quedan intactas, `<Float>` incluido).
    */
   faceCamera?: boolean;
   /**
@@ -254,7 +255,16 @@ export function Avatar3D({
         <Suspense fallback={null}>
           <RoamGroup enabled={roamEnabled} target={target} faceCamera={faceCamera}>
             <CursorFollowGroup enabled={rotationEnabled}>
-              <Float speed={reducedMotion ? 0 : 2} rotationIntensity={0.3} floatIntensity={0.6}>
+              <Float
+                speed={reducedMotion ? 0 : 2}
+                // Con `faceCamera`, el bamboleo de `<Float>` compite con
+                // "dar siempre la cara": a 0 solo se pierde el pequeño giro
+                // (drei `Float` usa `rotationIntensity` únicamente para
+                // `rotation.x/y/z`), el flotar arriba/abajo (`floatIntensity`,
+                // que lee `position.y` y es independiente) sigue intacto.
+                rotationIntensity={faceCamera ? 0 : 0.3}
+                floatIntensity={0.6}
+              >
                 <RobotModel
                   url={assetUrl}
                   clip={clip}

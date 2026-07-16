@@ -16,18 +16,20 @@ interface CalendarRobotProps {
  * `viewport.height ≈ 2·cameraZ·tan(21°) ≈ 0.768·cameraZ`. El robot en roam
  * mide `ROAM_TARGET_HEIGHT = 2` unidades de mundo, así que ocupa
  * `2 / (0.768·cameraZ) ≈ 2.6 / cameraZ` del alto del canvas. Calibrado a ojo
- * con el usuario: el default de la lib (`cameraZ = 9`) da ~29% (demasiado
- * grande), `45` daba ~5.8% (demasiado pequeño) y `28` ~9.3% (casi); `24`
- * deja ~10.8% (~102px en una vista de ~940px). No afecta al mapeo de
- * `target`: en modo `target` la
- * amplitud es `viewport/2`, que escala igual con `cameraZ`, así que ±1 sigue
- * siendo el borde del canvas.
+ * con el usuario, valores realmente vistos: `9` (default de la lib) ~29%
+ * (demasiado grande), `45` ~5.8% (demasiado pequeño), `28` ~9.3% (se quedaba
+ * corto). `22` deja ~11.8% (~111px en una vista de ~940px).
+ *
+ * No afecta al mapeo de `target`: en modo `target` la amplitud es
+ * `viewport/2`, que escala igual con `cameraZ`, así que ±1 sigue siendo el
+ * borde del canvas. Tampoco arregla el ángulo fuera de eje (ver `faceCamera`
+ * abajo): ese sale de `atan(norm·tan(fov/2))` y es independiente de `cameraZ`.
  *
  * OJO al retocarlo: R3F crea la cámara del `<Canvas>` **solo al montar**, así
  * que este número exige **recarga dura** para verse — con hot-reload se
  * conserva la cámara anterior y parece que el cambio no hace nada.
  */
-const CAMERA_Z = 28;
+const CAMERA_Z = 22;
 
 /**
  * Robot 3D decorativo sobre el calendario: flota en reposo arriba, viaja a
