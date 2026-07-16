@@ -11,22 +11,26 @@ export interface RobotTarget {
 }
 
 /**
- * Reposo: junto a la fila de nombres de día (LUN…DOM), pegado a la derecha.
- * `REST_TARGET` se normaliza contra el rect de TODA `.view` (cabecera de
- * página + tarjeta), así que hay que estimar a qué fracción de ese alto cae
- * la fila de weekdays. De arriba abajo (con la fuente base de 16px):
- *  - `.pageHeader` (eyebrow + `h1` 2rem + subtítulo): ~82px.
- *  - `gap` de `.view`: 1.5rem ≈ 24px.
- *  - `.card` hasta el borde superior de `.weekdays` (borde + `.cardHeader`
- *    con su padding 1.15rem): ~82px.
- *  - `.weekdays` (padding 0.7rem + una línea ~0.68rem): ~36px de alto.
- *  - `.grid`: 6 semanas × 118px ≈ 713px (domina el resto de la altura).
- * Centro de `.weekdays` ≈ (82+24+82+36/2) ≈ 206px de ~940px totales → ~22%
- * desde arriba → `y = 0.22·2 - 1 ≈ -0.55`. `x = 0.82`: claramente a la
- * derecha (la fila cubre todo el ancho de la tarjeta) con margen frente al
- * `overflow:hidden` de `.robotLayer`.
+ * Reposo: arriba del todo, pegado a la derecha. `y: -1` es el borde
+ * superior exacto del canvas (en modo `target` la amplitud es completa), así
+ * que `-0.92` lo deja prácticamente arriba del todo sin llegar a clipar
+ * contra el `overflow: hidden` de `.robotLayer`. `x: 0.82` lo mantiene claro
+ * a la derecha (mismo valor que antes).
  */
-export const REST_TARGET: RobotTarget = { x: 0.82, y: -0.55 };
+export const REST_TARGET: RobotTarget = { x: 0.82, y: -0.92 };
+
+/**
+ * Con el modal abierto: el robot se aparta a su izquierda en vez de tapar el
+ * diálogo. El modal es `position: fixed`, centrado en el **viewport**
+ * (`max-width: 430px`), pero `REST_TARGET`/`MODAL_TARGET` se normalizan
+ * contra el rect de `.view`, que arranca a la derecha de la barra lateral.
+ * Con una barra ~240px y un viewport ~1440px, el centro del viewport cae en
+ * `x ≈ -0.2` en coordenadas de la vista, y el borde izquierdo del modal
+ * (centro − 215px) en `x ≈ -0.56`. `x: -0.75` queda claramente a su
+ * izquierda con margen. Es una estimación que depende del ancho real de la
+ * barra lateral y del viewport — fácil de retocar a ojo si no cuadra.
+ */
+export const MODAL_TARGET: RobotTarget = { x: -0.75, y: -0.1 };
 
 // El ease del roam es exponencial con constante de tiempo ~0.55s, así que a
 // los ~520ms ya lee como "llegó" (el tiempo hasta "cerca" es casi
@@ -47,12 +51,14 @@ function targetFromRect(cellRect: DOMRect, layerRect: DOMRect | null): RobotTarg
 
 /**
  * Orquesta la coreografía del robot del calendario: al elegir un día, viaja
- * a su celda, la "toca" y con ese toque se abre el modal; al cerrarlo,
- * vuelve al reposo. Los timers viven aquí —fuera de la capa 3D
- * (`CalendarRobot`, que tiene su propio `ViewBoundary`)— así que un fallo
+ * a su celda, la "toca" y con ese toque se abre el modal a la vez que el
+ * robot se aparta a `MODAL_TARGET` (a la izquierda del diálogo); al
+ * cerrarlo, vuelve a `REST_TARGET`. Los timers viven aquí —fuera de la capa
+ * 3D (`CalendarRobot`, que tiene su propio `ViewBoundary`)— así que un fallo
  * del WebGL nunca bloquea la apertura del modal. Con
  * `prefers-reduced-motion` (mismo mecanismo que el rig del avatar) se salta
- * la coreografía: el modal abre al toque, sin esperar el viaje.
+ * la coreografía: el modal abre al toque, sin esperar el viaje ni mover al
+ * robot.
  */
 export function useRobotChoreography() {
   const viewRef = useRef<HTMLElement>(null);
@@ -87,7 +93,12 @@ export function useRobotChoreography() {
 
       timersRef.current.press = setTimeout(() => {
         setPressTrigger((n) => (n ?? 0) + 1);
-        timersRef.current.open = setTimeout(() => setSelected(day), PRESS_MS);
+        timersRef.current.open = setTimeout(() => {
+          // El toque abre el modal y, a la vez, el robot se aparta a su
+          // izquierda para no taparlo.
+          setSelected(day);
+          setRobotTarget(MODAL_TARGET);
+        }, PRESS_MS);
       }, TRAVEL_MS);
     },
     [clearTimers, reducedMotion],

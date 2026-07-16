@@ -20,6 +20,28 @@ const DEFAULT_ASSET_URL = '/avatar/botcito.glb';
  *  Calibrable: subir = frunce más; invertir el signo si frunce hacia afuera. */
 const EYEBROW_FROWN_TILT = 0.6;
 
+/**
+ * Hueso que ejecuta el gesto de "toque" (`usePressGesture`). Mano
+ * IZQUIERDA por defecto (feedback de usuario): la derecha (`Hueso.001`) ya
+ * es la mano "expresiva" del saludo (`gestures`, la única que saluda en
+ * `happy`/`notify`), así que usar la otra evita que el toque se lea como
+ * una variación del saludo.
+ *
+ * Sin ajuste de ejes/signos al mover el gesto de mano: se verificó en el
+ * propio GLB (`botcito.glb`, nodo `Esqueleto`) que ambos huesos de mano
+ * (`Hueso` y `Hueso.001`) son hijos DIRECTOS del mismo padre sin rotación
+ * ni escala negativa, con solo `translation` (`Hueso` en x≈-3.36, `Hueso.001`
+ * en x≈+3.27) y SIN campo `rotation` (⇒ identidad) — es decir, sus ejes
+ * locales están alineados igual entre sí (no son espejo el uno del otro),
+ * a diferencia de las cejas (que SÍ necesitan signo opuesto por lado, ver
+ * `EYEBROW_FROWN_TILT`). Esto coincide con que `useWaveGesture`/`useWalkSwing`
+ * ya aplican los mismos ejes/signos a ambas manos sin invertir nada entre
+ * ellas (solo cambian el `phaseOffset`). Por eso los ejes de
+ * `usePressGesture` (traslación adelante/abajo + rotación de empuje,
+ * calibrados en la mano derecha) se trasladan tal cual a la izquierda.
+ */
+const PRESS_BONE = 'Hueso';
+
 export interface RobotModelProps {
   url: string;
   /** Clip a reproducir; por defecto el primero disponible (`Esqueleto_acción`). */
@@ -47,7 +69,7 @@ export interface RobotModelProps {
   /** Balanceo de manos al desplazarse (columpio adelante/atrás, según velocidad). */
   walk?: boolean;
   /**
-   * Nonce edge-triggered del gesto de "toque" (mano derecha, `Hueso.001`):
+   * Nonce edge-triggered del gesto de "toque" (mano izquierda, `PRESS_BONE`):
    * cada valor NUEVO dispara un impulso corto una vez. `undefined` = nunca.
    * Ver `usePressGesture`.
    */
@@ -133,13 +155,13 @@ export function RobotModel({
   // mientras se mueve; alternado (fase π) como los brazos al andar.
   useWalkSwing(groupRef, 'Hueso.001', roamSpeed, walk, 0);
   useWalkSwing(groupRef, 'Hueso', roamSpeed, walk, Math.PI);
-  // Toque/pulsación: mano derecha (`Hueso.001`), la misma que lidera el
-  // saludo — es la mano "expresiva" ya establecida (única mano en `notify`/
-  // `happy`), así que reutilizarla para el toque mantiene la lectura
-  // consistente ("es la mano con la que el robot actúa"). Se llama al final
-  // para tener la última palabra si coincidiera con el saludo o el columpio
-  // (en el uso real no coincide: `state="idle"` los apaga a ambos).
-  usePressGesture(groupRef, 'Hueso.001', pressTrigger);
+  // Toque/pulsación: mano IZQUIERDA (`PRESS_BONE`, feedback de usuario tras
+  // probar la coreografía del calendario: la derecha ya se asocia al saludo
+  // y "competía" con esa lectura). Se llama al final para tener la última
+  // palabra si coincidiera con el saludo o el columpio (en el uso real no
+  // coincide: `state="idle"` los apaga a ambos, y la vista de calendario
+  // pasa `walk={false}`, así que el toque es el único movimiento de mano).
+  usePressGesture(groupRef, PRESS_BONE, pressTrigger);
 
   return (
     <Center>

@@ -114,7 +114,7 @@ export interface Avatar3DProps {
    */
   playClip?: boolean;
   /**
-   * Nonce edge-triggered del gesto de "toque" (mano derecha): cada vez que
+   * Nonce edge-triggered del gesto de "toque" (mano izquierda): cada vez que
    * cambia a un valor NUEVO se dispara UNA vez un impulso corto de la mano,
    * pensado para que el front lo accione cuando el robot llega a su
    * `target` en modo `roam` (p.ej. una celda del calendario) — el avatar no
