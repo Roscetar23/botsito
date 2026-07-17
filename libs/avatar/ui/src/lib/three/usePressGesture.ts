@@ -91,11 +91,30 @@ export function usePressGesture(
   const basePosRef = useRef<Vector3 | null>(null);
   const lastTriggerRef = useRef<number | undefined>(trigger);
   const startRef = useRef<number | null>(null);
+  const boneNameRef = useRef(boneName);
 
   useFrame((state) => {
     // Nada que hacer: sin nonce definido y sin impulso en curso (mismo idioma
     // `if (!enabled) return` de los demás gestos, aquí derivado del nonce).
     if (trigger === undefined && startRef.current === null) return;
+
+    // `boneName` cambió (p.ej. `pressHand` de un lado a otro): el hueso
+    // cacheado ya no vale. Si había uno resuelto, restaura SU pose base
+    // (para que no quede desplazado si se cambia de mano a mitad de un
+    // impulso) y fuerza la re-resolución del bloque de abajo, que capturará
+    // la base del hueso NUEVO. También corta cualquier impulso en curso
+    // (`startRef`): que no siga corriendo un gesto viejo en la mano nueva.
+    if (boneName !== boneNameRef.current) {
+      if (boneRef.current && baseQuatRef.current && basePosRef.current) {
+        boneRef.current.quaternion.copy(baseQuatRef.current);
+        boneRef.current.position.copy(basePosRef.current);
+      }
+      boneRef.current = null;
+      baseQuatRef.current = null;
+      basePosRef.current = null;
+      startRef.current = null;
+      boneNameRef.current = boneName;
+    }
 
     if (!boneRef.current) {
       const bone = findBone(groupRef.current, boneName);
