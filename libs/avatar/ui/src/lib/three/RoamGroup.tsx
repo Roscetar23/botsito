@@ -87,6 +87,16 @@ const offsetScratch = new Quaternion();
  * (`ShadowBlob`) que lo acompaña. La levitación (`Float`) va *dentro* de
  * este grupo, así que se suma a todo lo anterior.
  *
+ * El PRIMER frame activo hace SNAP directo al target (posición fijada, sin
+ * ease, `speedRef` a 0) en vez de arrancar en `(0,0,0)` y viajar hasta él —
+ * así, si el llamador ya pasa un `target` fijo desde el montaje (p.ej. el
+ * reposo del calendario), el robot aparece YA ahí, sin animación de entrada.
+ * A partir de ese frame, ease normal — el viaje al cambiar `target` después
+ * (p.ej. al clicar un día) no se toca. Con roam libre (sin `target`, p.ej.
+ * la Home) esto es un no-op: el target inicial es el cursor, que arranca en
+ * el centro `{x:0,y:0}` — igual que la posición inicial del grupo — así que
+ * el snap centro→centro no mueve nada.
+ *
  * Con `enabled=false` (incluye `prefers-reduced-motion`, decidido por el
  * llamador) el grupo queda centrado, sin rotación, a escala normal y sin
  * sombra — el comportamiento "en caja" de siempre.
@@ -127,6 +137,13 @@ export function RoamGroup({ enabled, children, target, faceCamera = false }: Roa
   const speedRef = useRef(0);
   /** Huesos de mano (los puebla `RobotModel`), para las sombras de mano. */
   const handBonesRef = useRef<HandBones>({ left: null, right: null });
+  /**
+   * `false` hasta el primer frame activo tras (re)activarse: ese frame hace
+   * SNAP directo al target en vez de ease (evita el "viaje de entrada"
+   * centro→reposo). Se resetea en la rama `!enabled` para que una
+   * reactivación futura vuelva a hacer snap.
+   */
+  const initializedRef = useRef(false);
 
   useFrame((_state, delta) => {
     const group = groupRef.current;
@@ -137,6 +154,7 @@ export function RoamGroup({ enabled, children, target, faceCamera = false }: Roa
       group.rotation.set(0, 0, 0);
       group.scale.setScalar(1);
       speedRef.current = 0;
+      initializedRef.current = false;
       return;
     }
 
@@ -158,19 +176,31 @@ export function RoamGroup({ enabled, children, target, faceCamera = false }: Roa
     const targetX = normX * amplitudeX;
     const targetY = -normY * amplitudeY;
 
-    // Posición previa (antes del ease) para medir el desplazamiento del frame.
-    const prevX = group.position.x;
-    const prevY = group.position.y;
+    if (!initializedRef.current) {
+      // Primer frame activo: SNAP directo, sin ease y sin pico de velocidad
+      // (si no, el salto centro→target se leería como un golpe de "caminar").
+      // El vuelo se deja para la llamada de más abajo: al ser la primera
+      // llamada real a `flight.update` (su `previous` interno empieza en
+      // `null`), esta solo guarda la posición y sale sin generar giro — no
+      // hay orientación espuria por el salto (ver `useFlightOrientation`).
+      initializedRef.current = true;
+      group.position.set(targetX, targetY, 0);
+      speedRef.current = 0;
+    } else {
+      // Posición previa (antes del ease) para medir el desplazamiento del frame.
+      const prevX = group.position.x;
+      const prevY = group.position.y;
 
-    const t = Math.min(1, POSITION_EASE_SPEED * delta);
-    group.position.x += (targetX - group.position.x) * t;
-    group.position.y += (targetY - group.position.y) * t;
+      const t = Math.min(1, POSITION_EASE_SPEED * delta);
+      group.position.x += (targetX - group.position.x) * t;
+      group.position.y += (targetY - group.position.y) * t;
 
-    // Velocidad de mundo → normalizada 0..1 → suavizada (para los gestos hijos).
-    const moved = Math.hypot(group.position.x - prevX, group.position.y - prevY);
-    const instNorm = delta > 0 ? Math.min(1, moved / delta / SPEED_REFERENCE) : 0;
-    const s = Math.min(1, SPEED_SMOOTH * delta);
-    speedRef.current += (instNorm - speedRef.current) * s;
+      // Velocidad de mundo → normalizada 0..1 → suavizada (para los gestos hijos).
+      const moved = Math.hypot(group.position.x - prevX, group.position.y - prevY);
+      const instNorm = delta > 0 ? Math.min(1, moved / delta / SPEED_REFERENCE) : 0;
+      const s = Math.min(1, SPEED_SMOOTH * delta);
+      speedRef.current += (instNorm - speedRef.current) * s;
+    }
 
     // El vuelo se calcula SIEMPRE (barato, y evita orientación obsoleta si
     // `faceCamera` se alternara en caliente): lo que cambia es cómo se aplica.
