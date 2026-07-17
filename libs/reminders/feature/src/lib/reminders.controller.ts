@@ -1,7 +1,20 @@
-import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  Param,
+  Patch,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ReminderDocument } from '@asistente/reminders-data-access';
-import { CreateReminderDto } from '@asistente/reminders-model';
+import {
+  CreateReminderDto,
+  UpdateReminderDto,
+} from '@asistente/reminders-model';
 import type { AuthenticatedUser } from '@asistente/shared-types';
 
 import { CurrentUser } from './current-user.decorator.js';
@@ -25,5 +38,23 @@ export class RemindersController {
     @CurrentUser() user: AuthenticatedUser,
   ): Promise<ReminderDocument[]> {
     return this.remindersService.findAllByOwner(user.userId);
+  }
+
+  @Patch(':id')
+  update(
+    @Param('id') id: string,
+    @Body() dto: UpdateReminderDto,
+    @CurrentUser() user: AuthenticatedUser,
+  ): Promise<ReminderDocument> {
+    return this.remindersService.update(id, user.userId, dto);
+  }
+
+  @Delete(':id')
+  @HttpCode(204)
+  remove(
+    @Param('id') id: string,
+    @CurrentUser() user: AuthenticatedUser,
+  ): Promise<void> {
+    return this.remindersService.remove(id, user.userId);
   }
 }

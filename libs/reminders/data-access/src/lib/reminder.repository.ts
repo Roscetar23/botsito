@@ -1,6 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { CreateReminderDto } from '@asistente/reminders-model';
+import {
+  CreateReminderDto,
+  UpdateReminderDto,
+} from '@asistente/reminders-model';
 import { Model } from 'mongoose';
 
 import { Reminder, ReminderDocument } from './reminder.schema.js';
@@ -25,6 +28,16 @@ export class ReminderRepository {
     ownerId: string,
   ): Promise<ReminderDocument | null> {
     return this.model.findOne({ _id: id, ownerId }).exec();
+  }
+
+  update(
+    id: string,
+    ownerId: string,
+    dto: UpdateReminderDto,
+  ): Promise<ReminderDocument | null> {
+    return this.model
+      .findOneAndUpdate({ _id: id, ownerId }, dto, { new: true })
+      .exec();
   }
 
   async remove(id: string, ownerId: string): Promise<boolean> {
