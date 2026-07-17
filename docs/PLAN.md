@@ -342,9 +342,20 @@ Estado: `[ ]` pendiente · `[~]` en curso · `[x]` hecho.
 - [ ] **T-15** `notifications/feature`: `NotificationsGateway` (Socket.IO) con auth de handshake.
 - [ ] **T-16** Cliente: `useRealtime()` que mapea eventos → `AvatarState`.
 
-### Fase 4 — Reminders (scheduler)
-- [ ] **T-17** `reminders/model`: `Reminder` (puntual y recurrente, cron/rrule).
-- [ ] **T-18** `reminders/feature`: scheduler con **Agenda** (MVP). Job → notificación WS.
+### Fase 4 — Reminders (recordatorios)
+
+> Detalle y roadmap fino (R-1…R-5) en **[`docs/BACKEND.md`](./BACKEND.md)** §3-4. Modelo decidido con el
+> usuario: `type` (medicina/cita/tarea/personal/otro) · `text` · `date` (el día) · `time` (hora exacta) ·
+> `recurrence { frequency: una vez/diario/semanal/mensual, count }`. **v1 = crear + guardar + ver** en el
+> calendario (entrada **escrita**); **disparo** (Agenda + WS) y **voz/IA por prompts** en fases posteriores.
+
+- [~] **T-17** `reminders/model` + `data-access`: entidad `Reminder` + enums + DTO (`class-validator`) +
+      función de ocurrencias; schema Mongoose **owner-aware** + repo + módulo. (BACKEND **R-1**)
+- [ ] **T-17b** `reminders/feature` + wiring + cliente: controller `POST`/`GET` (JWT) + service;
+      `RemindersModule` en `AppModule` + smoke curl; leer y **crear** desde el calendario. (BACKEND **R-2..R-4**)
+- [ ] **T-18** **Disparo**: scheduler con **Agenda** (MVP, tras `SchedulerPort`) → **Job → notificación WS**
+      (necesita el gateway de Fase 3, T-15/T-16); resolver zona horaria. (BACKEND **R-5**)
+      *Recurrencia v1 = `frequency`+`count`; migrable a cron/rrule si hiciera falta.*
 - [ ] **T-19** Variante documentada **BullMQ + Redis** (misma interfaz `SchedulerPort`).
 
 ### Fase 5 — Avatar (frontend) ⭐ **NÚCLEO DEL PRODUCTO**
@@ -430,3 +441,7 @@ Estado: `[ ]` pendiente · `[~]` en curso · `[x]` hecho.
 - 2026-07-09 — Decisiones confirmadas: Agenda (MVP), scope `@asistente`, scaffold en `/home/ogomez/bot`.
 - 2026-07-09 — Scaffold ejecutado (21 proyectos: 3 apps + 18 libs). Convención de import
   fijada a `@asistente/<dominio>-<tipo>` (npm sólo admite un `/`). SETUP §4 corregido.
+- 2026-07-16 — Arranca **Fase 4 (Reminders)** con doc propio **[`docs/BACKEND.md`](./BACKEND.md)**. Modelo
+  decidido con el usuario (`type`/`date`/`time`/`recurrence{frequency,count}`); **v1 = crear + guardar +
+  ver** en el calendario, entrada escrita (disparo con Agenda + WS y voz/IA por prompts, después). Fase 4
+  reestructurada (T-17/T-17b/T-18) mapeada al roadmap R-1…R-5 de BACKEND.md.
