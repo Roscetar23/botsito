@@ -179,11 +179,11 @@ servidor daría un HTML distinto al del cliente).
 - [x] **C-1 — Maqueta.** Cabecera de página + tarjeta "Planificador" (`‹ Hoy ›`, rejilla LUN–DOM de
       seis semanas, hoy en azul terciario, chips de eventos en morado) + modal "Agenda del día" con
       estado vacío. Semana en lunes, textos en español, sin librería de fechas.
-- [ ] **C-2 — Backend.** Hoy los eventos son **datos de ejemplo** (`calendar-events.ts`). Conectarlos
-      exige **construir antes el dominio `reminders`** (T-17/T-18 del PLAN): `libs/reminders/**` es
-      todavía el scaffold del generador. Entonces: `CalendarEvent` → `Reminder` de
-      `@asistente/reminders-model`, `useCalendarMonth` lee de la API y se habilita "Crear recordatorio"
-      (hoy deshabilitado a propósito, para no prometer lo que no hay).
+- [x] **C-2 — Backend (v1).** Conectado al dominio `reminders` (ver [`BACKEND.md`](./BACKEND.md) §3):
+      `useCalendarMonth` lee de `GET /api/reminders` y expande ocurrencias → `EventsByDay` (ya no hay
+      mock), y "Crear recordatorio" abre un **formulario** (Tipo/Hora/Frecuencia/Nº veces/Texto) que
+      reemplaza el modal y hace `POST`. **Hecho** (v1 escrito). Pendiente: **disparo** a la hora y
+      **voz/IA por prompts** (BACKEND R-5+).
 
 - [x] **C-3 — El robot sobre el calendario.** El modelo 3D flota en reposo sobre la vista y
       **coreografía la interacción con el modal**: clicar un día → viaja a su celda → la "toca" → abre el

@@ -115,13 +115,14 @@ interface Reminder {
 
 Estado: `[ ]` pendiente · `[~]` en curso · `[x]` hecho.
 
-- [ ] **R-1 — `reminders/model` + `data-access`.** Entidad, enums, DTO (`class-validator`), función de
-      ocurrencias; schema Mongoose owner-aware + repositorio + `RemindersDataAccessModule`.
-- [ ] **R-2 — `reminders/feature` + wiring.** Controller (`POST`/`GET`, JWT) + service; registrar
-      `RemindersModule` en `AppModule`. Smoke test (curl): 201 / 200 / 400 de validación.
-- [ ] **R-3 — Cliente (lectura).** `reminders-api.ts`; `useCalendarMonth` lee de la API y expande
-      ocurrencias → el calendario muestra recordatorios reales (vacío al principio).
-- [ ] **R-4 — Cliente (crear).** Habilitar "Crear recordatorio" → formulario escrito → `POST` → refresca.
+- [x] **R-1 — `reminders/model` + `data-access`.** Entidad, enums, DTO (`class-validator`), función de
+      ocurrencias; schema Mongoose owner-aware + repositorio + `RemindersDataAccessModule`. **Hecho.**
+- [x] **R-2 — `reminders/feature` + wiring.** Controller (`POST`/`GET`, JWT) + service; `RemindersModule`
+      en `AppModule`. **Hecho** — verificado: arranque real, rutas mapeadas, `401` sin token.
+- [x] **R-3 — Cliente (lectura).** `reminders-api.ts`; `useCalendarMonth` lee de la API y expande
+      ocurrencias → el calendario muestra recordatorios reales. **Hecho.**
+- [x] **R-4 — Cliente (crear).** "Crear recordatorio" → formulario escrito (reemplaza el modal) → `POST`
+      → refresca. **Hecho.** → **v1 cerrado: crear + guardar + ver.**
 - [ ] **R-5+ — Futuro.** `DELETE`/editar; disparo (Agenda + notifications gateway); voz + IA por prompts.
 
 ---
@@ -145,4 +146,8 @@ Estado: `[ ]` pendiente · `[~]` en curso · `[x]` hecho.
 - 2026-07-16 — Documento creado. Backend mapeado: Atlas + Auth + Tasks (plantilla) listos; reminders y
   notifications son stubs. Se arranca la feature **Reminders** (v1: crear + guardar + ver, entrada
   escrita; disparo y IA/voz después). Modelo decidido con el usuario (type / date / time /
-  recurrence{frequency,count}). Roadmap R-1…R-5 (§4).
+  frequency+count). Roadmap R-1…R-5 (§4).
+- 2026-07-16 — **v1 de Reminders COMPLETO (R-1…R-4).** Dominio `reminders/{model,data-access,feature}`
+  calcado de Tasks, `RemindersModule` en `apps/api` (arranque + `401` verificados), el calendario lee de
+  la API expandiendo ocurrencias, y el formulario "Crear recordatorio" (reemplaza el modal) crea vía
+  `POST` y refresca. Pendiente R-5+: `DELETE`/editar, **disparo** (Agenda + gateway WS), voz + IA.

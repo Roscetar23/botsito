@@ -349,10 +349,10 @@ Estado: `[ ]` pendiente · `[~]` en curso · `[x]` hecho.
 > `recurrence { frequency: una vez/diario/semanal/mensual, count }`. **v1 = crear + guardar + ver** en el
 > calendario (entrada **escrita**); **disparo** (Agenda + WS) y **voz/IA por prompts** en fases posteriores.
 
-- [~] **T-17** `reminders/model` + `data-access`: entidad `Reminder` + enums + DTO (`class-validator`) +
-      función de ocurrencias; schema Mongoose **owner-aware** + repo + módulo. (BACKEND **R-1**)
-- [ ] **T-17b** `reminders/feature` + wiring + cliente: controller `POST`/`GET` (JWT) + service;
-      `RemindersModule` en `AppModule` + smoke curl; leer y **crear** desde el calendario. (BACKEND **R-2..R-4**)
+- [x] **T-17** `reminders/model` + `data-access`: entidad `Reminder` + enums + DTO (`class-validator`) +
+      función de ocurrencias; schema Mongoose **owner-aware** + repo + módulo. (BACKEND **R-1**) ✅
+- [x] **T-17b** `reminders/feature` + wiring + cliente: controller `POST`/`GET` (JWT) + service;
+      `RemindersModule` en `AppModule` (arranque + `401` verificados); el calendario **lee y crea**. (BACKEND **R-2..R-4**) ✅
 - [ ] **T-18** **Disparo**: scheduler con **Agenda** (MVP, tras `SchedulerPort`) → **Job → notificación WS**
       (necesita el gateway de Fase 3, T-15/T-16); resolver zona horaria. (BACKEND **R-5**)
       *Recurrencia v1 = `frequency`+`count`; migrable a cron/rrule si hiciera falta.*
