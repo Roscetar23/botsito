@@ -5,6 +5,7 @@
     "noEmit": true,
     "emitDeclarationOnly": false,
     "esModuleInterop": true,
+    "experimentalDecorators": true,
     "module": "esnext",
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
@@ -57,6 +58,9 @@
     },
     {
       "path": "../../libs/avatar/model"
+    },
+    {
+      "path": "../../libs/reminders/model"
     }
   ]
 }
