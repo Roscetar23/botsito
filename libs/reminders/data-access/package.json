@@ -20,5 +20,10 @@
       "type:data-access"
     ]
   },
-  "dependencies": {}
+  "dependencies": {
+    "@asistente/reminders-model": "0.0.1",
+    "@nestjs/common": "^11.0.0",
+    "@nestjs/mongoose": "^11.0.4",
+    "mongoose": "^9.7.4"
+  }
 }
