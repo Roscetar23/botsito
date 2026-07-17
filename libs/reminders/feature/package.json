@@ -20,5 +20,11 @@
       "type:feature"
     ]
   },
-  "dependencies": {}
+  "dependencies": {
+    "@asistente/shared-types": "0.0.1",
+    "@asistente/reminders-data-access": "0.0.1",
+    "@asistente/reminders-model": "0.0.1",
+    "@nestjs/common": "^11.0.0",
+    "@nestjs/passport": "^11.0.5"
+  }
 }

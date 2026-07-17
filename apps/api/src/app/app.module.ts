@@ -3,6 +3,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { TasksModule } from '@asistente/tasks-feature';
 import { AuthModule } from '@asistente/auth-feature';
+import { RemindersModule } from '@asistente/reminders-feature';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -18,6 +19,7 @@ import { AppService } from './app.service';
     }),
     TasksModule,
     AuthModule,
+    RemindersModule,
   ],
   controllers: [AppController],
   providers: [AppService],
