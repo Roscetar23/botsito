@@ -227,6 +227,34 @@ Estado: `[ ]` pendiente · `[~]` en curso · `[x]` hecho.
 > [`AVATAR-ANIMACIONES.md`](./AVATAR-ANIMACIONES.md) §7; lo principal pendiente es cablear las
 > emociones a eventos reales del asistente (AV-6).
 
+### AV-9 — Avatar **dirigido por la app** (roam con objetivo + gestos disparables)  *(2026-07-16)*
+
+Hasta AV-8, en `roam` el bot solo perseguía el cursor. Para la vista Calendario (ver
+[`FRONTEND.md`](./FRONTEND.md) §5.2, C-3) se le dio a la app **control fino del bot**, todo mediante
+**props opcionales** de `Avatar3D` — **sin ellas, el comportamiento es idéntico** al de siempre (Home,
+login). La *coreografía* (cuándo viajar/tocar/volver) vive en el **front**; el avatar solo expone las
+capacidades y sigue siendo presentacional (AD-04).
+
+- [x] **`target?: {x,y}`** — en `roam`, viaja a un **punto fijo** (normalizado al rect del canvas, misma
+  convención que el cursor) en vez de perseguir el ratón. Al llegar, la velocidad cae sola → deja de
+  "caminar" y queda flotando. Reutiliza el ease/velocidad/orientación de `RoamGroup`.
+- [x] **`faceCamera?`** — *billboard*: el bot **encara siempre a la cámara** (`lookAt`), con el ladeo del
+  vuelo compuesto encima. Para posiciones fuera de eje donde si no se le vería el costado. Apaga la
+  rotación del `<Float>` (sigue flotando).
+- [x] **`fov?`** (default 42) — expone el campo de visión. `fov` bajo + `cameraZ` alto = **teleobjetivo**:
+  mismo encuadre/tamaño, perspectiva plana (quita el cizallamiento del billboard fuera de eje). El
+  tamaño aparente ≈ `2 / (2·cameraZ·tan(fov/2))`; el ángulo fuera de eje ≈ `atan(norm·tan(fov/2))` (**no**
+  depende de `cameraZ`). *(R3F crea la cámara al montar → recarga dura para ver cambios.)*
+- [x] **`pressTrigger?: number`** (nonce edge-triggered) + **`pressHand?: 'left'|'right'`** (lado de
+  **pantalla**) → **`usePressGesture`**: impulso procedural corto de **toque/pulsación** con una mano, de
+  **disparo único** (el avatar no sabe por qué; lo dispara el llamador). El hueso se **relee** al cambiar
+  de mano. Ejes verificados sobre el GLB (las dos manos no son espejo → mismos signos).
+- [x] **`roamEaseSpeed?`** (default 1.8, τ≈1/valor) — velocidad del ease del roam, para
+  acelerar/frenar desplazamientos concretos (p. ej. una vuelta más lenta).
+- **Bug corregido:** el `<Canvas>` de R3F fija `pointer-events:auto` **inline** y **bloqueaba los clics**
+  de lo que hubiera debajo (los días del calendario) → `Avatar3D` pasa `pointerEvents:none` (nada del
+  avatar usa eventos del canvas: los punteros se escuchan en `window`).
+
 ---
 
 ## 7. Decisiones del avatar (pros/cons)
@@ -263,3 +291,8 @@ Estado: `[ ]` pendiente · `[~]` en curso · `[x]` hecho.
   que **vuela persiguiendo el mouse** con sombra, reproduce el clip baked y hace un **gesto procedural**
   (saludo, en calibración). Toggles `playClip`/`gestures` para aislar. Detalle en
   [`AVATAR-ANIMACIONES.md`](./AVATAR-ANIMACIONES.md). Pendiente: calibrar gestos + mapear a estados (AV-8.7).
+- 2026-07-16 — **AV-9: avatar dirigido por la app.** Props nuevas de `Avatar3D` para el robot del
+  calendario: `target` (roam a un punto fijo), `faceCamera` (billboard), `fov` (teleobjetivo),
+  `pressTrigger`+`pressHand` (gesto de toque, `usePressGesture`) y `roamEaseSpeed`. Fix: `<Canvas>` con
+  `pointerEvents:none` (bloqueaba los clics de debajo). Todas opcionales, **sin regresión** en Home/login;
+  la coreografía vive en el front. Uso en [`FRONTEND.md`](./FRONTEND.md) §5.2 (C-3).

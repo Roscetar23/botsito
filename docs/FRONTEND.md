@@ -185,14 +185,37 @@ servidor daría un HTML distinto al del cliente).
       `@asistente/reminders-model`, `useCalendarMonth` lee de la API y se habilita "Crear recordatorio"
       (hoy deshabilitado a propósito, para no prometer lo que no hay).
 
-- [x] **C-3 — El robot sobre el calendario.** El modelo 3D flota **en reposo** arriba de la vista; al
-      clicar un día **viaja** hasta su celda (moviendo las manos: la velocidad alimenta el columpio), la
-      **"toca"** con la mano y con ese toque **se abre el modal**; sigue flotando ahí **por encima** del
-      overlay y al cerrar **vuelve al reposo**. Capa **decorativa** (`pointer-events:none`, `aria-hidden`)
-      con **boundary propio y silencioso**. El robot **nunca bloquea la UI**: el timer de apertura vive
-      fuera de la capa 3D y con `prefers-reduced-motion` el modal abre al instante, sin coreografía.
-      Piezas: `Avatar3D#target` (destino arbitrario) + `Avatar3D#pressTrigger` (nonce → `usePressGesture`)
-      + `use-robot-choreography.ts`. **Hecho.**
+- [x] **C-3 — El robot sobre el calendario.** El modelo 3D flota en reposo sobre la vista y
+      **coreografía la interacción con el modal**: clicar un día → viaja a su celda → la "toca" → abre el
+      modal; cerrar (X/"Cerrar") → viaja al botón → lo pulsa → cierra → vuelve al reposo. Capa
+      **decorativa** que **nunca bloquea la UI**. Detalle completo abajo. **Hecho** (afinado con el usuario).
+
+**C-3 en detalle — el robot del calendario** 🤖 (`_components/calendar/calendar-robot.tsx` +
+`use-robot-choreography.ts`; capacidades del avatar en [`AVATAR.md`](./AVATAR.md) AV-9)
+
+- **Presencia (reposo).** `CalendarRobot` es una capa sobre `.view`: `position:absolute`,
+  `pointer-events:none`, `aria-hidden`, con **su propio `ViewBoundary` y `fallback={null}`** — si el WebGL
+  falla, ni se nota ni tumba el calendario. Va a `z-index:30`, **por encima** del overlay del modal, para
+  verse junto al día. **Aparece ya en su reposo** (arriba-derecha, `REST_TARGET`) sin animación de entrada
+  (el roam hace *snap* al objetivo en el primer frame). No camina (`walk={false}`).
+- **Que siempre dé la cara.** El reposo cae ~25° fuera del eje de la cámara y se le veía de lado. Se
+  arregla con **billboard** (`faceCamera`: `lookAt` a la cámara + el ladeo del vuelo compuesto encima) +
+  **teleobjetivo** (`fov=15°`/`cameraZ=52`): el cizallamiento del billboard escala con `tan(fov/2)` y **no
+  depende de `cameraZ`**, así que el tele lo baja de ~5.5° a ~1.9°. Con `faceCamera`, el `<Float>` deja de
+  rotar (solo flota). **Ojo:** R3F crea la cámara del `<Canvas>` **solo al montar** → cambiar `fov`/`cameraZ`
+  exige **recarga dura** del navegador.
+- **Abrir un día.** Click → **viaja a la celda** (mano según el lado: mitad izquierda → mano izquierda de
+  pantalla; derecha → derecha) → la **toca** (`usePressGesture`, impulso corto) → con el toque **abre el
+  modal** y se **aparta a la izquierda** (`MODAL_TARGET`) para no taparlo.
+- **Cerrar.** X o "Cerrar" → viaja al botón → lo **pulsa** (siempre con la **mano derecha** de pantalla) →
+  **cierra** → **vuelve al reposo más despacio** (`roamEaseSpeed` lento solo en esa vuelta). Escape y
+  click-fuera cierran al instante (no hay botón que pulsar).
+- **Robustez.** El modal **siempre** abre/cierra: los timers viven en `use-robot-choreography.ts`, **fuera**
+  de la capa 3D. Con `prefers-reduced-motion` no hay coreografía (abre/cierra al instante).
+- **Perillas de ajuste** (en `_components/calendar/`): `REST_TARGET`/`MODAL_TARGET` (posiciones,
+  normalizadas al rect de `.view`), `TRAVEL_MS`/`PRESS_MS` (ritmo click→acción), `REST_EASE_SLOW` (lentitud
+  de la vuelta), `CAMERA_FOV`/`CAMERA_Z` (encuadre/tamaño — para el tamaño, mover solo `CAMERA_Z`),
+  `pressHandFor` (umbral izquierda/derecha).
 
 **Desviaciones del mockup** (decididas con el usuario):
 - **Topbar mínima** (solo toggle de tema): se respeta la decisión de H-1; fuera el "+ Nuevo proyecto"
@@ -281,3 +304,11 @@ servidor daría un HTML distinto al del cliente).
   **nada del avatar usa eventos de puntero del canvas** (`usePointerRotation` y `usePointerViewportTarget`
   escuchan en `window`; no hay meshes clicables ni `OrbitControls`). Arreglaba también el mismo bug
   **latente en la Home**, donde no se notaba porque los controles flotan por encima del canvas.
+- 2026-07-16 — **FE-6 C-3 · robot del calendario, pulido (varias iteraciones con el usuario)**: **billboard**
+  (`faceCamera`) + **teleobjetivo** (`fov=15`/`cameraZ=52`) para que siempre dé la cara sin ladearse — el
+  ladeo era perspectiva fuera de eje (no rotación) y **no dependía de `cameraZ`**, así que se atacó con el
+  `fov`, no con el tamaño; **snap** al reposo en el primer frame (sin viaje de entrada); tamaño afinado a
+  ojo; **mano según el lado** del día al abrir y **mano derecha fija** al cerrar (de paso, `usePressGesture`
+  **relee el hueso** al cambiar de mano — antes lo cacheaba y solo una mano se movía); **coreografía de
+  cierre** simétrica a la de abrir (viaja al botón → pulsa → cierra → vuelve); **vuelta al reposo más
+  lenta** (`roamEaseSpeed`). Detalle consolidado en §5.2 (C-3). Props del avatar en `AVATAR.md` (AV-9).
