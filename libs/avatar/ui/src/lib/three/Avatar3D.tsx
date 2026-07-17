@@ -88,6 +88,18 @@ export interface Avatar3DProps {
    */
   faceCamera?: boolean;
   /**
+   * Velocidad del ease de posición hacia `target`/cursor en modo `roam`
+   * (constante de tiempo τ ≈ 1 / `roamEaseSpeed`, en segundos): mayor valor
+   * converge más rápido, menor valor va con más lag. `undefined` (default)
+   * usa el valor de siempre (`POSITION_EASE_SPEED` en `RoamGroup`) —
+   * comportamiento IDÉNTICO al de hoy en cualquier consumidor que no la
+   * pase. Pensado, por ejemplo, para que el calendario ralentice solo el
+   * regreso al reposo al cerrar el modal, sin afectar al resto de
+   * desplazamientos (que siguen con el default). No afecta al snap del
+   * primer frame activo (ver `RoamGroup`), que siempre es instantáneo.
+   */
+  roamEaseSpeed?: number;
+  /**
    * Clip del GLB a reproducir (por nombre exacto). Sin especificar, se
    * reproduce el primero disponible (`Esqueleto_acción`). Preparado para
    * un futuro mapeo `AvatarState → clip`; hoy nadie lo pasa.
@@ -239,6 +251,7 @@ export function Avatar3D({
   roam = false,
   target,
   faceCamera = false,
+  roamEaseSpeed,
   clip,
   gestures = true,
   gesturesLeft = true,
@@ -293,7 +306,12 @@ export function Avatar3D({
         <directionalLight position={[4, 6, 5]} intensity={1.1} />
         <directionalLight position={[-4, -2, -3]} intensity={0.4} />
         <Suspense fallback={null}>
-          <RoamGroup enabled={roamEnabled} target={target} faceCamera={faceCamera}>
+          <RoamGroup
+            enabled={roamEnabled}
+            target={target}
+            faceCamera={faceCamera}
+            roamEaseSpeed={roamEaseSpeed}
+          >
             <CursorFollowGroup enabled={rotationEnabled}>
               <Float
                 speed={reducedMotion ? 0 : 2}

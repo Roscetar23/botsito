@@ -13,39 +13,34 @@ export interface RobotTarget {
 /** Lado de la PANTALLA (del espectador) con el que se toca. */
 export type PressHand = 'left' | 'right';
 
-/**
- * Mano según el lado del objetivo: `.card`/los botones ocupan el ancho de
- * `.view`, así que su centro geométrico (x=0) separa la mitad izquierda de
- * la derecha (en la rejilla, ~la columna central). `x<0` → izquierda, si no
- * → derecha; en el umbral cualquier mano vale.
- */
+/** `.card` ocupa el ancho de `.view`, así que su centro (x=0) separa la
+ * mitad izquierda de la rejilla de la derecha. `x<0` → izquierda, si no →
+ * derecha (umbral: cualquier mano vale). */
 function pressHandFor(x: number): PressHand {
   return x < 0 ? 'left' : 'right';
 }
 
-/**
- * Reposo: arriba del todo, pegado a la derecha. `y:-1` es el borde superior
- * exacto del canvas (amplitud completa en modo `target`); `-0.92` lo deja
- * casi arriba sin clipar contra el `overflow:hidden` de `.robotLayer`.
- * `x:0.6`: a la derecha, afinado a ojo con el usuario.
- */
+/** Reposo: arriba del todo, a la derecha. `y:-1` es el borde superior exacto
+ * (amplitud completa en `target`); `-0.92` casi arriba sin clipar contra
+ * `overflow:hidden` de `.robotLayer`. `x:0.6` afinado a ojo. */
 export const REST_TARGET: RobotTarget = { x: 0.6, y: -0.92 };
 
-/**
- * Con el modal abierto: el robot se aparta a su izquierda para no taparlo.
- * El modal es `fixed`, centrado en el **viewport** (`max-width:430px`), pero
- * los targets se normalizan contra `.view` (arranca a la derecha de la
- * barra lateral). Con barra ~240px y viewport ~1440px: centro del viewport
- * en coordenadas de `.view` ≈ `x:-0.2`, borde izquierdo del modal ≈
- * `x:-0.56`. `x:-0.75` queda claramente a su izquierda — estimación
- * dependiente del ancho real de barra/viewport, fácil de retocar.
- */
+/** Con el modal abierto, el robot se aparta a su izquierda. El modal es
+ * `fixed`, centrado en el viewport (no en `.view`, que arranca tras la barra
+ * lateral ~240px): con viewport ~1440px, su borde izquierdo cae en
+ * `x≈-0.56` en coordenadas de `.view`. `x:-0.75` queda claro a su
+ * izquierda — estimación fácil de retocar si cambian esos anchos. */
 export const MODAL_TARGET: RobotTarget = { x: -0.75, y: -0.1 };
 
-// Ease del roam exponencial (τ≈0.55s): a ~520ms ya lee como "llegó". Tras el
-// toque, un respiro corto antes de resolver (abrir/cerrar).
+// Ease exponencial (τ≈0.55s): a ~520ms ya lee como "llegó". Tras el toque,
+// un respiro corto antes de resolver (abrir/cerrar).
 const TRAVEL_MS = 520;
 const PRESS_MS = 180;
+
+// `roamEaseSpeed`: `undefined`=default de la lib (1.8 → τ≈0.55s). Solo la
+// VUELTA AL REPOSO es más lenta: 0.8 → τ≈1.25s (~2×). El viaje (abrir o al
+// botón) usa la normal: `runPressChoreography` resetea `easeSpeed` al empezar.
+const REST_EASE_SLOW = 0.8;
 
 function targetFromRect(cellRect: DOMRect, layerRect: DOMRect | null): RobotTarget {
   if (!layerRect || layerRect.width === 0 || layerRect.height === 0) return REST_TARGET;
@@ -57,15 +52,11 @@ function targetFromRect(cellRect: DOMRect, layerRect: DOMRect | null): RobotTarg
   };
 }
 
-/**
- * Orquesta la coreografía del robot, al abrir y al cerrar el modal: viaja al
- * objetivo (celda o botón), lo "toca" y con ese toque resuelve la acción,
- * vía `runPressChoreography` (compartida). Los timers viven aquí, fuera de
- * la capa 3D (`CalendarRobot`, con su propio `ViewBoundary`): un fallo del
- * WebGL nunca bloquea abrir ni cerrar. Con `prefers-reduced-motion` (mismo
- * mecanismo que el rig del avatar), o al cerrar sin botón concreto
- * (Escape/click fuera), se salta la coreografía: acción inmediata.
- */
+/** Orquesta la coreografía al abrir/cerrar el modal: viaja al objetivo
+ * (celda o botón), lo "toca" y resuelve, vía `runPressChoreography`
+ * (compartida). Los timers viven aquí, fuera de la capa 3D (`CalendarRobot`,
+ * con su `ViewBoundary`): un fallo del WebGL nunca bloquea abrir/cerrar. Con
+ * reduced motion, o al cerrar sin botón (Escape/click fuera), es inmediato. */
 export function useRobotChoreography() {
   const viewRef = useRef<HTMLElement>(null);
   const timersRef = useRef<{ press?: ReturnType<typeof setTimeout>; open?: ReturnType<typeof setTimeout> }>({});
@@ -75,6 +66,7 @@ export function useRobotChoreography() {
   const [robotTarget, setRobotTarget] = useState<RobotTarget>(REST_TARGET);
   const [pressTrigger, setPressTrigger] = useState<number>();
   const [pressHand, setPressHand] = useState<PressHand>('right');
+  const [easeSpeed, setEaseSpeed] = useState<number>();
 
   const clearTimers = useCallback(() => {
     if (timersRef.current.press) clearTimeout(timersRef.current.press);
@@ -84,12 +76,13 @@ export function useRobotChoreography() {
 
   useEffect(() => clearTimers, [clearTimers]); // limpia timers al desmontar
 
-  // Mecánica compartida: fija target+mano (síncrono), a TRAVEL_MS dispara el
-  // toque y PRESS_MS después resuelve. No limpia timers: el llamador ya hizo
-  // `clearTimers()` (re-entrancia). `hand` opcional fuerza la mano; por
-  // defecto se elige por el lado del objetivo (`pressHandFor`).
+  // Mecánica compartida: fija target+mano+velocidad normal (síncrono), a
+  // TRAVEL_MS dispara el toque y PRESS_MS después resuelve. No limpia
+  // timers (el llamador ya hizo `clearTimers()`). `hand` opcional fuerza la
+  // mano; si no, se elige por el lado del objetivo (`pressHandFor`).
   const runPressChoreography = useCallback(
     (target: RobotTarget, onResolve: () => void, hand?: PressHand) => {
+      setEaseSpeed(undefined);
       setRobotTarget(target);
       setPressHand(hand ?? pressHandFor(target.x));
 
@@ -128,20 +121,24 @@ export function useRobotChoreography() {
       clearTimers();
 
       if (reducedMotion || !rect) {
+        // Batcheadas: la vuelta ya arranca lenta (inofensivo con reduced
+        // motion, que apaga el roam).
         setSelected(null);
         setRobotTarget(REST_TARGET);
+        setEaseSpeed(REST_EASE_SLOW);
         return;
       }
 
-      // Cerrar siempre con la mano derecha de pantalla (`Hueso.001`),
-      // independientemente de dónde caiga el botón (decisión del usuario;
-      // abrir sí elige la mano por el lado del día).
+      // Cerrar siempre con la mano derecha (decisión del usuario; abrir sí
+      // elige la mano por el lado del día).
       const buttonTarget = targetFromRect(rect, viewRef.current?.getBoundingClientRect() ?? null);
       runPressChoreography(
         buttonTarget,
         () => {
+          // Batcheadas: el toque cierra y la vuelta arranca lenta ya en el mismo tick.
           setSelected(null);
           setRobotTarget(REST_TARGET);
+          setEaseSpeed(REST_EASE_SLOW);
         },
         'right',
       );
@@ -149,5 +146,5 @@ export function useRobotChoreography() {
     [clearTimers, reducedMotion, runPressChoreography],
   );
 
-  return { viewRef, selected, robotTarget, pressTrigger, pressHand, handleSelectDay, handleCloseModal };
+  return { viewRef, selected, robotTarget, pressTrigger, pressHand, easeSpeed, handleSelectDay, handleCloseModal };
 }

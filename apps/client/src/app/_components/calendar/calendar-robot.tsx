@@ -11,6 +11,8 @@ interface CalendarRobotProps {
   pressTrigger?: number;
   /** Lado de la pantalla con el que toca (lado del día elegido). */
   pressHand?: PressHand;
+  /** Velocidad del ease del roam; `undefined` = normal. Lenta solo al volver al reposo. */
+  easeSpeed?: number;
 }
 
 /**
@@ -64,7 +66,7 @@ const CAMERA_Z = 52;
  * (`z-index` en `calendar.module.css`) para que el robot quede visible junto
  * al día mientras el modal está abierto.
  */
-export function CalendarRobot({ target, pressTrigger, pressHand }: CalendarRobotProps) {
+export function CalendarRobot({ target, pressTrigger, pressHand, easeSpeed }: CalendarRobotProps) {
   return (
     <div className={styles.robotLayer} aria-hidden="true">
       <ViewBoundary name="El robot del calendario" fallback={null}>
@@ -84,6 +86,7 @@ export function CalendarRobot({ target, pressTrigger, pressHand }: CalendarRobot
           target={target}
           pressTrigger={pressTrigger}
           pressHand={pressHand}
+          roamEaseSpeed={easeSpeed}
           state="idle"
           playClip={false}
         />

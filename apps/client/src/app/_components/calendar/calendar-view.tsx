@@ -16,7 +16,7 @@ import styles from './calendar.module.css';
  */
 export function CalendarView() {
   const month = useCalendarMonth();
-  const { viewRef, selected, robotTarget, pressTrigger, pressHand, handleSelectDay, handleCloseModal } =
+  const { viewRef, selected, robotTarget, pressTrigger, pressHand, easeSpeed, handleSelectDay, handleCloseModal } =
     useRobotChoreography();
 
   return (
@@ -44,7 +44,12 @@ export function CalendarView() {
         />
       )}
 
-      <CalendarRobot target={robotTarget} pressTrigger={pressTrigger} pressHand={pressHand} />
+      <CalendarRobot
+        target={robotTarget}
+        pressTrigger={pressTrigger}
+        pressHand={pressHand}
+        easeSpeed={easeSpeed}
+      />
     </section>
   );
 }

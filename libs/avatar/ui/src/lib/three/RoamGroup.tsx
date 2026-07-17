@@ -36,6 +36,17 @@ export interface RoamGroupProps {
    * (comportamiento de siempre — Home/roam libre no lo pasan).
    */
   faceCamera?: boolean;
+  /**
+   * Velocidad del ease de posición hacia `target`/cursor (constante de
+   * tiempo τ ≈ 1 / `roamEaseSpeed`, en segundos): mayor valor converge más
+   * rápido, menor valor va con más lag. `undefined` (default) usa
+   * `POSITION_EASE_SPEED` — comportamiento idéntico al de siempre. Pensado
+   * para que el llamador ralentice, por ejemplo, el regreso al reposo del
+   * calendario sin afectar al resto de desplazamientos (que siguen usando
+   * el default). NO afecta al snap del primer frame activo (ver el JSDoc de
+   * `RoamGroup`): ese siempre es instantáneo, sin ease de por medio.
+   */
+  roamEaseSpeed?: number;
 }
 
 /** Altura objetivo del modelo mientras deambula (unidades del mundo). */
@@ -126,7 +137,13 @@ const offsetScratch = new Quaternion();
  * sobre los ejes de mundo. Sin `faceCamera`, comportamiento idéntico al de
  * siempre (rotación = solo el vuelo, sin billboard).
  */
-export function RoamGroup({ enabled, children, target, faceCamera = false }: RoamGroupProps) {
+export function RoamGroup({
+  enabled,
+  children,
+  target,
+  faceCamera = false,
+  roamEaseSpeed,
+}: RoamGroupProps) {
   const groupRef = useRef<Group>(null);
   const { viewport, camera } = useThree();
   const flight = useFlightOrientation();
@@ -191,7 +208,8 @@ export function RoamGroup({ enabled, children, target, faceCamera = false }: Roa
       const prevX = group.position.x;
       const prevY = group.position.y;
 
-      const t = Math.min(1, POSITION_EASE_SPEED * delta);
+      const easeSpeed = roamEaseSpeed ?? POSITION_EASE_SPEED;
+      const t = Math.min(1, easeSpeed * delta);
       group.position.x += (targetX - group.position.x) * t;
       group.position.y += (targetY - group.position.y) * t;
 
