@@ -86,16 +86,20 @@ export function useRobotChoreography() {
 
   // Mecánica compartida: fija target+mano (síncrono), a TRAVEL_MS dispara el
   // toque y PRESS_MS después resuelve. No limpia timers: el llamador ya hizo
-  // `clearTimers()` (re-entrancia).
-  const runPressChoreography = useCallback((target: RobotTarget, onResolve: () => void) => {
-    setRobotTarget(target);
-    setPressHand(pressHandFor(target.x));
+  // `clearTimers()` (re-entrancia). `hand` opcional fuerza la mano; por
+  // defecto se elige por el lado del objetivo (`pressHandFor`).
+  const runPressChoreography = useCallback(
+    (target: RobotTarget, onResolve: () => void, hand?: PressHand) => {
+      setRobotTarget(target);
+      setPressHand(hand ?? pressHandFor(target.x));
 
-    timersRef.current.press = setTimeout(() => {
-      setPressTrigger((n) => (n ?? 0) + 1);
-      timersRef.current.open = setTimeout(onResolve, PRESS_MS);
-    }, TRAVEL_MS);
-  }, []);
+      timersRef.current.press = setTimeout(() => {
+        setPressTrigger((n) => (n ?? 0) + 1);
+        timersRef.current.open = setTimeout(onResolve, PRESS_MS);
+      }, TRAVEL_MS);
+    },
+    [],
+  );
 
   const handleSelectDay = useCallback(
     (day: CalendarDay, rect: DOMRect) => {
@@ -129,11 +133,18 @@ export function useRobotChoreography() {
         return;
       }
 
+      // Cerrar siempre con la mano derecha de pantalla (`Hueso.001`),
+      // independientemente de dónde caiga el botón (decisión del usuario;
+      // abrir sí elige la mano por el lado del día).
       const buttonTarget = targetFromRect(rect, viewRef.current?.getBoundingClientRect() ?? null);
-      runPressChoreography(buttonTarget, () => {
-        setSelected(null);
-        setRobotTarget(REST_TARGET);
-      });
+      runPressChoreography(
+        buttonTarget,
+        () => {
+          setSelected(null);
+          setRobotTarget(REST_TARGET);
+        },
+        'right',
+      );
     },
     [clearTimers, reducedMotion, runPressChoreography],
   );
