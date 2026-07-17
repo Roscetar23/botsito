@@ -156,14 +156,25 @@ export interface Avatar3DProps {
    */
   playClip?: boolean;
   /**
-   * Nonce edge-triggered del gesto de "toque" (mano izquierda): cada vez que
-   * cambia a un valor NUEVO se dispara UNA vez un impulso corto de la mano,
-   * pensado para que el front lo accione cuando el robot llega a su
+   * Nonce edge-triggered del gesto de "toque" (mano según `pressHand`): cada
+   * vez que cambia a un valor NUEVO se dispara UNA vez un impulso corto de
+   * la mano, pensado para que el front lo accione cuando el robot llega a su
    * `target` en modo `roam` (p.ej. una celda del calendario) — el avatar no
    * sabe que ha llegado, solo reacciona al nonce. `undefined` (default) =
    * nunca. Se apaga con `prefers-reduced-motion`. Ver `usePressGesture`.
    */
   pressTrigger?: number;
+  /**
+   * Lado de PANTALLA (espectador, no anatomía del robot) con el que se
+   * ejecuta el toque: `'left'` usa la mano que se ve a la izquierda,
+   * `'right'` la de la derecha — pensado para "misma acera que el día"
+   * (día a la izquierda de la pantalla → toca con esa mano). Ver
+   * `PRESS_BONE_BY_SIDE` en `RobotModel` para el mapeo hueso↔lado y su
+   * verificación geométrica. Default `'left'` — reproduce el
+   * comportamiento de siempre (antes de esta prop, el toque solo usaba
+   * `Hueso`).
+   */
+  pressHand?: 'left' | 'right';
 }
 
 /** Velocidad del lerp de la rotación hacia el cursor (más alto = más ágil). */
@@ -241,6 +252,7 @@ export function Avatar3D({
   walk = true,
   playClip = true,
   pressTrigger,
+  pressHand = 'left',
 }: Avatar3DProps) {
   const reducedMotion = Boolean(useReducedMotion());
   const roamEnabled = roam && !reducedMotion;
@@ -308,6 +320,7 @@ export function Avatar3D({
                   mouth={g(flags.mouth)}
                   walk={walkActive}
                   pressTrigger={reducedMotion ? undefined : pressTrigger}
+                  pressHand={pressHand}
                 />
               </Float>
             </CursorFollowGroup>

@@ -10,6 +10,21 @@ export interface RobotTarget {
   y: number;
 }
 
+/** Lado de la PANTALLA (del espectador) con el que se toca la celda. */
+export type PressHand = 'left' | 'right';
+
+/**
+ * Elige la mano según el lado de la celda: `.card` ocupa el ancho completo
+ * de `.view` y la rejilla de 7 columnas se reparte simétricamente dentro,
+ * así que el centro geométrico de `.view` (x = 0) cae ~sobre la columna
+ * central (jueves), separando la mitad izquierda de la rejilla de la
+ * derecha. Con `x < 0` toca con la izquierda; si no, con la derecha — en la
+ * columna central, justo en el umbral, cualquier mano vale.
+ */
+function pressHandFor(x: number): PressHand {
+  return x < 0 ? 'left' : 'right';
+}
+
 /**
  * Reposo: arriba del todo, pegado a la derecha. `y: -1` es el borde
  * superior exacto del canvas (en modo `target` la amplitud es completa), así
@@ -69,6 +84,7 @@ export function useRobotChoreography() {
   const [selected, setSelected] = useState<CalendarDay | null>(null);
   const [robotTarget, setRobotTarget] = useState<RobotTarget>(REST_TARGET);
   const [pressTrigger, setPressTrigger] = useState<number>();
+  const [pressHand, setPressHand] = useState<PressHand>('right');
 
   const clearTimers = useCallback(() => {
     if (timersRef.current.press) clearTimeout(timersRef.current.press);
@@ -90,7 +106,11 @@ export function useRobotChoreography() {
         return;
       }
 
-      setRobotTarget(targetFromRect(rect, viewRef.current?.getBoundingClientRect() ?? null));
+      // El lado se fija ya (síncrono), a la vez que el target: cuando el
+      // `pressTrigger` dispare tras `TRAVEL_MS`, `pressHand` ya es correcto.
+      const cellTarget = targetFromRect(rect, viewRef.current?.getBoundingClientRect() ?? null);
+      setRobotTarget(cellTarget);
+      setPressHand(pressHandFor(cellTarget.x));
 
       timersRef.current.press = setTimeout(() => {
         setPressTrigger((n) => (n ?? 0) + 1);
@@ -110,5 +130,5 @@ export function useRobotChoreography() {
     setRobotTarget(REST_TARGET);
   }, []);
 
-  return { viewRef, selected, robotTarget, pressTrigger, handleSelectDay, handleCloseModal };
+  return { viewRef, selected, robotTarget, pressTrigger, pressHand, handleSelectDay, handleCloseModal };
 }

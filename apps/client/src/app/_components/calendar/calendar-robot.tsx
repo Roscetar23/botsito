@@ -2,13 +2,15 @@
 
 import { Avatar3DLazy } from '../avatar-3d-lazy';
 import { ViewBoundary } from '../view-boundary';
-import type { RobotTarget } from './use-robot-choreography';
+import type { PressHand, RobotTarget } from './use-robot-choreography';
 import styles from './calendar.module.css';
 
 interface CalendarRobotProps {
   target: RobotTarget;
   /** Nonce de disparo único: cada valor nuevo hace UNA vez el gesto de toque. */
   pressTrigger?: number;
+  /** Lado de la pantalla con el que toca (lado del día elegido). */
+  pressHand?: PressHand;
 }
 
 /**
@@ -62,7 +64,7 @@ const CAMERA_Z = 52;
  * (`z-index` en `calendar.module.css`) para que el robot quede visible junto
  * al día mientras el modal está abierto.
  */
-export function CalendarRobot({ target, pressTrigger }: CalendarRobotProps) {
+export function CalendarRobot({ target, pressTrigger, pressHand }: CalendarRobotProps) {
   return (
     <div className={styles.robotLayer} aria-hidden="true">
       <ViewBoundary name="El robot del calendario" fallback={null}>
@@ -81,6 +83,7 @@ export function CalendarRobot({ target, pressTrigger }: CalendarRobotProps) {
           cameraZ={CAMERA_Z}
           target={target}
           pressTrigger={pressTrigger}
+          pressHand={pressHand}
           state="idle"
           playClip={false}
         />
