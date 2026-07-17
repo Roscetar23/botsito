@@ -41,6 +41,7 @@ export function CalendarView() {
           day={selected}
           events={month.events[selected.key] ?? []}
           onClose={handleCloseModal}
+          onCreated={month.refetch}
         />
       )}
 

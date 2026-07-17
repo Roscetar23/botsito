@@ -1,9 +1,10 @@
 'use client';
 
-import { useEffect } from 'react';
-import { dayLongLabel, monthName } from './calendar-dates';
+import { useEffect, useState } from 'react';
+import { dateKey, dayLongLabel, monthName } from './calendar-dates';
 import type { CalendarDay } from './calendar-dates';
 import type { CalendarEvent } from './calendar-events';
+import { ReminderForm } from './reminder-form';
 import styles from './calendar.module.css';
 
 interface DayModalProps {
@@ -15,14 +16,20 @@ interface DayModalProps {
    * pulsar): cierre inmediato.
    */
   onClose: (rect?: DOMRect) => void;
+  /** Se llama tras crear un recordatorio con éxito, para refrescar el mes. */
+  onCreated?: () => void;
 }
 
 /**
- * Agenda del día seleccionado. Cierra con la X, con "Cerrar", con Escape o
- * pulsando fuera del diálogo. "Crear recordatorio" queda deshabilitado hasta
- * que exista el dominio `reminders` en el backend (T-17/T-18 del PLAN).
+ * Agenda del día seleccionado, con dos modos de contenido dentro del mismo
+ * diálogo: `agenda` (lista de eventos, por defecto) y `create` (formulario de
+ * "Nuevo recordatorio", R-4). Cierra con la X, con "Cerrar", con Escape o
+ * pulsando fuera del diálogo; el cierre y la coreografía del robot no cambian
+ * entre modos.
  */
-export function DayModal({ day, events, onClose }: DayModalProps) {
+export function DayModal({ day, events, onClose, onCreated }: DayModalProps) {
+  const [mode, setMode] = useState<'agenda' | 'create'>('agenda');
+
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') onClose();
@@ -42,7 +49,7 @@ export function DayModal({ day, events, onClose }: DayModalProps) {
       >
         <header className={styles.modalHeader}>
           <div>
-            <p className={styles.eyebrow}>Agenda del día</p>
+            <p className={styles.eyebrow}>{mode === 'create' ? 'Nuevo recordatorio' : 'Agenda del día'}</p>
             <h2 id="day-modal-title" className={styles.modalTitle}>
               {day.dayOfMonth} de {monthName(day.date)}
             </h2>
@@ -58,40 +65,48 @@ export function DayModal({ day, events, onClose }: DayModalProps) {
           </button>
         </header>
 
-        {events.length === 0 ? (
-          <div className={styles.emptyState}>
-            <p className={styles.emptyTitle}>Aún no hay actividades.</p>
-            <p className={styles.emptyText}>Este día está libre. Puedes crear un recordatorio.</p>
-          </div>
+        {mode === 'create' ? (
+          <ReminderForm
+            date={dateKey(day.date)}
+            onCancel={() => setMode('agenda')}
+            onCreated={() => {
+              onCreated?.();
+              setMode('agenda');
+            }}
+          />
         ) : (
-          <ul className={styles.eventList}>
-            {events.map((event) => (
-              <li key={event.id} className={styles.eventRow}>
-                {event.time && <span className={styles.eventTime}>{event.time}</span>}
-                <span className={styles.eventTitle}>{event.title}</span>
-              </li>
-            ))}
-          </ul>
-        )}
+          <>
+            {events.length === 0 ? (
+              <div className={styles.emptyState}>
+                <p className={styles.emptyTitle}>Aún no hay actividades.</p>
+                <p className={styles.emptyText}>Este día está libre. Puedes crear un recordatorio.</p>
+              </div>
+            ) : (
+              <ul className={styles.eventList}>
+                {events.map((event) => (
+                  <li key={event.id} className={styles.eventRow}>
+                    {event.time && <span className={styles.eventTime}>{event.time}</span>}
+                    <span className={styles.eventTitle}>{event.title}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
 
-        <footer className={styles.modalFooter}>
-          <button
-            type="button"
-            className={styles.ghostButton}
-            onClick={(event) => onClose(event.currentTarget.getBoundingClientRect())}
-          >
-            Cerrar
-          </button>
-          <button
-            type="button"
-            className={styles.primaryButton}
-            disabled
-            title="Disponible cuando conectemos los recordatorios al backend"
-          >
-            <CalendarPlusIcon />
-            Crear recordatorio
-          </button>
-        </footer>
+            <footer className={styles.modalFooter}>
+              <button
+                type="button"
+                className={styles.ghostButton}
+                onClick={(event) => onClose(event.currentTarget.getBoundingClientRect())}
+              >
+                Cerrar
+              </button>
+              <button type="button" className={styles.primaryButton} onClick={() => setMode('create')}>
+                <CalendarPlusIcon />
+                Crear recordatorio
+              </button>
+            </footer>
+          </>
+        )}
       </div>
     </div>
   );
