@@ -9,7 +9,12 @@ import styles from './calendar.module.css';
 interface DayModalProps {
   day: CalendarDay;
   events: CalendarEvent[];
-  onClose: () => void;
+  /**
+   * Con `rect` (X o "Cerrar"): el robot viaja hasta ese botón y lo toca antes
+   * de cerrar. Sin `rect` (Escape/click fuera, no hay botón concreto que
+   * pulsar): cierre inmediato.
+   */
+  onClose: (rect?: DOMRect) => void;
 }
 
 /**
@@ -27,7 +32,7 @@ export function DayModal({ day, events, onClose }: DayModalProps) {
   }, [onClose]);
 
   return (
-    <div className={styles.overlay} onClick={onClose} role="presentation">
+    <div className={styles.overlay} onClick={() => onClose()} role="presentation">
       <div
         className={styles.modal}
         role="dialog"
@@ -43,7 +48,12 @@ export function DayModal({ day, events, onClose }: DayModalProps) {
             </h2>
             <p className={styles.modalSubtitle}>{dayLongLabel(day.date)}</p>
           </div>
-          <button type="button" className={styles.closeButton} onClick={onClose} aria-label="Cerrar">
+          <button
+            type="button"
+            className={styles.closeButton}
+            onClick={(event) => onClose(event.currentTarget.getBoundingClientRect())}
+            aria-label="Cerrar"
+          >
             ×
           </button>
         </header>
@@ -65,7 +75,11 @@ export function DayModal({ day, events, onClose }: DayModalProps) {
         )}
 
         <footer className={styles.modalFooter}>
-          <button type="button" className={styles.ghostButton} onClick={onClose}>
+          <button
+            type="button"
+            className={styles.ghostButton}
+            onClick={(event) => onClose(event.currentTarget.getBoundingClientRect())}
+          >
             Cerrar
           </button>
           <button

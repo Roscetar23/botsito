@@ -10,48 +10,40 @@ export interface RobotTarget {
   y: number;
 }
 
-/** Lado de la PANTALLA (del espectador) con el que se toca la celda. */
+/** Lado de la PANTALLA (del espectador) con el que se toca. */
 export type PressHand = 'left' | 'right';
 
 /**
- * Elige la mano según el lado de la celda: `.card` ocupa el ancho completo
- * de `.view` y la rejilla de 7 columnas se reparte simétricamente dentro,
- * así que el centro geométrico de `.view` (x = 0) cae ~sobre la columna
- * central (jueves), separando la mitad izquierda de la rejilla de la
- * derecha. Con `x < 0` toca con la izquierda; si no, con la derecha — en la
- * columna central, justo en el umbral, cualquier mano vale.
+ * Mano según el lado del objetivo: `.card`/los botones ocupan el ancho de
+ * `.view`, así que su centro geométrico (x=0) separa la mitad izquierda de
+ * la derecha (en la rejilla, ~la columna central). `x<0` → izquierda, si no
+ * → derecha; en el umbral cualquier mano vale.
  */
 function pressHandFor(x: number): PressHand {
   return x < 0 ? 'left' : 'right';
 }
 
 /**
- * Reposo: arriba del todo, pegado a la derecha. `y: -1` es el borde
- * superior exacto del canvas (en modo `target` la amplitud es completa), así
- * que `-0.92` lo deja prácticamente arriba del todo sin llegar a clipar
- * contra el `overflow: hidden` de `.robotLayer`. `x: 0.6` lo deja a la
- * derecha pero algo más adentro que el `0.82` inicial (afinado a ojo con el
- * usuario).
+ * Reposo: arriba del todo, pegado a la derecha. `y:-1` es el borde superior
+ * exacto del canvas (amplitud completa en modo `target`); `-0.92` lo deja
+ * casi arriba sin clipar contra el `overflow:hidden` de `.robotLayer`.
+ * `x:0.6`: a la derecha, afinado a ojo con el usuario.
  */
 export const REST_TARGET: RobotTarget = { x: 0.6, y: -0.92 };
 
 /**
- * Con el modal abierto: el robot se aparta a su izquierda en vez de tapar el
- * diálogo. El modal es `position: fixed`, centrado en el **viewport**
- * (`max-width: 430px`), pero `REST_TARGET`/`MODAL_TARGET` se normalizan
- * contra el rect de `.view`, que arranca a la derecha de la barra lateral.
- * Con una barra ~240px y un viewport ~1440px, el centro del viewport cae en
- * `x ≈ -0.2` en coordenadas de la vista, y el borde izquierdo del modal
- * (centro − 215px) en `x ≈ -0.56`. `x: -0.75` queda claramente a su
- * izquierda con margen. Es una estimación que depende del ancho real de la
- * barra lateral y del viewport — fácil de retocar a ojo si no cuadra.
+ * Con el modal abierto: el robot se aparta a su izquierda para no taparlo.
+ * El modal es `fixed`, centrado en el **viewport** (`max-width:430px`), pero
+ * los targets se normalizan contra `.view` (arranca a la derecha de la
+ * barra lateral). Con barra ~240px y viewport ~1440px: centro del viewport
+ * en coordenadas de `.view` ≈ `x:-0.2`, borde izquierdo del modal ≈
+ * `x:-0.56`. `x:-0.75` queda claramente a su izquierda — estimación
+ * dependiente del ancho real de barra/viewport, fácil de retocar.
  */
 export const MODAL_TARGET: RobotTarget = { x: -0.75, y: -0.1 };
 
-// El ease del roam es exponencial con constante de tiempo ~0.55s, así que a
-// los ~520ms ya lee como "llegó" (el tiempo hasta "cerca" es casi
-// independiente de la distancia). Tras el toque, un respiro corto antes de
-// abrir el modal para que se lea como "la mano lo empuja".
+// Ease del roam exponencial (τ≈0.55s): a ~520ms ya lee como "llegó". Tras el
+// toque, un respiro corto antes de resolver (abrir/cerrar).
 const TRAVEL_MS = 520;
 const PRESS_MS = 180;
 
@@ -66,15 +58,13 @@ function targetFromRect(cellRect: DOMRect, layerRect: DOMRect | null): RobotTarg
 }
 
 /**
- * Orquesta la coreografía del robot del calendario: al elegir un día, viaja
- * a su celda, la "toca" y con ese toque se abre el modal a la vez que el
- * robot se aparta a `MODAL_TARGET` (a la izquierda del diálogo); al
- * cerrarlo, vuelve a `REST_TARGET`. Los timers viven aquí —fuera de la capa
- * 3D (`CalendarRobot`, que tiene su propio `ViewBoundary`)— así que un fallo
- * del WebGL nunca bloquea la apertura del modal. Con
- * `prefers-reduced-motion` (mismo mecanismo que el rig del avatar) se salta
- * la coreografía: el modal abre al toque, sin esperar el viaje ni mover al
- * robot.
+ * Orquesta la coreografía del robot, al abrir y al cerrar el modal: viaja al
+ * objetivo (celda o botón), lo "toca" y con ese toque resuelve la acción,
+ * vía `runPressChoreography` (compartida). Los timers viven aquí, fuera de
+ * la capa 3D (`CalendarRobot`, con su propio `ViewBoundary`): un fallo del
+ * WebGL nunca bloquea abrir ni cerrar. Con `prefers-reduced-motion` (mismo
+ * mecanismo que el rig del avatar), o al cerrar sin botón concreto
+ * (Escape/click fuera), se salta la coreografía: acción inmediata.
  */
 export function useRobotChoreography() {
   const viewRef = useRef<HTMLElement>(null);
@@ -92,13 +82,25 @@ export function useRobotChoreography() {
     timersRef.current = {};
   }, []);
 
-  // Limpia los timers al desmontar la vista.
-  useEffect(() => clearTimers, [clearTimers]);
+  useEffect(() => clearTimers, [clearTimers]); // limpia timers al desmontar
+
+  // Mecánica compartida: fija target+mano (síncrono), a TRAVEL_MS dispara el
+  // toque y PRESS_MS después resuelve. No limpia timers: el llamador ya hizo
+  // `clearTimers()` (re-entrancia).
+  const runPressChoreography = useCallback((target: RobotTarget, onResolve: () => void) => {
+    setRobotTarget(target);
+    setPressHand(pressHandFor(target.x));
+
+    timersRef.current.press = setTimeout(() => {
+      setPressTrigger((n) => (n ?? 0) + 1);
+      timersRef.current.open = setTimeout(onResolve, PRESS_MS);
+    }, TRAVEL_MS);
+  }, []);
 
   const handleSelectDay = useCallback(
     (day: CalendarDay, rect: DOMRect) => {
-      // Cancela cualquier viaje en curso: re-target sin timers zombis (cubre
-      // clicar otro día a mitad de viaje y el doble click sobre el mismo).
+      // Re-target sin timers zombis: cubre clicar otro día a mitad de viaje
+      // y el doble click sobre el mismo.
       clearTimers();
 
       if (reducedMotion) {
@@ -106,29 +108,35 @@ export function useRobotChoreography() {
         return;
       }
 
-      // El lado se fija ya (síncrono), a la vez que el target: cuando el
-      // `pressTrigger` dispare tras `TRAVEL_MS`, `pressHand` ya es correcto.
       const cellTarget = targetFromRect(rect, viewRef.current?.getBoundingClientRect() ?? null);
-      setRobotTarget(cellTarget);
-      setPressHand(pressHandFor(cellTarget.x));
-
-      timersRef.current.press = setTimeout(() => {
-        setPressTrigger((n) => (n ?? 0) + 1);
-        timersRef.current.open = setTimeout(() => {
-          // El toque abre el modal y, a la vez, el robot se aparta a su
-          // izquierda para no taparlo.
-          setSelected(day);
-          setRobotTarget(MODAL_TARGET);
-        }, PRESS_MS);
-      }, TRAVEL_MS);
+      runPressChoreography(cellTarget, () => {
+        setSelected(day); // el toque abre el modal...
+        setRobotTarget(MODAL_TARGET); // ...y el robot se aparta a la izquierda
+      });
     },
-    [clearTimers, reducedMotion],
+    [clearTimers, reducedMotion, runPressChoreography],
   );
 
-  const handleCloseModal = useCallback(() => {
-    setSelected(null);
-    setRobotTarget(REST_TARGET);
-  }, []);
+  const handleCloseModal = useCallback(
+    (rect?: DOMRect) => {
+      // Cubre cerrar dos veces y Escape/click fuera a mitad del viaje hacia
+      // la X/"Cerrar": cierre inmediato, cancela la coreografía de cierre.
+      clearTimers();
+
+      if (reducedMotion || !rect) {
+        setSelected(null);
+        setRobotTarget(REST_TARGET);
+        return;
+      }
+
+      const buttonTarget = targetFromRect(rect, viewRef.current?.getBoundingClientRect() ?? null);
+      runPressChoreography(buttonTarget, () => {
+        setSelected(null);
+        setRobotTarget(REST_TARGET);
+      });
+    },
+    [clearTimers, reducedMotion, runPressChoreography],
+  );
 
   return { viewRef, selected, robotTarget, pressTrigger, pressHand, handleSelectDay, handleCloseModal };
 }
