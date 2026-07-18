@@ -5,8 +5,9 @@ import { ReminderFrequency, ReminderType } from '@asistente/reminders-model';
 import { useState, type FormEvent } from 'react';
 import type { CreateReminderDto, Reminder, UpdateReminderDto } from '@asistente/reminders-model';
 import { createReminder, updateReminder, RemindersApiError } from './reminders-api';
-import { SelectField } from './reminder-form-fields';
+import { CountField, SelectField } from './reminder-form-fields';
 import { FREQUENCY_LABELS, TYPE_LABELS, validateReminderForm } from './reminder-form-options';
+import { typeClass } from './reminder-type-style';
 import styles from './calendar.module.css';
 
 interface ReminderFormProps {
@@ -79,7 +80,14 @@ export function ReminderForm({ date, reminder, onCancel, onSaved }: ReminderForm
 
   return (
     <form className={styles.form} onSubmit={handleSubmit}>
-      <SelectField id="reminder-type" label="Tipo" value={type} options={TYPE_LABELS} onChange={setType} />
+      <SelectField
+        id="reminder-type"
+        label="Tipo"
+        value={type}
+        options={TYPE_LABELS}
+        onChange={setType}
+        indicator={<span className={typeClass('typeDot', type)} aria-hidden="true" />}
+      />
 
       <div className={styles.formField}>
         <label className={styles.formLabel} htmlFor="reminder-time">
@@ -103,22 +111,7 @@ export function ReminderForm({ date, reminder, onCancel, onSaved }: ReminderForm
         onChange={setFrequency}
       />
 
-      {!isOnce && (
-        <div className={styles.formField}>
-          <label className={styles.formLabel} htmlFor="reminder-count">
-            Nº de veces
-          </label>
-          <input
-            id="reminder-count"
-            type="number"
-            min={1}
-            max={365}
-            className={styles.formInput}
-            value={count}
-            onChange={(event) => setCount(Number(event.target.value))}
-          />
-        </div>
-      )}
+      {!isOnce && <CountField value={count} onChange={setCount} />}
 
       <div className={styles.formField}>
         <label className={styles.formLabel} htmlFor="reminder-text">

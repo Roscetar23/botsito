@@ -212,15 +212,47 @@
 
 .chip {
   padding: 0.28rem 0.45rem;
-  border-left: 3px solid var(--brand-primary-bright);
+  border-left: 3px solid transparent;
   border-radius: 5px;
-  background: color-mix(in srgb, var(--brand-primary) 65%, transparent);
-  color: #fff;
   font-size: 0.71rem;
+  font-weight: 600;
   line-height: 1.35;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+/* Color por tipo de recordatorio (ver tokens `--rem-*` en global.css y el
+ * mapa `typeClass` en `reminder-type-style.ts`): fondo tintado suave +
+ * texto/borde del propio color, legible en claro y oscuro. */
+.chip-tarea {
+  border-left-color: var(--rem-tarea);
+  background: color-mix(in srgb, var(--rem-tarea) 18%, transparent);
+  color: var(--rem-tarea-text);
+}
+
+.chip-cita {
+  border-left-color: var(--rem-cita);
+  background: color-mix(in srgb, var(--rem-cita) 18%, transparent);
+  color: var(--rem-cita-text);
+}
+
+.chip-medicina {
+  border-left-color: var(--rem-medicina);
+  background: color-mix(in srgb, var(--rem-medicina) 18%, transparent);
+  color: var(--rem-medicina-text);
+}
+
+.chip-personal {
+  border-left-color: var(--rem-personal);
+  background: color-mix(in srgb, var(--rem-personal) 18%, transparent);
+  color: var(--rem-personal-text);
+}
+
+.chip-otro {
+  border-left-color: var(--rem-otro);
+  background: color-mix(in srgb, var(--rem-otro) 18%, transparent);
+  color: var(--rem-otro-text);
 }
 
 .chipMore {
@@ -326,15 +358,37 @@
   flex-direction: column;
   gap: 0.4rem;
   padding: 0.65rem 0.75rem;
-  border-left: 3px solid var(--brand-primary-bright);
+  border-left: 3px solid transparent;
   border-radius: var(--radius);
   background: var(--surface);
+}
+
+/* Mismo color por tipo que en los chips del calendario: solo el acento del
+ * borde, aquí no hace falta tintar el fondo (ya lo da `--surface`). */
+.eventRow-tarea {
+  border-left-color: var(--rem-tarea);
+}
+
+.eventRow-cita {
+  border-left-color: var(--rem-cita);
+}
+
+.eventRow-medicina {
+  border-left-color: var(--rem-medicina);
+}
+
+.eventRow-personal {
+  border-left-color: var(--rem-personal);
+}
+
+.eventRow-otro {
+  border-left-color: var(--rem-otro);
 }
 
 .rowMain {
   display: flex;
   align-items: center;
-  gap: 0.7rem;
+  gap: 0.6rem;
 }
 
 .eventTime {
@@ -342,6 +396,72 @@
   font-size: 0.78rem;
   font-weight: 600;
   color: var(--brand-primary-bright);
+}
+
+/* Punto de color del tipo: se reutiliza en la fila de la agenda y en el
+ * selector "Tipo" del formulario (mismo mapa `typeClass`). */
+.typeDot {
+  flex-shrink: 0;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.typeDot-tarea {
+  background: var(--rem-tarea);
+}
+
+.typeDot-cita {
+  background: var(--rem-cita);
+}
+
+.typeDot-medicina {
+  background: var(--rem-medicina);
+}
+
+.typeDot-personal {
+  background: var(--rem-personal);
+}
+
+.typeDot-otro {
+  background: var(--rem-otro);
+}
+
+/* Etiqueta pequeña con el nombre del tipo, en su color, para que el usuario
+ * aprenda el mapeo tipo→color de un vistazo. */
+.typeLabel {
+  flex-shrink: 0;
+  padding: 0.12rem 0.42rem;
+  border-radius: 999px;
+  font-size: 0.66rem;
+  font-weight: 700;
+  line-height: 1.3;
+  white-space: nowrap;
+}
+
+.typeLabel-tarea {
+  color: var(--rem-tarea-text);
+  background: color-mix(in srgb, var(--rem-tarea) 16%, transparent);
+}
+
+.typeLabel-cita {
+  color: var(--rem-cita-text);
+  background: color-mix(in srgb, var(--rem-cita) 16%, transparent);
+}
+
+.typeLabel-medicina {
+  color: var(--rem-medicina-text);
+  background: color-mix(in srgb, var(--rem-medicina) 16%, transparent);
+}
+
+.typeLabel-personal {
+  color: var(--rem-personal-text);
+  background: color-mix(in srgb, var(--rem-personal) 16%, transparent);
+}
+
+.typeLabel-otro {
+  color: var(--rem-otro-text);
+  background: color-mix(in srgb, var(--rem-otro) 16%, transparent);
 }
 
 .eventTitle {
@@ -449,6 +569,9 @@
 }
 
 .formLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
   font-size: 0.78rem;
   font-weight: 600;
   color: var(--text-muted);

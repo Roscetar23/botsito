@@ -4,6 +4,8 @@ import { ReminderFrequency } from '@asistente/reminders-model';
 import { useState } from 'react';
 import type { Reminder } from '@asistente/reminders-model';
 import { deleteReminder, RemindersApiError } from './reminders-api';
+import { TYPE_LABELS } from './reminder-form-options';
+import { typeClass } from './reminder-type-style';
 import styles from './calendar.module.css';
 
 interface ReminderRowProps {
@@ -43,9 +45,11 @@ export function ReminderRow({ reminder, accessToken, onEdit, onDeleted }: Remind
   }
 
   return (
-    <li className={styles.eventRow}>
+    <li className={typeClass('eventRow', reminder.type)}>
       <div className={styles.rowMain}>
+        <span className={typeClass('typeDot', reminder.type)} aria-hidden="true" />
         <span className={styles.eventTime}>{reminder.time}</span>
+        <span className={typeClass('typeLabel', reminder.type)}>{TYPE_LABELS[reminder.type]}</span>
         <span className={styles.eventTitle}>{reminder.text}</span>
 
         {confirming ? (

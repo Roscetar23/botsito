@@ -2,6 +2,7 @@
 
 import type { CalendarDay } from './calendar-dates';
 import type { CalendarEvent } from './calendar-events';
+import { typeClass } from './reminder-type-style';
 import styles from './calendar.module.css';
 
 interface CalendarDayCellProps {
@@ -42,7 +43,7 @@ export function CalendarDayCell({ day, events, onSelect }: CalendarDayCellProps)
 
       <span className={styles.chips}>
         {visible.map((event) => (
-          <span key={event.id} className={styles.chip} title={event.title}>
+          <span key={event.id} className={typeClass('chip', event.type)} title={event.title}>
             {event.title}
           </span>
         ))}

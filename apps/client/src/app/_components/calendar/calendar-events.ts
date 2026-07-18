@@ -1,5 +1,5 @@
 import { reminderOccurrences } from '@asistente/reminders-model';
-import type { Reminder } from '@asistente/reminders-model';
+import type { Reminder, ReminderType } from '@asistente/reminders-model';
 
 /**
  * Evento pintado en el calendario. Se construye a partir de las ocurrencias
@@ -11,6 +11,8 @@ export interface CalendarEvent {
   title: string;
   /** Hora local `HH:mm`; opcional porque un recordatorio puede ser de todo el día. */
   time?: string;
+  /** Tipo del recordatorio de origen: colorea el chip (ver `reminder-type-style.ts`). */
+  type: ReminderType;
 }
 
 /** Eventos de un mes, indexados por `YYYY-MM-DD`. */
@@ -38,6 +40,7 @@ export function remindersToEventsByDay(reminders: Reminder[], monthCursor: Date)
         id: `${reminder.id}:${date}`,
         title: reminder.text,
         time: reminder.time,
+        type: reminder.type,
       };
       (byDay[date] ??= []).push(event);
     }
