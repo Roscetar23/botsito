@@ -2,6 +2,7 @@
 
 import { CalendarCard } from './calendar-card';
 import { CalendarRobot } from './calendar-robot';
+import { remindersForDay } from './calendar-events';
 import { DayModal } from './day-modal';
 import { useCalendarMonth } from './use-calendar-month';
 import { useRobotChoreography } from './use-robot-choreography';
@@ -39,9 +40,9 @@ export function CalendarView() {
       {selected && (
         <DayModal
           day={selected}
-          events={month.events[selected.key] ?? []}
+          reminders={remindersForDay(month.reminders, selected.key)}
           onClose={handleCloseModal}
-          onCreated={month.refetch}
+          onChanged={month.refetch}
         />
       )}
 

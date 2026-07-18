@@ -1,34 +1,39 @@
 'use client';
 
+import { useAuth } from '@asistente/auth-ui';
 import { useEffect, useState } from 'react';
 import { dateKey, dayLongLabel, monthName } from './calendar-dates';
 import type { CalendarDay } from './calendar-dates';
-import type { CalendarEvent } from './calendar-events';
+import { DayAgenda } from './day-agenda';
 import { ReminderForm } from './reminder-form';
+import type { Reminder } from '@asistente/reminders-model';
 import styles from './calendar.module.css';
 
 interface DayModalProps {
   day: CalendarDay;
-  events: CalendarEvent[];
+  /** Recordatorios (completos) cuyas ocurrencias caen en `day`. */
+  reminders: Reminder[];
   /**
    * Con `rect` (X o "Cerrar"): el robot viaja hasta ese botón y lo toca antes
    * de cerrar. Sin `rect` (Escape/click fuera, no hay botón concreto que
    * pulsar): cierre inmediato.
    */
   onClose: (rect?: DOMRect) => void;
-  /** Se llama tras crear un recordatorio con éxito, para refrescar el mes. */
-  onCreated?: () => void;
+  /** Se llama tras crear, editar o borrar un recordatorio, para refrescar el mes. */
+  onChanged?: () => void;
 }
 
 /**
  * Agenda del día seleccionado, con dos modos de contenido dentro del mismo
- * diálogo: `agenda` (lista de eventos, por defecto) y `create` (formulario de
- * "Nuevo recordatorio", R-4). Cierra con la X, con "Cerrar", con Escape o
- * pulsando fuera del diálogo; el cierre y la coreografía del robot no cambian
- * entre modos.
+ * diálogo: `agenda` (lista de recordatorios, por defecto, con editar/borrar
+ * en `DayAgenda`/`ReminderRow`) y `form` (crear o editar un recordatorio).
+ * Cierra con la X, con "Cerrar", con Escape o pulsando fuera del diálogo; el
+ * cierre y la coreografía del robot no cambian entre modos.
  */
-export function DayModal({ day, events, onClose, onCreated }: DayModalProps) {
-  const [mode, setMode] = useState<'agenda' | 'create'>('agenda');
+export function DayModal({ day, reminders, onClose, onChanged }: DayModalProps) {
+  const { accessToken } = useAuth();
+  const [mode, setMode] = useState<'agenda' | 'form'>('agenda');
+  const [editing, setEditing] = useState<Reminder | null>(null);
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
@@ -37,6 +42,8 @@ export function DayModal({ day, events, onClose, onCreated }: DayModalProps) {
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
   }, [onClose]);
+
+  const eyebrow = mode === 'form' ? (editing ? 'Editar recordatorio' : 'Nuevo recordatorio') : 'Agenda del día';
 
   return (
     <div className={styles.overlay} onClick={() => onClose()} role="presentation">
@@ -49,7 +56,7 @@ export function DayModal({ day, events, onClose, onCreated }: DayModalProps) {
       >
         <header className={styles.modalHeader}>
           <div>
-            <p className={styles.eyebrow}>{mode === 'create' ? 'Nuevo recordatorio' : 'Agenda del día'}</p>
+            <p className={styles.eyebrow}>{eyebrow}</p>
             <h2 id="day-modal-title" className={styles.modalTitle}>
               {day.dayOfMonth} de {monthName(day.date)}
             </h2>
@@ -65,68 +72,33 @@ export function DayModal({ day, events, onClose, onCreated }: DayModalProps) {
           </button>
         </header>
 
-        {mode === 'create' ? (
+        {mode === 'form' ? (
           <ReminderForm
             date={dateKey(day.date)}
+            reminder={editing ?? undefined}
             onCancel={() => setMode('agenda')}
-            onCreated={() => {
-              onCreated?.();
+            onSaved={() => {
+              onChanged?.();
               setMode('agenda');
             }}
           />
         ) : (
-          <>
-            {events.length === 0 ? (
-              <div className={styles.emptyState}>
-                <p className={styles.emptyTitle}>Aún no hay actividades.</p>
-                <p className={styles.emptyText}>Este día está libre. Puedes crear un recordatorio.</p>
-              </div>
-            ) : (
-              <ul className={styles.eventList}>
-                {events.map((event) => (
-                  <li key={event.id} className={styles.eventRow}>
-                    {event.time && <span className={styles.eventTime}>{event.time}</span>}
-                    <span className={styles.eventTitle}>{event.title}</span>
-                  </li>
-                ))}
-              </ul>
-            )}
-
-            <footer className={styles.modalFooter}>
-              <button
-                type="button"
-                className={styles.ghostButton}
-                onClick={(event) => onClose(event.currentTarget.getBoundingClientRect())}
-              >
-                Cerrar
-              </button>
-              <button type="button" className={styles.primaryButton} onClick={() => setMode('create')}>
-                <CalendarPlusIcon />
-                Crear recordatorio
-              </button>
-            </footer>
-          </>
+          <DayAgenda
+            reminders={reminders}
+            accessToken={accessToken}
+            onClose={onClose}
+            onEdit={(target) => {
+              setEditing(target);
+              setMode('form');
+            }}
+            onCreate={() => {
+              setEditing(null);
+              setMode('form');
+            }}
+            onDeleted={() => onChanged?.()}
+          />
         )}
       </div>
     </div>
-  );
-}
-
-function CalendarPlusIcon() {
-  return (
-    <svg
-      width="16"
-      height="16"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.7"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      <rect x="3" y="5" width="18" height="16" rx="2" />
-      <path d="M3 10h18M8 3v4M16 3v4M12 13v5M9.5 15.5h5" />
-    </svg>
   );
 }

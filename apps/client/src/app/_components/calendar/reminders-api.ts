@@ -1,4 +1,4 @@
-import type { CreateReminderDto, Reminder } from '@asistente/reminders-model';
+import type { CreateReminderDto, Reminder, UpdateReminderDto } from '@asistente/reminders-model';
 
 /** Base de la API (Next inyecta `NEXT_PUBLIC_*`); fallback al backend en :3001. */
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001/api';
@@ -62,7 +62,7 @@ export async function fetchReminders(accessToken: string): Promise<Reminder[]> {
   return raw.map(normalize);
 }
 
-/** Crea un recordatorio (listo para R-4; aún no se usa desde el calendario). */
+/** Crea un recordatorio. */
 export async function createReminder(
   dto: CreateReminderDto,
   accessToken: string,
@@ -72,4 +72,22 @@ export async function createReminder(
     body: JSON.stringify(dto),
   });
   return normalize(raw);
+}
+
+/** Actualiza un recordatorio existente (afecta a todas sus ocurrencias). */
+export async function updateReminder(
+  id: string,
+  dto: UpdateReminderDto,
+  accessToken: string,
+): Promise<Reminder> {
+  const raw = await request<RawReminder>(`/reminders/${id}`, accessToken, {
+    method: 'PATCH',
+    body: JSON.stringify(dto),
+  });
+  return normalize(raw);
+}
+
+/** Borra un recordatorio por completo (todas sus ocurrencias). */
+export async function deleteReminder(id: string, accessToken: string): Promise<void> {
+  await request<null>(`/reminders/${id}`, accessToken, { method: 'DELETE' });
 }

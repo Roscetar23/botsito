@@ -323,12 +323,18 @@
 
 .eventRow {
   display: flex;
-  align-items: center;
-  gap: 0.7rem;
+  flex-direction: column;
+  gap: 0.4rem;
   padding: 0.65rem 0.75rem;
   border-left: 3px solid var(--brand-primary-bright);
   border-radius: var(--radius);
   background: var(--surface);
+}
+
+.rowMain {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
 }
 
 .eventTime {
@@ -339,8 +345,94 @@
 }
 
 .eventTitle {
+  flex: 1;
+  min-width: 0;
   font-size: 0.88rem;
   color: var(--text);
+  overflow-wrap: anywhere;
+}
+
+/* ===== Acciones de fila (editar/borrar) ===== */
+.rowActions {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.rowIconButton {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.rowIconButton:hover {
+  background: var(--surface-2);
+  color: var(--text);
+}
+
+.rowIconButtonDanger:hover {
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+/* Confirmación inline de borrado (dentro de .rowMain, en vez de los iconos). */
+.rowConfirmActions {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.rowConfirmYes,
+.rowConfirmNo {
+  padding: 0.3rem 0.6rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: transparent;
+  font: inherit;
+  font-size: 0.76rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.rowConfirmYes {
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+.rowConfirmYes:hover {
+  background: color-mix(in srgb, var(--danger) 16%, transparent);
+}
+
+.rowConfirmNo {
+  color: var(--text-muted);
+}
+
+.rowConfirmNo:hover {
+  color: var(--text);
+}
+
+.rowConfirmYes:disabled,
+.rowConfirmNo:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.rowConfirmText {
+  font-size: 0.76rem;
+  color: var(--text-muted);
+}
+
+.rowError {
+  font-size: 0.76rem;
+  color: var(--danger);
 }
 
 /* ===== Formulario "Nuevo recordatorio" ===== */
@@ -445,7 +537,10 @@
 .cell:focus-visible,
 .closeButton:focus-visible,
 .ghostButton:focus-visible,
-.primaryButton:focus-visible {
+.primaryButton:focus-visible,
+.rowIconButton:focus-visible,
+.rowConfirmYes:focus-visible,
+.rowConfirmNo:focus-visible {
   outline: 2px solid var(--brand-primary-bright);
   outline-offset: -2px;
 }

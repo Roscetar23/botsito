@@ -3,31 +3,36 @@
 import { useAuth } from '@asistente/auth-ui';
 import { ReminderFrequency, ReminderType } from '@asistente/reminders-model';
 import { useState, type FormEvent } from 'react';
-import type { CreateReminderDto } from '@asistente/reminders-model';
-import { createReminder, RemindersApiError } from './reminders-api';
+import type { CreateReminderDto, Reminder, UpdateReminderDto } from '@asistente/reminders-model';
+import { createReminder, updateReminder, RemindersApiError } from './reminders-api';
 import { SelectField } from './reminder-form-fields';
 import { FREQUENCY_LABELS, TYPE_LABELS, validateReminderForm } from './reminder-form-options';
 import styles from './calendar.module.css';
 
 interface ReminderFormProps {
-  /** Día del modal (`YYYY-MM-DD`); fijo, no editable desde el formulario. */
+  /** Día del modal (`YYYY-MM-DD`); fijo, no editable. Solo se usa al crear. */
   date: string;
+  /** Recordatorio a editar (PATCH); si no viene, el formulario crea (POST). */
+  reminder?: Reminder;
   onCancel: () => void;
-  /** Se llama tras crear el recordatorio con éxito. */
-  onCreated: () => void;
+  /** Se llama tras crear o guardar el recordatorio con éxito. */
+  onSaved: () => void;
 }
 
 /**
- * Formulario de "Nuevo recordatorio" que reemplaza el contenido del modal del
- * día (R-4). La `date` viene fija del día seleccionado en el calendario.
+ * Formulario de "Nuevo/Editar recordatorio" que reemplaza el contenido del
+ * modal del día. Sin `reminder`: crea con la `date` fija del día
+ * seleccionado. Con `reminder`: edita el recordatorio completo (todas sus
+ * ocurrencias) y conserva su `date` original, no la del día desde el que se
+ * abrió el modal.
  */
-export function ReminderForm({ date, onCancel, onCreated }: ReminderFormProps) {
+export function ReminderForm({ date, reminder, onCancel, onSaved }: ReminderFormProps) {
   const { accessToken } = useAuth();
-  const [type, setType] = useState<ReminderType>(ReminderType.Personal);
-  const [time, setTime] = useState('');
-  const [frequency, setFrequency] = useState<ReminderFrequency>(ReminderFrequency.Once);
-  const [count, setCount] = useState(1);
-  const [text, setText] = useState('');
+  const [type, setType] = useState<ReminderType>(reminder?.type ?? ReminderType.Personal);
+  const [time, setTime] = useState(reminder?.time ?? '');
+  const [frequency, setFrequency] = useState<ReminderFrequency>(reminder?.frequency ?? ReminderFrequency.Once);
+  const [count, setCount] = useState(reminder?.count ?? 1);
+  const [text, setText] = useState(reminder?.text ?? '');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -47,14 +52,26 @@ export function ReminderForm({ date, onCancel, onCreated }: ReminderFormProps) {
       return;
     }
 
-    const dto: CreateReminderDto = { type, text: text.trim(), date, time, frequency, count: effectiveCount };
+    const effectiveDate = reminder?.date ?? date;
+    const dto: CreateReminderDto | UpdateReminderDto = {
+      type,
+      text: text.trim(),
+      date: effectiveDate,
+      time,
+      frequency,
+      count: effectiveCount,
+    };
     setLoading(true);
     setError(null);
     try {
-      await createReminder(dto, accessToken);
-      onCreated();
+      if (reminder) {
+        await updateReminder(reminder.id, dto, accessToken);
+      } else {
+        await createReminder(dto as CreateReminderDto, accessToken);
+      }
+      onSaved();
     } catch (err) {
-      setError(err instanceof RemindersApiError ? err.message : 'No se pudo crear el recordatorio.');
+      setError(err instanceof RemindersApiError ? err.message : 'No se pudo guardar el recordatorio.');
     } finally {
       setLoading(false);
     }

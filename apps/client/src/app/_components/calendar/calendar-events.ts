@@ -49,3 +49,16 @@ export function remindersToEventsByDay(reminders: Reminder[], monthCursor: Date)
 
   return byDay;
 }
+
+/**
+ * Recordatorios (completos, no ocurrencias sueltas) cuyas fechas de
+ * ocurrencia incluyen `dayKey` (`YYYY-MM-DD`), ordenados por `time`
+ * ascendente. Para la agenda del `DayModal`: editar/borrar actúa sobre el
+ * `Reminder` entero, así que ahí se necesita el recordatorio, no el
+ * `CalendarEvent` derivado.
+ */
+export function remindersForDay(reminders: Reminder[], dayKey: string): Reminder[] {
+  return reminders
+    .filter((reminder) => reminderOccurrences(reminder).includes(dayKey))
+    .sort((a, b) => a.time.localeCompare(b.time));
+}

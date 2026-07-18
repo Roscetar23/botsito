@@ -28,6 +28,8 @@ export interface CalendarMonth {
   name: string;
   totalDays: number;
   events: EventsByDay;
+  /** Recordatorios crudos del mes (sin expandir), para la agenda del día (R-5b). */
+  reminders: Reminder[];
   /** `true` mientras se están (re)cargando los recordatorios del mes. */
   loading: boolean;
   /** Vuelve a pedir los recordatorios (p.ej. tras crear uno en R-4). */
@@ -93,6 +95,7 @@ export function useCalendarMonth(): CalendarMonth {
     name: monthName(cursor),
     totalDays: daysInMonth(cursor),
     events,
+    reminders,
     loading,
     refetch,
     goPrev,
