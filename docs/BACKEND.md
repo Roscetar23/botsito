@@ -123,7 +123,10 @@ Estado: `[ ]` pendiente · `[~]` en curso · `[x]` hecho.
       ocurrencias → el calendario muestra recordatorios reales. **Hecho.**
 - [x] **R-4 — Cliente (crear).** "Crear recordatorio" → formulario escrito (reemplaza el modal) → `POST`
       → refresca. **Hecho.** → **v1 cerrado: crear + guardar + ver.**
-- [ ] **R-5+ — Futuro.** `DELETE`/editar; disparo (Agenda + notifications gateway); voz + IA por prompts.
+- [x] **R-5 — Editar / borrar.** Backend `PATCH`/`DELETE` (`UpdateReminderDto`, repo `update`, endpoints
+      owner-aware) + UI: cada recordatorio del día con **editar** (form pre-rellenado → `PATCH`) y **borrar**
+      (confirmación inline; avisa si es recurrente → `DELETE`). **Hecho.** → **CRUD completo.**
+- [ ] **R-6+ — Futuro.** Disparo a la hora (Agenda + `SchedulerPort` + gateway WS); voz + IA por prompts.
 
 ---
 
@@ -151,3 +154,8 @@ Estado: `[ ]` pendiente · `[~]` en curso · `[x]` hecho.
   calcado de Tasks, `RemindersModule` en `apps/api` (arranque + `401` verificados), el calendario lee de
   la API expandiendo ocurrencias, y el formulario "Crear recordatorio" (reemplaza el modal) crea vía
   `POST` y refresca. Pendiente R-5+: `DELETE`/editar, **disparo** (Agenda + gateway WS), voz + IA.
+- 2026-07-18 — **R-5: editar/borrar (CRUD completo).** Backend `PATCH`/`DELETE` owner-aware
+  (`UpdateReminderDto`, repo `update`; arranque + `401` verificados). UI: en la agenda del día, cada
+  recordatorio con lápiz (form en modo edición → `PATCH`) y papelera (confirmación inline, con aviso de
+  repeticiones si es recurrente → `DELETE`); `refetch` tras cualquier cambio. Pendiente R-6+: disparo
+  (Agenda + gateway WS) y voz + IA por prompts.
