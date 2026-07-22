@@ -339,8 +339,10 @@ Estado: `[ ]` pendiente · `[~]` en curso · `[x]` hecho.
   Verificado lint/typecheck/test/build. Falta: probar login real contra el backend (usuario).
 
 ### Fase 3 — Realtime + Notifications
-- [ ] **T-15** `notifications/feature`: `NotificationsGateway` (Socket.IO) con auth de handshake.
-- [ ] **T-16** Cliente: `useRealtime()` que mapea eventos → `AvatarState`.
+- [x] **T-15** `notifications/feature`: `NotificationsGateway` (Socket.IO) con auth de handshake (JWT),
+      sala por usuario, `@OnEvent(reminder.fired)` → emite `'reminder'`. **Hecho** (disparo, BACKEND F-2). ✅
+- [x] **T-16** Cliente: `RealtimeProvider`/`useReminderSocket` (socket.io-client con el token); avisos in-app
+      y el robot del calendario reacciona (`notify`). **Hecho** (BACKEND F-3). ✅
 
 ### Fase 4 — Reminders (recordatorios)
 
@@ -353,8 +355,9 @@ Estado: `[ ]` pendiente · `[~]` en curso · `[x]` hecho.
       función de ocurrencias; schema Mongoose **owner-aware** + repo + módulo. (BACKEND **R-1**) ✅
 - [x] **T-17b** `reminders/feature` + wiring + cliente: controller `POST`/`GET` (JWT) + service;
       `RemindersModule` en `AppModule` (arranque + `401` verificados); el calendario **lee y crea**. (BACKEND **R-2..R-4**) ✅
-- [ ] **T-18** **Disparo**: scheduler con **Agenda** (MVP, tras `SchedulerPort`) → **Job → notificación WS**
-      (necesita el gateway de Fase 3, T-15/T-16); resolver zona horaria. (BACKEND **R-5**)
+- [x] **T-18** **Disparo**: scheduler con **Agenda** (tras `SchedulerPort`) → **Job → evento de dominio →
+      notificación WS** (gateway de Fase 3) → aviso in-app + robot. Zona horaria = local del servidor
+      (multi-zona luego). **Hecho** (BACKEND **R-6** / F-1..F-3). ✅
       *Recurrencia v1 = `frequency`+`count`; migrable a cron/rrule si hiciera falta.*
 - [ ] **T-19** Variante documentada **BullMQ + Redis** (misma interfaz `SchedulerPort`).
 
@@ -445,3 +448,7 @@ Estado: `[ ]` pendiente · `[~]` en curso · `[x]` hecho.
   decidido con el usuario (`type`/`date`/`time`/`recurrence{frequency,count}`); **v1 = crear + guardar +
   ver** en el calendario, entrada escrita (disparo con Agenda + WS y voz/IA por prompts, después). Fase 4
   reestructurada (T-17/T-17b/T-18) mapeada al roadmap R-1…R-5 de BACKEND.md.
+- 2026-07-22 — **Reminders CRUD (R-5) + disparo en tiempo real (R-6) hechos.** Editar/borrar (T-17b amplía),
+  y **T-15/T-16/T-18 completadas**: Agenda dispara → evento de dominio → `NotificationsGateway` (Socket.IO,
+  auth JWT) → cliente (`RealtimeProvider`) con aviso in-app + el robot reacciona. Detalle en BACKEND.md
+  (R-5/R-6, F-1…F-3). Pendiente R-7+: voz + IA por prompts, y entrega offline.

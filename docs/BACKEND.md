@@ -17,7 +17,7 @@
 | **Auth** (`libs/auth/**`) | ✅ Completo: registro/login, JWT access+refresh, `JwtStrategy`, `AuthGuard('jwt')`. |
 | **Tasks** (`libs/tasks/**`) | ✅ Vertical completo (model→data-access→feature) contra Atlas. **Es la plantilla de dominio.** |
 | **Reminders** (`libs/reminders/**`) | ⏳ Stubs del generador (3 líneas c/u). **Se construye ahora.** |
-| **Notifications** (`libs/notifications/**`) | ⏳ Stubs. Gateway WebSocket (Socket.IO) sin montar (PLAN T-15). |
+| **Notifications** (`libs/notifications/**`) | ✅ Gateway WebSocket (Socket.IO), auth JWT por handshake, sala por usuario; empuja el aviso del disparo al cliente. |
 
 `apps/api/src/app/app.module.ts` hoy registra `ConfigModule` (global), `MongooseModule.forRootAsync`,
 `ValidationPipe` (global, `whitelist`/`forbidNonWhitelisted`/`transform`), CORS, y los módulos
@@ -126,7 +126,13 @@ Estado: `[ ]` pendiente · `[~]` en curso · `[x]` hecho.
 - [x] **R-5 — Editar / borrar.** Backend `PATCH`/`DELETE` (`UpdateReminderDto`, repo `update`, endpoints
       owner-aware) + UI: cada recordatorio del día con **editar** (form pre-rellenado → `PATCH`) y **borrar**
       (confirmación inline; avisa si es recurrente → `DELETE`). **Hecho.** → **CRUD completo.**
-- [ ] **R-6+ — Futuro.** Disparo a la hora (Agenda + `SchedulerPort` + gateway WS); voz + IA por prompts.
+- [x] **R-6 — Disparo en tiempo real.** Agenda (tras `SchedulerPort`) programa/cancela un job por ocurrencia
+      y dispara a su hora (F-1); emite un evento de dominio (`reminder.fired`, contrato en `shared`) que el
+      **gateway WebSocket** de `notifications` (Socket.IO + auth JWT) empuja a la sala del usuario (F-2); el
+      cliente conecta, muestra un **aviso in-app** y el **robot reacciona** (`notify`) (F-3). Zona horaria =
+      **local del servidor** (correcto para un usuario; multi-zona luego). **Hecho.**
+- [ ] **R-7+ — Futuro.** Voz + IA por prompts (texto/voz → recordatorio). Entrega **offline** (push/email
+      cuando la app está cerrada; hoy el aviso solo llega con la app abierta).
 
 ---
 
@@ -159,3 +165,11 @@ Estado: `[ ]` pendiente · `[~]` en curso · `[x]` hecho.
   recordatorio con lápiz (form en modo edición → `PATCH`) y papelera (confirmación inline, con aviso de
   repeticiones si es recurrente → `DELETE`); `refetch` tras cualquier cambio. Pendiente R-6+: disparo
   (Agenda + gateway WS) y voz + IA por prompts.
+- 2026-07-22 — **R-6: disparo en tiempo real (F-1/F-2/F-3).** **F-1** scheduler `Agenda` tras
+  `SchedulerPort` (misma conexión Mongo; job `reminder-fire`; agenda/cancela por ocurrencia; hora local del
+  servidor) — verificado con un job real disparándose contra Atlas. **F-2** desacople por evento de dominio
+  `reminder.fired` (tipo en `shared`) + **`NotificationsGateway`** (Socket.IO, auth JWT por handshake, sala
+  por `userId`, `@OnEvent` → emite `'reminder'`); `EventEmitterModule` + `NotificationsModule` en `apps/api`
+  — arranque real verificado sin errores de DI. **F-3** cliente: `RealtimeProvider`/`useReminderSocket`
+  (socket.io-client con el token), **toasts** app-wide y el **robot** del calendario pasa a `notify` al
+  dispararse. Pendiente R-7+: voz + IA por prompts, y entrega offline. Detalle en §3.4/§4.
