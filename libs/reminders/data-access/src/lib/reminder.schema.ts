@@ -30,6 +30,11 @@ export class Reminder {
 
   @Prop({ type: String, required: true, index: true })
   ownerId!: string;
+
+  // Añadidos por `{ timestamps: true }` (no requieren @Prop): se declaran
+  // aquí solo para que el tipo `ReminderDocument` los conozca.
+  createdAt!: Date;
+  updatedAt!: Date;
 }
 
 export type ReminderDocument = HydratedDocument<Reminder>;
