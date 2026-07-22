@@ -1,1 +1,2 @@
-export * from './lib/notifications-feature.js';
+export * from './lib/notifications.module.js';
+export * from './lib/notifications.gateway.js';

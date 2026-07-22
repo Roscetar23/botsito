@@ -26,6 +26,7 @@
     "@asistente/reminders-model": "0.0.1",
     "@agendajs/mongo-backend": "^4.0.3",
     "@nestjs/common": "^11.0.0",
+    "@nestjs/event-emitter": "^3.1.0",
     "@nestjs/mongoose": "^11.0.4",
     "@nestjs/passport": "^11.0.5",
     "agenda": "^6.2.5",

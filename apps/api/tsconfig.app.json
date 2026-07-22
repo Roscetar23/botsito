@@ -23,6 +23,9 @@
   ],
   "references": [
     {
+      "path": "../../libs/notifications/feature/tsconfig.lib.json"
+    },
+    {
       "path": "../../libs/reminders/feature/tsconfig.lib.json"
     },
     {

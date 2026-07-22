@@ -5,11 +5,16 @@ import {
   OnModuleInit,
 } from '@nestjs/common';
 import { InjectConnection } from '@nestjs/mongoose';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { Connection } from 'mongoose';
 import { Agenda, Job } from 'agenda';
 import { MongoBackend } from '@agendajs/mongo-backend';
 import { Reminder, reminderOccurrences } from '@asistente/reminders-model';
 import { SchedulerPort } from '@asistente/reminders-data-access';
+import {
+  REMINDER_FIRED_EVENT,
+  ReminderFiredEvent,
+} from '@asistente/shared-types';
 
 import {
   REMINDER_FIRE_JOB,
@@ -31,7 +36,10 @@ export class AgendaScheduler
   private readonly logger = new Logger(AgendaScheduler.name);
   private readonly agenda: Agenda;
 
-  constructor(@InjectConnection() connection: Connection) {
+  constructor(
+    @InjectConnection() connection: Connection,
+    private readonly eventEmitter: EventEmitter2,
+  ) {
     const db = connection.db;
     if (!db) {
       throw new Error(
@@ -49,11 +57,19 @@ export class AgendaScheduler
       async (job: Job<ReminderFireJobData>) => {
         const { reminderId, ownerId, occurrenceDate, text, type } =
           job.attrs.data;
-        // F-2 (notifications) sustituirá este log por la emisión del
-        // evento hacia el cliente vía la interfaz pública de notifications.
         this.logger.log(
           `🔔 Recordatorio disparado: ${text} (${type}) reminderId=${reminderId} owner=${ownerId} ocurrencia=${occurrenceDate}`,
         );
+        // `notifications` escucha este evento para avisar al cliente por
+        // WebSocket; este dominio no conoce ni depende de ese transporte.
+        const payload: ReminderFiredEvent = {
+          reminderId,
+          ownerId,
+          occurrenceDate,
+          text,
+          type,
+        };
+        this.eventEmitter.emit(REMINDER_FIRED_EVENT, payload);
       },
     );
     await this.agenda.start();
