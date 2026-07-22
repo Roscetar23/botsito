@@ -5,7 +5,7 @@ import type { ReminderAlert } from './use-reminder-socket';
 import styles from './reminder-alerts.module.css';
 
 /** Vida del toast antes de autodescartarse (el usuario también puede cerrarlo). */
-const AUTO_DISMISS_MS = 8000;
+const AUTO_DISMISS_MS = 20000;
 
 /** Etiquetas en español del tipo; `otro` cubre cualquier valor no reconocido. */
 const TYPE_LABELS: Record<string, string> = {
@@ -34,7 +34,7 @@ interface ReminderAlertItemProps {
 
 /**
  * Un aviso: color del tipo (tokens `--rem-{tipo}` de `global.css`), texto y
- * cuándo llegó. Se autodescarta a los ~8s con un timer limpiable, o antes si
+ * cuándo llegó. Se autodescarta a los ~20s con un timer limpiable, o antes si
  * se pulsa cerrar.
  */
 export function ReminderAlertItem({ alert, onDismiss }: ReminderAlertItemProps) {

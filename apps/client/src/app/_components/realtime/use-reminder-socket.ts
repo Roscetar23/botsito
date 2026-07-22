@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { io, type Socket } from 'socket.io-client';
 import type { ReminderFiredEvent } from '@asistente/shared-types';
+import { playDing } from './play-ding';
 
 /** URL del gateway Socket.IO (mismo host que la API); fallback a :3001 en local. */
 const WS_URL = process.env.NEXT_PUBLIC_WS_URL ?? 'http://localhost:3001';
@@ -44,6 +45,7 @@ export function useReminderSocket(accessToken: string | null) {
     });
 
     socket.on('reminder', (payload: ReminderFiredEvent) => {
+      playDing();
       const firedAt = Date.now();
       setAlerts((prev) => [...prev, { ...payload, id: `${payload.reminderId}-${firedAt}`, firedAt }]);
       setLastFired(firedAt);
