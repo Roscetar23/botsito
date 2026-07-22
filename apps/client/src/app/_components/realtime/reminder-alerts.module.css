@@ -1,0 +1,70 @@
+/* Pila de toasts fija, por encima de cualquier vista (modal del calendario
+ * incluido, z-index:20) y del robot decorativo (z-index:30). `pointer-events`
+ * solo en `.toast`: la columna en sí no debe robar clics del contenido de
+ * debajo en los huecos entre avisos. */
+.stack {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  width: min(22rem, calc(100vw - 2rem));
+  pointer-events: none;
+}
+
+.toast {
+  pointer-events: auto;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  padding: 0.85rem 0.9rem;
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--toast-color, var(--rem-otro));
+  border-radius: var(--radius);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
+}
+
+.dot {
+  flex: 0 0 auto;
+  width: 0.6rem;
+  height: 0.6rem;
+  margin-top: 0.3rem;
+  border-radius: 50%;
+  background: var(--toast-color, var(--rem-otro));
+}
+
+.body {
+  flex: 1;
+  min-width: 0;
+}
+
+.text {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--text);
+  word-break: break-word;
+}
+
+.meta {
+  margin: 0.2rem 0 0;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.closeButton {
+  flex: 0 0 auto;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0.1rem 0.2rem;
+}
+
+.closeButton:hover {
+  color: var(--text);
+}

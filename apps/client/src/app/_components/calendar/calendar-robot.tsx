@@ -3,6 +3,7 @@
 import { Avatar3DLazy } from '../avatar-3d-lazy';
 import { ViewBoundary } from '../view-boundary';
 import type { PressHand, RobotTarget } from './use-robot-choreography';
+import { useReminderNotifyState } from './use-reminder-notify';
 import styles from './calendar.module.css';
 
 interface CalendarRobotProps {
@@ -64,9 +65,14 @@ const CAMERA_Z = 52;
  * su propio `ViewBoundary` con fallback silencioso: un fallo del WebGL aquí
  * nunca debe tumbar el calendario ni notarse. Por encima del modal
  * (`z-index` en `calendar.module.css`) para que el robot quede visible junto
- * al día mientras el modal está abierto.
+ * al día mientras el modal está abierto. Además reacciona en tiempo real:
+ * `useReminderNotifyState` pasa a `state="notify"` ~3s cuando llega un
+ * `'reminder'` por el socket (`RealtimeProvider`) y vuelve a `"idle"`; no
+ * interfiere con `target`/`pressTrigger` (la coreografía de viaje/toque).
  */
 export function CalendarRobot({ target, pressTrigger, pressHand, easeSpeed }: CalendarRobotProps) {
+  const notifyState = useReminderNotifyState();
+
   return (
     <div className={styles.robotLayer} aria-hidden="true">
       <ViewBoundary name="El robot del calendario" fallback={null}>
@@ -87,7 +93,7 @@ export function CalendarRobot({ target, pressTrigger, pressHand, easeSpeed }: Ca
           pressTrigger={pressTrigger}
           pressHand={pressHand}
           roamEaseSpeed={easeSpeed}
-          state="idle"
+          state={notifyState}
           playClip={false}
         />
       </ViewBoundary>
