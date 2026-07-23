@@ -25,8 +25,9 @@ export function TasksBoard() {
   async function handleQuickAdd(status: TaskStatus, title: string) {
     if (!accessToken) return;
     try {
-      await createTask({ title, status }, accessToken);
+      const created = await createTask({ title, status }, accessToken);
       refetch();
+      setSelected(created); // abre el modal para editarla al instante
     } catch (err) {
       console.error(
         'No se pudo crear la tarea',
