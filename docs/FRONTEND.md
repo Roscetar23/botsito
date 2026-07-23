@@ -147,13 +147,12 @@ Estado: `[ ]` pendiente · `[~]` en curso · `[x]` hecho.
       del día. **Conectada al backend de recordatorios**: crear/ver/editar/borrar, colores por tipo, y
       **disparo en tiempo real** (aviso in-app + ding + el robot reacciona). Ver §5.2 y
       [`BACKEND.md`](./BACKEND.md) (R-1…R-6).
-- [ ] **FE-7 — Vista Tareas (tablero de cards tipo Notion).** 🗂️ Una vista propia con un **tablero de
-      cards creadas por el usuario**, estilo **Notion**: cada card con **notas/texto**, **progreso**, y la
-      opción de **adjuntar recordatorios** que aparezcan en el **calendario** (enlaza **Tareas ↔
-      Reminders**), "y todo eso". **Base:** ya existe el dominio backend **Tasks** (`libs/tasks/**`, CRUD
-      contra Atlas) como punto de partida, pero su modelo actual (`title/description/status/priority/
-      dueDate`) seguramente hay que **extenderlo** (notas ricas, progreso, recordatorios enlazados).
-      **Pendiente — se diseña e implementa en una sesión aparte con más contexto.**
+- [x] **FE-7 — Vista Tareas (tablero de cards tipo Notion).** 🗂️ Vista propia (`/tareas`) con un
+      **tablero Kanban de 3 columnas por estado** (Por hacer / En progreso / Hecho). Cada card lleva
+      **notas** (reutiliza `description`), **barra de progreso** (0–100) y **prioridad** opcional; se
+      crean con **alta rápida** por columna y se editan/borran en un **modal**. Desde la card se
+      **adjuntan recordatorios** que quedan enlazados por `taskId` y **aparecen en el calendario**
+      (enlaza **Tareas ↔ Reminders**). **Hecho** (v1). Ver §5.3.
 
 ### 5.1 Fase FE-2 — Home (pantalla base) 🏠 — EN CURSO
 
@@ -236,6 +235,32 @@ servidor daría un HTML distinto al del cliente).
 - **Copy del dominio** en vez del de estudio de diseño ("Organiza tus recordatorios…", no "sesiones de diseño").
 - **Punto de la leyenda en azul terciario** (`--brand-accent`) en vez del verde del mockup: el verde no
   está en la identidad de marca (§4.1).
+
+### 5.3 Fase FE-7 — Vista Tareas (tablero Kanban) 🗂️ — HECHA (v1)
+
+Vista propia y autocontenida en `apps/client/src/app/_components/tasks/` (ruta `/tareas`, con
+`ViewBoundary` + carga diferida `ssr:false`, e item **"Tareas"** en la barra lateral). Sigue el mismo
+patrón que el calendario (cliente REST + hook con `refetch`, modal estilo `day-modal`).
+
+- **Tablero Kanban**: 3 columnas por `TaskStatus` (Por hacer / En progreso / Hecho) desde
+  `task-status.ts` (`TASK_COLUMNS`, `groupTasksByStatus`). Alta rápida por columna (solo título → crea
+  la card en ese estado).
+- **Card** (`task-card.tsx`): título, vista previa de las **notas** (reutiliza `description`), **barra
+  de progreso** (`progress` 0–100) y chip de **prioridad** opcional. Click → modal.
+- **Modal de edición** (`task-modal.tsx` + `task-form.tsx` + `task-form-fields.tsx`): título, notas,
+  progreso (`range` 0–100), estado (mueve de columna) y prioridad. Guardar = `PATCH`; borrar con
+  confirmación inline (patrón `ReminderRow`).
+- **Recordatorios enlazados** (`task-reminders.tsx` + `task-reminder-form.tsx`): desde la card se crean
+  recordatorios **puntuales** (`ReminderFrequency.Once`, `count 1`) con `taskId` fijo; se listan
+  filtrando por `taskId` y se borran. Como el calendario ya pinta **todos** los recordatorios, los
+  enlazados **aparecen allí solos**. Reutiliza (sin duplicar) `reminders-api`, `reminder-form-options`
+  y `reminder-type-style` del calendario → mismos colores/etiquetas por tipo.
+- **Backend**: `Task` ganó `progress?` (0–100) y `Reminder` ganó `taskId?` (`@IsMongoId`). El CRUD
+  genérico de `libs/tasks/**` no cambió. Ver [`BACKEND.md`](./BACKEND.md).
+
+**Pendiente (futuro):** al borrar una tarea, sus recordatorios enlazados quedan (sin cascada);
+notas ricas / drag&drop entre columnas; `min` de fecha "hoy" en el alta de recordatorio de la card
+(el calendario ya restringe días pasados, este mini-form aún no).
 
 ---
 
@@ -332,3 +357,7 @@ servidor daría un HTML distinto al del cliente).
 - 2026-07-22 — **FE-7 anotada — Vista Tareas (cards tipo Notion).** Visión registrada (tablero de cards del
   usuario con notas/progreso/recordatorios enlazados al calendario, Tareas↔Reminders); **se diseña e
   implementa en una sesión aparte con más contexto**. Ver §5 (FE-7).
+- 2026-07-23 — **FE-7 implementada (v1).** Tablero Kanban en `/tareas` (3 columnas por estado, alta
+  rápida, card con notas + progreso + prioridad, modal de edición/borrado) y **recordatorios enlazados**
+  desde la card (`taskId`) que aparecen en el calendario. Backend: `Task.progress` + `Reminder.taskId`.
+  Detalle en §5.3.

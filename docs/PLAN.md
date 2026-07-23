@@ -390,10 +390,10 @@ Estado: `[ ]` pendiente · `[~]` en curso · `[x]` hecho.
 - [x] **FE-6** **Calendario** — ruta `/calendario` (rejilla + modal del día), **conectada a reminders**:
   crear/ver/editar/borrar, colores por tipo, **disparo en tiempo real** (aviso + robot); no se crea en
   días pasados. Detalle en [`FRONTEND.md`](./FRONTEND.md) §5.2.
-- [ ] **FE-7** **Vista Tareas** 🗂️ — tablero de **cards tipo Notion** creadas por el usuario (notas,
-  progreso, **recordatorios adjuntos al calendario** → Tareas↔Reminders, "y todo eso"). Base: el dominio
-  backend **Tasks** (Fase 1, hecho) — a **extender** su modelo. **Se diseña/implementa en una sesión
-  aparte con más contexto.** Ver [`FRONTEND.md`](./FRONTEND.md) FE-7.
+- [x] **FE-7** **Vista Tareas** 🗂️ — tablero **Kanban** en `/tareas` (3 columnas por estado, alta rápida,
+  card con notas + progreso + prioridad, modal editar/borrar) y **recordatorios adjuntos** desde la card
+  (`taskId`) que **aparecen en el calendario** (Tareas↔Reminders). Backend: `Task.progress` +
+  `Reminder.taskId` (CRUD de Tasks sin cambios). Ver [`FRONTEND.md`](./FRONTEND.md) §5.3.
 - [ ] **FE-4/FE-5** marca (metadata/favicon) + responsive/accesibilidad.
 
 ### Fase 6 — NLU (opcional)
@@ -459,3 +459,7 @@ Estado: `[ ]` pendiente · `[~]` en curso · `[x]` hecho.
 - 2026-07-22 — Calendario cerrado (reminders + disparo + "ding" + no crear en días pasados). **FE-7 (Vista
   Tareas — cards tipo Notion) anotada** para una sesión aparte: cards del usuario con notas, progreso y
   recordatorios adjuntos al calendario (Tareas↔Reminders); base = dominio Tasks (Fase 1) a extender.
+- 2026-07-23 — **FE-7 implementada (v1).** Tablero Kanban `/tareas` (3 columnas por estado, alta rápida,
+  card con notas/progreso/prioridad, modal editar-borrar) + **recordatorios enlazados** desde la card
+  (`taskId`) que aparecen en el calendario. Backend: `Task.progress` + `Reminder.taskId`. En 6 partes
+  (backend modelo → API/hook → tablero → modal → recordatorios → docs). Detalle en `FRONTEND.md` §5.3.

@@ -176,3 +176,10 @@ Estado: `[ ]` pendiente · `[~]` en curso · `[x]` hecho.
 - 2026-07-22 — **R-6 pulido (cliente).** Al dispararse: un **"ding"** corto (Web Audio, sin archivo de
   audio) y el toast dura **~20s** (antes se iba rápido). Además, el calendario **no deja crear
   recordatorios en días pasados** (solo verlos/editarlos) — detalle en [`FRONTEND.md`](./FRONTEND.md) §5.2 C-4.
+- 2026-07-23 — **Base FE-7 (Vista Tareas).** Dos añadidos de modelo, sin tocar el CRUD:
+  **`Task.progress?`** (0–100: entity, DTOs `@IsInt @Min(0) @Max(100)`, schema `Number` min/max/default 0)
+  y **`Reminder.taskId?`** (`@IsMongoId`: entity, DTOs, schema indexado, mapper). Con `taskId`, la card de
+  una tarea crea recordatorios que **aparecen en el calendario** y se filtran por tarea. El disparo no
+  cambia (taskId es metadato). Pendiente: **cascada** al borrar una tarea (hoy sus reminders quedan
+  huérfanos) y endpoint `GET /reminders?taskId=` (el cliente filtra en memoria por ahora). UI en
+  [`FRONTEND.md`](./FRONTEND.md) §5.3.
