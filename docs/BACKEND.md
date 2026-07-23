@@ -173,3 +173,6 @@ Estado: `[ ]` pendiente · `[~]` en curso · `[x]` hecho.
   — arranque real verificado sin errores de DI. **F-3** cliente: `RealtimeProvider`/`useReminderSocket`
   (socket.io-client con el token), **toasts** app-wide y el **robot** del calendario pasa a `notify` al
   dispararse. Pendiente R-7+: voz + IA por prompts, y entrega offline. Detalle en §3.4/§4.
+- 2026-07-22 — **R-6 pulido (cliente).** Al dispararse: un **"ding"** corto (Web Audio, sin archivo de
+  audio) y el toast dura **~20s** (antes se iba rápido). Además, el calendario **no deja crear
+  recordatorios en días pasados** (solo verlos/editarlos) — detalle en [`FRONTEND.md`](./FRONTEND.md) §5.2 C-4.

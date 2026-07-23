@@ -387,9 +387,13 @@ Estado: `[ ]` pendiente · `[~]` en curso · `[x]` hecho.
   tareas, recordatorios, notificaciones y el avatar reactivo. **Se construye iterando** hasta
   completarla; detalle e iteraciones (H-0…H-4) en [`FRONTEND.md`](./FRONTEND.md) §5.1. **Prioritaria
   antes de retomar backend.**
-- [~] **FE-6** **Calendario** — ruta `/calendario` (rejilla del mes + modal del día) según el mockup
-  del usuario. Maqueta hecha con **datos de ejemplo**; conectarla exige construir antes **T-17/T-18**
-  (el dominio `reminders` es todavía scaffold). Detalle en [`FRONTEND.md`](./FRONTEND.md) §5.2.
+- [x] **FE-6** **Calendario** — ruta `/calendario` (rejilla + modal del día), **conectada a reminders**:
+  crear/ver/editar/borrar, colores por tipo, **disparo en tiempo real** (aviso + robot); no se crea en
+  días pasados. Detalle en [`FRONTEND.md`](./FRONTEND.md) §5.2.
+- [ ] **FE-7** **Vista Tareas** 🗂️ — tablero de **cards tipo Notion** creadas por el usuario (notas,
+  progreso, **recordatorios adjuntos al calendario** → Tareas↔Reminders, "y todo eso"). Base: el dominio
+  backend **Tasks** (Fase 1, hecho) — a **extender** su modelo. **Se diseña/implementa en una sesión
+  aparte con más contexto.** Ver [`FRONTEND.md`](./FRONTEND.md) FE-7.
 - [ ] **FE-4/FE-5** marca (metadata/favicon) + responsive/accesibilidad.
 
 ### Fase 6 — NLU (opcional)
@@ -452,3 +456,6 @@ Estado: `[ ]` pendiente · `[~]` en curso · `[x]` hecho.
   y **T-15/T-16/T-18 completadas**: Agenda dispara → evento de dominio → `NotificationsGateway` (Socket.IO,
   auth JWT) → cliente (`RealtimeProvider`) con aviso in-app + el robot reacciona. Detalle en BACKEND.md
   (R-5/R-6, F-1…F-3). Pendiente R-7+: voz + IA por prompts, y entrega offline.
+- 2026-07-22 — Calendario cerrado (reminders + disparo + "ding" + no crear en días pasados). **FE-7 (Vista
+  Tareas — cards tipo Notion) anotada** para una sesión aparte: cards del usuario con notas, progreso y
+  recordatorios adjuntos al calendario (Tareas↔Reminders); base = dominio Tasks (Fase 1) a extender.

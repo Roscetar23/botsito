@@ -143,9 +143,17 @@ Estado: `[ ]` pendiente · `[~]` en curso · `[x]` hecho.
       Logo sensible al tema (`Logotipo Final` oscuro / `LogoClaro` claro), **solo en el panel izquierdo**.
 - [ ] **FE-4 — Layout & marca.** `metadata` real (título/descr.), favicon, tipografía.
 - [ ] **FE-5 — Responsive + a11y pass.** Revisión de breakpoints, foco y contraste.
-- [~] **FE-6 — Vista Calendario.** Ruta `/calendario` con la rejilla del mes y el modal de la agenda
-      del día, según el mockup del usuario (`myDesign/Vistas/Calendario/`). **Maqueta hecha con datos
-      de ejemplo**; falta el backend (ver §5.2).
+- [x] **FE-6 — Vista Calendario.** Ruta `/calendario` con la rejilla del mes y el modal de la agenda
+      del día. **Conectada al backend de recordatorios**: crear/ver/editar/borrar, colores por tipo, y
+      **disparo en tiempo real** (aviso in-app + ding + el robot reacciona). Ver §5.2 y
+      [`BACKEND.md`](./BACKEND.md) (R-1…R-6).
+- [ ] **FE-7 — Vista Tareas (tablero de cards tipo Notion).** 🗂️ Una vista propia con un **tablero de
+      cards creadas por el usuario**, estilo **Notion**: cada card con **notas/texto**, **progreso**, y la
+      opción de **adjuntar recordatorios** que aparezcan en el **calendario** (enlaza **Tareas ↔
+      Reminders**), "y todo eso". **Base:** ya existe el dominio backend **Tasks** (`libs/tasks/**`, CRUD
+      contra Atlas) como punto de partida, pero su modelo actual (`title/description/status/priority/
+      dueDate`) seguramente hay que **extenderlo** (notas ricas, progreso, recordatorios enlazados).
+      **Pendiente — se diseña e implementa en una sesión aparte con más contexto.**
 
 ### 5.1 Fase FE-2 — Home (pantalla base) 🏠 — EN CURSO
 
@@ -189,6 +197,11 @@ servidor daría un HTML distinto al del cliente).
       **coreografía la interacción con el modal**: clicar un día → viaja a su celda → la "toca" → abre el
       modal; cerrar (X/"Cerrar") → viaja al botón → lo pulsa → cierra → vuelve al reposo. Capa
       **decorativa** que **nunca bloquea la UI**. Detalle completo abajo. **Hecho** (afinado con el usuario).
+- [x] **C-4 — Restricciones y avisos.** No se pueden **crear recordatorios en días pasados** (el día se
+      abre y se ve, pero "Crear recordatorio" queda deshabilitado; hoy y futuros sí — `CalendarDay.isPast`);
+      editar/borrar los existentes sigue disponible. Cuando un recordatorio **se dispara** a su hora
+      (BACKEND R-6): **aviso in-app** (toast ~20s) **+ un "ding"** (Web Audio, sin archivo) y el **robot**
+      del calendario reacciona (`notify`). **Hecho.**
 
 **C-3 en detalle — el robot del calendario** 🤖 (`_components/calendar/calendar-robot.tsx` +
 `use-robot-choreography.ts`; capacidades del avatar en [`AVATAR.md`](./AVATAR.md) AV-9)
@@ -312,3 +325,10 @@ servidor daría un HTML distinto al del cliente).
   **relee el hueso** al cambiar de mano — antes lo cacheaba y solo una mano se movía); **coreografía de
   cierre** simétrica a la de abrir (viaja al botón → pulsa → cierra → vuelve); **vuelta al reposo más
   lenta** (`roamEaseSpeed`). Detalle consolidado en §5.2 (C-3). Props del avatar en `AVATAR.md` (AV-9).
+- 2026-07-22 — **FE-6 · disparo, avisos y restricciones (C-4).** El aviso en tiempo real llega al cliente
+  (toast app-wide + el robot en `notify`; ver BACKEND F-3); se añade un **"ding"** al dispararse y el toast
+  dura ~20s. Y no se pueden **crear recordatorios en días pasados** (`CalendarDay.isPast`: el día se ve y
+  se editan/borran los existentes, pero no se crean; hoy no cuenta como pasado).
+- 2026-07-22 — **FE-7 anotada — Vista Tareas (cards tipo Notion).** Visión registrada (tablero de cards del
+  usuario con notas/progreso/recordatorios enlazados al calendario, Tareas↔Reminders); **se diseña e
+  implementa en una sesión aparte con más contexto**. Ver §5 (FE-7).
