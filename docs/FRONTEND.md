@@ -255,6 +255,12 @@ patrón que el calendario (cliente REST + hook con `refetch`, modal estilo `day-
   filtrando por `taskId` y se borran. Como el calendario ya pinta **todos** los recordatorios, los
   enlazados **aparecen allí solos**. Reutiliza (sin duplicar) `reminders-api`, `reminder-form-options`
   y `reminder-type-style` del calendario → mismos colores/etiquetas por tipo.
+- **Robot 3D** (`tasks-robot.tsx` + `use-tasks-robot.ts` + `robot-target.ts`): el mismo robot del
+  calendario (fov 15 / cameraZ 52, `faceCamera`, roam, reposo arriba-derecha) flota sobre el tablero.
+  Además **avanza cards olvidadas**: si el `progress` de una card va por delante de su columna
+  (`taskNeedsAdvance`: 0%→Por hacer, 1–99%→En progreso, 100%→Hecho), el robot viaja hasta ella, la
+  "empuja" y la mueve (`PATCH`). **Solo hacia adelante** (nunca retrocede una card colocada a mano).
+  Capa `.robotLayer` con `z-index 15` (sobre las cards, bajo el modal); `busyRef` evita solapes.
 - **Backend**: `Task` ganó `progress?` (0–100) y `Reminder` ganó `taskId?` (`@IsMongoId`). El CRUD
   genérico de `libs/tasks/**` no cambió. Ver [`BACKEND.md`](./BACKEND.md).
 
@@ -361,3 +367,7 @@ notas ricas / drag&drop entre columnas; `min` de fecha "hoy" en el alta de recor
   rápida, card con notas + progreso + prioridad, modal de edición/borrado) y **recordatorios enlazados**
   desde la card (`taskId`) que aparecen en el calendario. Backend: `Task.progress` + `Reminder.taskId`.
   Detalle en §5.3.
+- 2026-07-23 — **FE-7 pulido.** Modal **ancho de dos columnas** (edición | recordatorios) con scroll
+  interno; alta **solo en "Por hacer"**; **drag&drop** de cards entre columnas; **abrir el modal al
+  crear**; y el **robot 3D** en el tablero que **avanza las cards olvidadas** según su progreso
+  (mismo robot/encuadre que el calendario). Detalle en §5.3.
