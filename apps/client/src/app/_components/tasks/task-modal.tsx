@@ -49,20 +49,25 @@ export function TaskModal({ task, onClose, onChanged }: TaskModalProps) {
           </button>
         </header>
 
-        <TaskForm
-          task={task}
-          onSaved={() => {
-            onChanged();
-            onClose();
-          }}
-          onDeleted={() => {
-            onChanged();
-            onClose();
-          }}
-        />
+        <div className={styles.modalBody}>
+          <div className={styles.modalCol}>
+            <TaskForm
+              task={task}
+              onSaved={() => {
+                onChanged();
+                onClose();
+              }}
+              onDeleted={() => {
+                onChanged();
+                onClose();
+              }}
+            />
+          </div>
 
-        <hr className={styles.sectionDivider} />
-        <TaskReminders task={task} />
+          <div className={`${styles.modalCol} ${styles.modalColReminders}`}>
+            <TaskReminders task={task} />
+          </div>
+        </div>
       </div>
     </div>
   );
