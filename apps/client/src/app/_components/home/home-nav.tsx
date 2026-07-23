@@ -12,6 +12,7 @@ interface HomeNavProps {
 const ITEMS = [
   { href: '/', label: 'Inicio', icon: HomeIcon },
   { href: '/calendario', label: 'Calendario', icon: CalendarIcon },
+  { href: '/tareas', label: 'Tareas', icon: TasksIcon },
 ] as const;
 
 /**
@@ -80,6 +81,26 @@ function CalendarIcon() {
     >
       <rect x="3" y="5" width="18" height="16" rx="2" />
       <path d="M3 10h18M8 3v4M16 3v4" />
+    </svg>
+  );
+}
+
+function TasksIcon() {
+  return (
+    <svg
+      width="18"
+      height="18"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.7"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <rect x="3" y="4" width="5.5" height="16" rx="1.3" />
+      <rect x="9.5" y="4" width="5.5" height="10" rx="1.3" />
+      <rect x="16" y="4" width="5.5" height="13" rx="1.3" />
     </svg>
   );
 }

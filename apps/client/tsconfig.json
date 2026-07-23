@@ -57,6 +57,9 @@
       "path": "../../libs/auth/ui"
     },
     {
+      "path": "../../libs/tasks/model"
+    },
+    {
       "path": "../../libs/reminders/model"
     },
     {
