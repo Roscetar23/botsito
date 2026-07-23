@@ -3,7 +3,7 @@
 import { useAuth } from '@asistente/auth-ui';
 import { useState } from 'react';
 import type { Task, TaskStatus } from '@asistente/tasks-model';
-import { createTask, TasksApiError } from './tasks-api';
+import { createTask, updateTask, TasksApiError } from './tasks-api';
 import { TASK_COLUMNS, groupTasksByStatus } from './task-status';
 import { TaskModal } from './task-modal';
 import { TasksColumn } from './tasks-column';
@@ -35,6 +35,21 @@ export function TasksBoard() {
     }
   }
 
+  async function handleDropTask(status: TaskStatus, taskId: string) {
+    if (!accessToken) return;
+    const task = tasks.find((item) => item.id === taskId);
+    if (!task || task.status === status) return;
+    try {
+      await updateTask(taskId, { status }, accessToken);
+      refetch();
+    } catch (err) {
+      console.error(
+        'No se pudo mover la tarea',
+        err instanceof TasksApiError ? err.message : err,
+      );
+    }
+  }
+
   return (
     <section className={styles.view}>
       <header className={styles.pageHeader}>
@@ -56,6 +71,7 @@ export function TasksBoard() {
             tasks={grouped[meta.status]}
             onOpen={setSelected}
             onQuickAdd={handleQuickAdd}
+            onDropTask={handleDropTask}
           />
         ))}
       </div>

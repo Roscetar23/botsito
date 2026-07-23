@@ -81,6 +81,12 @@
   padding: 1rem;
 }
 
+/* Columna resaltada mientras se arrastra una card por encima (zona de soltado). */
+.columnDragOver {
+  border-color: var(--brand-accent);
+  background: color-mix(in srgb, var(--brand-accent) 10%, var(--bg-elev));
+}
+
 .columnHeader {
   display: flex;
   align-items: center;
@@ -127,7 +133,11 @@
   color: var(--text);
   font: inherit;
   text-align: left;
-  cursor: pointer;
+  cursor: grab;
+}
+
+.card:active {
+  cursor: grabbing;
 }
 
 .card:hover {

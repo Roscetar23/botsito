@@ -1,7 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import type { Task, TaskStatus } from '@asistente/tasks-model';
+import { TaskStatus } from '@asistente/tasks-model';
+import type { Task } from '@asistente/tasks-model';
 import { TaskCard } from './task-card';
 import type { TaskColumnMeta } from './task-status';
 import styles from './tasks.module.css';
@@ -11,15 +12,20 @@ interface TasksColumnProps {
   tasks: Task[];
   onOpen: (task: Task) => void;
   onQuickAdd: (status: TaskStatus, title: string) => void;
+  /** Suelta una card (por id) en esta columna → la mueve a `meta.status`. */
+  onDropTask: (status: TaskStatus, taskId: string) => void;
 }
 
 /**
- * Una columna del tablero: cabecera con el contador, la lista de cards y el
- * alta rápida al pie (solo título; el resto de campos se completan al abrir
- * la tarea, cuando exista el modal de edición).
+ * Una columna del tablero: cabecera con el contador, la lista de cards y
+ * (solo en "Por hacer") el alta rápida al pie. El flujo va siempre de Por
+ * hacer → Hecho, así que las tareas nacen en la primera columna. Es zona de
+ * soltado: arrastrar una card aquí la mueve a este estado.
  */
-export function TasksColumn({ meta, tasks, onOpen, onQuickAdd }: TasksColumnProps) {
+export function TasksColumn({ meta, tasks, onOpen, onQuickAdd, onDropTask }: TasksColumnProps) {
   const [draft, setDraft] = useState('');
+  const [dragOver, setDragOver] = useState(false);
+  const canAdd = meta.status === TaskStatus.Todo;
 
   function handleAdd() {
     const title = draft.trim();
@@ -28,8 +34,25 @@ export function TasksColumn({ meta, tasks, onOpen, onQuickAdd }: TasksColumnProp
     setDraft('');
   }
 
+  function handleDrop(event: React.DragEvent) {
+    event.preventDefault();
+    setDragOver(false);
+    const taskId = event.dataTransfer.getData('text/plain');
+    if (taskId) onDropTask(meta.status, taskId);
+  }
+
   return (
-    <section className={styles.column}>
+    <section
+      className={`${styles.column} ${dragOver ? styles.columnDragOver : ''}`.trim()}
+      onDragOver={(event) => {
+        event.preventDefault();
+        setDragOver(true);
+      }}
+      onDragLeave={(event) => {
+        if (!event.currentTarget.contains(event.relatedTarget as Node)) setDragOver(false);
+      }}
+      onDrop={handleDrop}
+    >
       <header className={styles.columnHeader}>
         <p className={styles.columnLabel}>{meta.label}</p>
         <span className={styles.columnCount}>{tasks.length}</span>
@@ -41,26 +64,28 @@ export function TasksColumn({ meta, tasks, onOpen, onQuickAdd }: TasksColumnProp
         ))}
       </div>
 
-      <div className={styles.quickAdd}>
-        <input
-          type="text"
-          className={styles.quickAddInput}
-          placeholder="Nueva tarea…"
-          value={draft}
-          onChange={(event) => setDraft(event.target.value)}
-          onKeyDown={(event) => {
-            if (event.key === 'Enter') handleAdd();
-          }}
-        />
-        <button
-          type="button"
-          className={styles.quickAddButton}
-          onClick={handleAdd}
-          aria-label="Añadir tarea"
-        >
-          +
-        </button>
-      </div>
+      {canAdd && (
+        <div className={styles.quickAdd}>
+          <input
+            type="text"
+            className={styles.quickAddInput}
+            placeholder="Nueva tarea…"
+            value={draft}
+            onChange={(event) => setDraft(event.target.value)}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter') handleAdd();
+            }}
+          />
+          <button
+            type="button"
+            className={styles.quickAddButton}
+            onClick={handleAdd}
+            aria-label="Añadir tarea"
+          >
+            +
+          </button>
+        </div>
+      )}
     </section>
   );
 }

@@ -18,13 +18,21 @@ function previewNotes(notes: string): string {
 
 /**
  * Card de una tarea: título, vista previa de las notas, barra de progreso y
- * chip de prioridad si la tiene. `onOpen` abre el modal de edición completa.
+ * chip de prioridad si la tiene. `onOpen` abre el modal de edición completa;
+ * arrastrarla (HTML5 drag) la mueve de columna (la lee el `onDrop` de la
+ * columna destino por su id).
  */
 export function TaskCard({ task, onOpen }: TaskCardProps) {
   const progress = Math.max(0, Math.min(100, task.progress ?? 0));
 
   return (
-    <button type="button" className={styles.card} onClick={() => onOpen(task)}>
+    <button
+      type="button"
+      className={styles.card}
+      draggable
+      onDragStart={(event) => event.dataTransfer.setData('text/plain', task.id)}
+      onClick={() => onOpen(task)}
+    >
       <div className={styles.cardHeaderRow}>
         <p className={styles.cardTitle}>{task.title}</p>
         {task.priority && (
