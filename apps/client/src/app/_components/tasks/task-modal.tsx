@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import type { Task } from '@asistente/tasks-model';
 import { TaskForm } from './task-form';
+import { TaskReminders } from './task-reminders';
 import styles from './tasks.module.css';
 
 interface TaskModalProps {
@@ -59,6 +60,9 @@ export function TaskModal({ task, onClose, onChanged }: TaskModalProps) {
             onClose();
           }}
         />
+
+        <hr className={styles.sectionDivider} />
+        <TaskReminders task={task} />
       </div>
     </div>
   );

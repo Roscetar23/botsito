@@ -481,6 +481,159 @@
   outline-offset: -2px;
 }
 
+/* ===== Recordatorios enlazados (dentro del modal de tarea) ===== */
+.sectionDivider {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 0;
+}
+
+.remindersSection {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+.remindersHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+}
+
+.sectionTitle {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.ghostAddButton {
+  padding: 0.35rem 0.6rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--brand-primary-bright);
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.ghostAddButton:hover {
+  background: color-mix(in srgb, var(--brand-primary) 14%, transparent);
+}
+
+.remindersEmpty {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+
+.reminderList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.reminderItem {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.6rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.reminderDate {
+  flex-shrink: 0;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.reminderTime {
+  flex-shrink: 0;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--brand-primary-bright);
+}
+
+.reminderText {
+  flex: 1;
+  min-width: 0;
+  font-size: 0.84rem;
+  color: var(--text);
+  overflow-wrap: anywhere;
+}
+
+.reminderDeleteButton {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.reminderDeleteButton:hover {
+  background: color-mix(in srgb, var(--danger) 14%, transparent);
+  color: var(--danger);
+}
+
+/* ===== Mini-formulario de alta de recordatorio ===== */
+.reminderForm {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  padding: 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.reminderFormRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.8rem;
+}
+
+.reminderFormFooter {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.6rem;
+}
+
+.ghostButton {
+  padding: 0.6rem 1rem;
+  border: none;
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--text-muted);
+  font: inherit;
+  font-size: 0.86rem;
+  cursor: pointer;
+}
+
+.ghostButton:hover {
+  color: var(--text);
+}
+
+/* ===== Foco visible (recordatorios) ===== */
+.ghostAddButton:focus-visible,
+.reminderDeleteButton:focus-visible,
+.ghostButton:focus-visible {
+  outline: 2px solid var(--brand-primary-bright);
+  outline-offset: -2px;
+}
+
 /* ===== Responsive ===== */
 @media (max-width: 720px) {
   .title {
