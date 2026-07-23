@@ -32,6 +32,8 @@ export interface CalendarDay {
   /** `false` en los días de relleno del mes anterior/siguiente. */
   inMonth: boolean;
   isToday: boolean;
+  /** Día anterior a hoy: se puede abrir/ver, pero no crear recordatorios. */
+  isPast: boolean;
 }
 
 /** Medianoche local: normaliza para comparar días sin que estorbe la hora. */
@@ -100,6 +102,9 @@ export function buildMonthGrid(cursor: Date, today: Date): CalendarDay[] {
       dayOfMonth: date.getDate(),
       inMonth: date.getMonth() === first.getMonth(),
       isToday: key === todayKey,
+      // `date` y `today` están a medianoche local, así que esto es "antes de
+      // hoy" (hoy no cuenta como pasado — sí se puede crear para más tarde).
+      isPast: date.getTime() < today.getTime(),
     };
   });
 }

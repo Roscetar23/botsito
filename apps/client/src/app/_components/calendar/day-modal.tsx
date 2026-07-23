@@ -86,6 +86,7 @@ export function DayModal({ day, reminders, onClose, onChanged }: DayModalProps) 
           <DayAgenda
             reminders={reminders}
             accessToken={accessToken}
+            canCreate={!day.isPast}
             onClose={onClose}
             onEdit={(target) => {
               setEditing(target);

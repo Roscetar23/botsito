@@ -7,6 +7,8 @@ import styles from './calendar.module.css';
 interface DayAgendaProps {
   reminders: Reminder[];
   accessToken: string | null;
+  /** `false` en días pasados: se ve la agenda pero no se puede crear. */
+  canCreate: boolean;
   onClose: (rect?: DOMRect) => void;
   onEdit: (reminder: Reminder) => void;
   onCreate: () => void;
@@ -17,13 +19,15 @@ interface DayAgendaProps {
  * Contenido del `DayModal` en modo agenda: la lista de recordatorios del día
  * (o el estado vacío) y el pie con "Cerrar" / "Crear recordatorio".
  */
-export function DayAgenda({ reminders, accessToken, onClose, onEdit, onCreate, onDeleted }: DayAgendaProps) {
+export function DayAgenda({ reminders, accessToken, canCreate, onClose, onEdit, onCreate, onDeleted }: DayAgendaProps) {
   return (
     <>
       {reminders.length === 0 ? (
         <div className={styles.emptyState}>
           <p className={styles.emptyTitle}>Aún no hay actividades.</p>
-          <p className={styles.emptyText}>Este día está libre. Puedes crear un recordatorio.</p>
+          <p className={styles.emptyText}>
+            {canCreate ? 'Este día está libre. Puedes crear un recordatorio.' : 'Este día ya pasó.'}
+          </p>
         </div>
       ) : (
         <ul className={styles.eventList}>
@@ -47,7 +51,13 @@ export function DayAgenda({ reminders, accessToken, onClose, onEdit, onCreate, o
         >
           Cerrar
         </button>
-        <button type="button" className={styles.primaryButton} onClick={onCreate}>
+        <button
+          type="button"
+          className={styles.primaryButton}
+          onClick={onCreate}
+          disabled={!canCreate}
+          title={canCreate ? undefined : 'No puedes crear recordatorios en días pasados'}
+        >
           <CalendarPlusIcon />
           Crear recordatorio
         </button>
