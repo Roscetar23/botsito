@@ -7,6 +7,8 @@ export interface Task {
   description?: string;
   status: TaskStatus;
   priority?: TaskPriority;
+  /** Porcentaje de avance 0–100. */
+  progress?: number;
   dueDate?: Date;
   ownerId: string;
   createdAt: Date;

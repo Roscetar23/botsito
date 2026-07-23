@@ -20,6 +20,9 @@ export class Task {
   @Prop({ type: String, enum: Object.values(TaskPriority) })
   priority?: TaskPriority;
 
+  @Prop({ type: Number, min: 0, max: 100, default: 0 })
+  progress?: number;
+
   @Prop({ type: Date })
   dueDate?: Date;
 

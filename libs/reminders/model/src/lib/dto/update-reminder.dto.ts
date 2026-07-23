@@ -1,6 +1,7 @@
 import {
   IsEnum,
   IsInt,
+  IsMongoId,
   IsOptional,
   IsString,
   Matches,
@@ -39,4 +40,8 @@ export class UpdateReminderDto {
   @Min(1)
   @Max(365)
   count?: number;
+
+  @IsOptional()
+  @IsMongoId()
+  taskId?: string;
 }

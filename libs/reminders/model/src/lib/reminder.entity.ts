@@ -12,6 +12,8 @@ export interface Reminder {
   time: string;
   frequency: ReminderFrequency;
   count: number;
+  /** Id de la Task a la que pertenece, si el recordatorio se creó desde una card. */
+  taskId?: string;
   createdAt: string;
   updatedAt: string;
 }

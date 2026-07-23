@@ -13,6 +13,7 @@ export function toReminderEntity(doc: ReminderDocument): Reminder {
     time: doc.time,
     frequency: doc.frequency,
     count: doc.count,
+    taskId: doc.taskId,
     createdAt: doc.createdAt.toISOString(),
     updatedAt: doc.updatedAt.toISOString(),
   };

@@ -51,16 +51,19 @@
   ],
   "references": [
     {
+      "path": "../../libs/shared/types"
+    },
+    {
       "path": "../../libs/auth/ui"
+    },
+    {
+      "path": "../../libs/reminders/model"
     },
     {
       "path": "../../libs/avatar/ui"
     },
     {
       "path": "../../libs/avatar/model"
-    },
-    {
-      "path": "../../libs/reminders/model"
     }
   ]
 }
