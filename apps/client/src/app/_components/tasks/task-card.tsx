@@ -1,20 +1,14 @@
 'use client';
 
-import { TaskPriority } from '@asistente/tasks-model';
 import type { Task } from '@asistente/tasks-model';
+import { PRIORITY_LABELS } from './task-status';
 import styles from './tasks.module.css';
 
 interface TaskCardProps {
   task: Task;
-  /** Abre la tarea (edición completa, aún no implementada). */
+  /** Abre el modal de edición completa de la tarea. */
   onOpen: (task: Task) => void;
 }
-
-const PRIORITY_LABELS: Record<TaskPriority, string> = {
-  [TaskPriority.Low]: 'Baja',
-  [TaskPriority.Medium]: 'Media',
-  [TaskPriority.High]: 'Alta',
-};
 
 /** Recorta las notas de la card para la vista previa (no rompe palabras). */
 function previewNotes(notes: string): string {
@@ -24,8 +18,7 @@ function previewNotes(notes: string): string {
 
 /**
  * Card de una tarea: título, vista previa de las notas, barra de progreso y
- * chip de prioridad si la tiene. `onOpen` deja el gancho listo para el modal
- * de edición completa (siguiente parte); aquí solo se conecta el click.
+ * chip de prioridad si la tiene. `onOpen` abre el modal de edición completa.
  */
 export function TaskCard({ task, onOpen }: TaskCardProps) {
   const progress = Math.max(0, Math.min(100, task.progress ?? 0));
