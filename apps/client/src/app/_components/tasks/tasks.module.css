@@ -1,10 +1,24 @@
 /* ===== Vista ===== */
 .view {
+  position: relative;
   flex: 1;
   min-width: 0;
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+}
+
+/* Robot decorativo: cubre toda la vista (cabecera + tablero) y queda POR
+ * DEBAJO del modal de edición (`.overlay`, z-index: 20) para no taparlo
+ * mientras está abierto. `.view` es `position:relative` sin `z-index`
+ * propio (no crea stacking context), así que ambas capas comparten el mismo
+ * contexto de apilamiento y este `z-index` manda. `pointer-events: none`
+ * para que las cards (arrastre incluido) sigan interactivas debajo. */
+.robotLayer {
+  position: absolute;
+  inset: 0;
+  z-index: 15;
+  pointer-events: none;
 }
 
 .loading {

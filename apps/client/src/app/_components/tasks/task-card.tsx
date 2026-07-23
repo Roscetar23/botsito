@@ -29,6 +29,7 @@ export function TaskCard({ task, onOpen }: TaskCardProps) {
     <button
       type="button"
       className={styles.card}
+      data-task-id={task.id}
       draggable
       onDragStart={(event) => event.dataTransfer.setData('text/plain', task.id)}
       onClick={() => onOpen(task)}

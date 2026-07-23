@@ -1,26 +1,41 @@
 'use client';
 
 import { useAuth } from '@asistente/auth-ui';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import type { Task, TaskStatus } from '@asistente/tasks-model';
 import { createTask, updateTask, TasksApiError } from './tasks-api';
 import { TASK_COLUMNS, groupTasksByStatus } from './task-status';
 import { TaskModal } from './task-modal';
 import { TasksColumn } from './tasks-column';
+import { TasksRobot } from './tasks-robot';
 import { useTasks } from './use-tasks';
+import { useTasksRobot } from './use-tasks-robot';
 import styles from './tasks.module.css';
 
 /**
  * Vista Tareas: cabecera de página + tablero Kanban de 3 columnas (Por
- * hacer / En progreso / Hecho). Módulo autocontenido (§2.1 de FRONTEND.md):
- * no conoce nada del resto de la Home. El enlace con recordatorios llega en
- * una parte siguiente.
+ * hacer / En progreso / Hecho), con el robot 3D flotando encima (mismo
+ * tamaño/encuadre que en el calendario): si el progreso de una card se
+ * adelanta a su columna, viaja hasta ella, la "empuja" y la mueve (ver
+ * `useTasksRobot`). Módulo autocontenido (§2.1 de FRONTEND.md): no conoce
+ * nada del resto de la Home. El enlace con recordatorios llega en una parte
+ * siguiente.
  */
 export function TasksBoard() {
   const { accessToken } = useAuth();
   const { tasks, loading, error, refetch } = useTasks();
   const [selected, setSelected] = useState<Task | null>(null);
   const grouped = groupTasksByStatus(tasks);
+
+  const advance = useCallback(
+    async (taskId: string, toStatus: TaskStatus) => {
+      if (!accessToken) return;
+      await updateTask(taskId, { status: toStatus }, accessToken);
+      refetch();
+    },
+    [accessToken, refetch],
+  );
+  const { boardRef, robotTarget, pressTrigger, pressHand, easeSpeed, robotState } = useTasksRobot(tasks, advance);
 
   async function handleQuickAdd(status: TaskStatus, title: string) {
     if (!accessToken) return;
@@ -52,7 +67,7 @@ export function TasksBoard() {
   }
 
   return (
-    <section className={styles.view}>
+    <section className={styles.view} ref={boardRef}>
       <header className={styles.pageHeader}>
         <div>
           <p className={styles.eyebrow}>Espacio de trabajo</p>
@@ -84,6 +99,14 @@ export function TasksBoard() {
           onChanged={refetch}
         />
       )}
+
+      <TasksRobot
+        target={robotTarget}
+        pressTrigger={pressTrigger}
+        pressHand={pressHand}
+        easeSpeed={easeSpeed}
+        state={robotState}
+      />
     </section>
   );
 }
